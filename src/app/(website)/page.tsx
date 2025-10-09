@@ -1,33 +1,112 @@
 "use client";
 import Image from "next/image";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Loader2 } from "lucide-react";
 
-export default function page() {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("submitted");
+type formData={
+  email: string;
+}
+export default function Page() {
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<formData>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  
+  const onSubmit = async (data: formData) => {
+    setIsLoading(true);
+    setErrorMessage(""); // Clear any previous errors
+    try {
+      const response = await fetch("/api/coming-soon", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        reset();
+        setIsSubmitted(true);
+      } else {
+        setErrorMessage(result.message || "Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setErrorMessage("Failed to subscribe. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <section className="min-h-screen w-full bg-background flex flex-col items-center justify-between pt-10 pb-5 px-10">
-      <h1 className="text-primary text-shadow-primary font-mont  text-4xl font-semibold text-center tracking-tighter">
+    <section className="min-h-screen w-full bg-background flex flex-col items-center justify-between pt-6 md:pt-10 pb-5 px-4 sm:px-6 md:px-10">
+      <h1 className="text-primary text-shadow-primary font-mont text-2xl sm:text-3xl md:text-4xl font-semibold text-center tracking-tighter">
         My Forex Firms
       </h1>
-      <div className=" flex flex-col items-center justify-center">
-        <Image src="/images/coming-soon/coming-bg.png" alt="coming soon" width={450} height={450} />
-        <p className="font-mont text-2xl font-semibold text-center mt-1 tracking-[44px] uppercase text-primary text-shadow-primary">Coming Soon</p>
+      <div className="flex flex-col items-center justify-center">
+        <Image 
+          src="/images/coming-soon/coming-bg.png" 
+          alt="coming soon" 
+          width={450} 
+          height={450}
+          className="w-[280px] sm:w-[350px] md:w-[450px] h-auto"
+        />
+        <p className="font-mont text-base sm:text-xl md:text-2xl font-semibold text-center mt-1 tracking-[16px] sm:tracking-[28px] md:tracking-[44px] uppercase text-primary text-shadow-primary">
+          Coming Soon
+        </p>
       </div>
 
-      <form className="flex flex-col items-center justify-center" onSubmit={handleSubmit}>
-        <p className="font-geist-sans text-2xl font-semibold text-center mt-2 text-foreground">
-          Get Notified When It’s <span className="text-primary">Live</span>
-        </p>
-        <div className="mt-5 flex items-center justify-center gap-3">
-          <input type="email" placeholder="Enter your email" className="input-field" required />
-          <button className="btn-grad">Get Notified</button>
-        </div>
+      <form className="flex flex-col items-center justify-center w-full max-w-2xl px-4" onSubmit={handleSubmit(onSubmit)}>
+        {isSubmitted ? (
+          <div className="text-center">
+            <p className="font-geist-sans text-xl sm:text-xl md:text-2xl font-semibold text-primary mb-2">
+              Thank You! 🎉
+            </p>
+            <p className="font-geist-sans text-sm sm:text-base text-foreground/80">
+              {/* Check your email for confirmation.  */}
+              We&apos;ll notify you when we launch!
+            </p>
+          </div>
+        ) : errorMessage ? (
+          <div className="text-center">
+            <p className="font-geist-sans text-xl sm:text-xl md:text-2xl font-semibold text-destructive mb-2">
+              Oops! ⚠️
+            </p>
+            <p className="font-geist-sans text-sm sm:text-base text-foreground/80 mb-4">
+              {errorMessage}
+            </p>
+            <button 
+              type="button" 
+              onClick={() => setErrorMessage("")} 
+              className="btn-grad px-6 py-2"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : (
+          <>
+            <p className="font-geist-sans text-lg sm:text-xl md:text-2xl font-semibold text-center mt-2 text-foreground">
+              Get Notified When {`It's`} <span className="text-primary">Live</span>
+            </p>
+            <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+              <input 
+                type="email" 
+                placeholder="Enter your email" 
+                className={`input-field w-full sm:w-auto ${errors.email ? "!border-destructive" : ""}`} 
+                {...register("email", { required: true })}
+              />
+              <button type="submit" className="btn-grad w-full sm:w-auto max-w-xs" disabled={isLoading}>
+                {isLoading ? <div className="flex items-center justify-center gap-1"> <Loader2 className="w-4 h-4 animate-spin" /> Sending...</div> : "Get Notified"}
+              </button>
+            </div>
+          </>
+        )}
       </form>
 
-      <footer className="flex flex-row items-center justify-center w-full gap-3">
+      <footer className="flex flex-col sm:flex-row items-center justify-center w-full gap-3 sm:gap-4 mt-8 sm:mt-0">
         <div className="flex items-center justify-center gap-3">
           <a href="https://www.facebook.com/myforexfirms" target="_blank" rel="noopener noreferrer">
             <Image src="/images/social-brands/instagram.png" alt="instagram" width={24} height={24} />
@@ -36,8 +115,10 @@ export default function page() {
             <Image src="/images/social-brands/twitter.png" alt="twitter" width={24} height={24} />
           </a>
         </div>
-        <div className="h-4 w-[1px] bg-foreground/20 mx-4"></div>
-        <p className="font-geist-sans text-xs font-light text-foreground/50">© 2025 My Forex Firms. All rights reserved.</p>
+        <div className="hidden sm:block h-4 w-[1px] bg-foreground/20 mx-4"></div>
+        <p className="font-geist-sans text-xs font-light text-foreground/50 text-center">
+          © 2025 My Forex Firms. All rights reserved.
+        </p>
       </footer>
     </section>
   );
