@@ -108,10 +108,10 @@ export default function Page() {
 
       <footer className="flex flex-col sm:flex-row items-center justify-center w-full gap-3 sm:gap-4 mt-8 sm:mt-0">
         <div className="flex items-center justify-center gap-3">
-          <a href="https://www.facebook.com/myforexfirms" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.instagram.com/myforexfirms?igsh=eWdydHMyNmN5aTFk" target="_blank" rel="noopener noreferrer">
             <Image src="/images/social-brands/instagram.png" alt="instagram" width={24} height={24} />
           </a>
-          <a href="https://www.instagram.com/myforexfirms" target="_blank" rel="noopener noreferrer">
+          <a href="https://x.com/Myforexfirms?t=sSgEgazE7haqqWME_vQ_yQ&s=09" target="_blank" rel="noopener noreferrer">
             <Image src="/images/social-brands/twitter.png" alt="twitter" width={24} height={24} />
           </a>
         </div>
