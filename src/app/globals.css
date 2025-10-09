@@ -1,1 +1,57 @@
 @import "tailwindcss";
+
+:root{
+  --font-inter: var(--font-inter);
+  --font-montserrat: var(--font-montserrat);
+  --font-geist-sans: var(--font-geist-sans);
+  --font-geist-mono: var(--font-geist-mono);
+
+  --primary: #F66435;
+  --background: #101111;
+  --foreground: #F4F4F1;
+  --destructive: #ef4444;
+  --destructive-foreground: #F4F4F1;
+  --grad-btn: linear-gradient(115deg, #F66435 0%, #672611 100%);
+  --grad-text: linear-gradient(90deg, #FFFFFF 0%, #999999 100%);
+  --success: #34d399;
+  --success-foreground: #F4F4F1;
+  --shadow-head: 0px 4px 4px rgba(255, 255, 255, 0.25);
+  --shadow-primary: 0px 4px 4px rgba(246, 100, 53, 0.30);
+}
+
+@theme inline{
+  --color-primary: var(--primary);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
+  --font-inter: var(--font-inter);
+  --font-mont: var(--font-montserrat);
+  --font-geist-sans: var(--font-geist-sans);
+  --font-geist-mono: var(--font-geist-mono);
+
+  --text-shadow-head: var(--shadow-head);
+  --text-shadow-primary: var(--shadow-primary);
+}
+
+.headline-grad{
+  background: var(--grad-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  text-shadow: var(--shadow-head);
+}
+
+@layer components{
+  .input-field{
+    @apply bg-foreground/5 w-full max-w-md py-[10px] px-6 font-geist-sans text-base font-light rounded-full border border-foreground/10 text-foreground outline-none focus:outline-none;
+  }
+  .btn-grad{
+    @apply px-4 py-[10px] rounded-full w-fit whitespace-nowrap font-geist-sans text-base font-medium tracking-tighter text-foreground;
+    background: var(--grad-btn);
+  }
+}
