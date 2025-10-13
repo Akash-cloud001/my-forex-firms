@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Upload, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
 
 interface StepProps {
   data: Record<string, unknown>;
@@ -32,6 +34,8 @@ interface StepProps {
 
 interface FirmInformationForm {
   firmName: string;
+  logoUrl: string;
+  logoFile: File | null;
   legalEntityName: string;
   registrationNumber: string;
   jurisdiction: string;
@@ -52,6 +56,8 @@ export default function FirmInformationStep({
   const form = useForm<FirmInformationForm>({
     defaultValues: {
       firmName: (data.firmName as string) || "",
+      logoUrl: (data.logoUrl as string) || "",
+      logoFile: null,
       legalEntityName: (data.legalEntityName as string) || "",
       registrationNumber: (data.registrationNumber as string) || "",
       jurisdiction: (data.jurisdiction as string) || "",
@@ -86,7 +92,83 @@ export default function FirmInformationStep({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col gap-6">
+
+                <FormField
+                  control={form.control}
+                  name="logoUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Firm Logo/Image</FormLabel>
+                      <FormControl>
+                        <div className="space-y-4">
+                          <FormField
+                            control={form.control}
+                            name="logoFile"
+                            render={({ field: fileField }) => (
+                              <div>
+                                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 hover:border-muted-foreground/50 transition-colors">
+                                  <div className="flex flex-row justify-center gap-4 items-center space-y-3">
+                                    <Upload className="h-10 w-10 text-muted-foreground" />
+                                    <div className="text-center">
+                                      <label htmlFor="logo-upload" className="cursor-pointer text-primary hover:text-primary/80 font-medium">
+                                        Click to upload
+                                      </label>
+                                      <input
+                                        id="logo-upload"
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                          const file = e.target.files?.[0] || null;
+                                          fileField.onChange(file);
+                                          if (file) {
+                                            form.setValue("logoUrl", "");
+                                          }
+                                        }}
+                                      />
+                                      <span className="text-muted-foreground"> or drag and drop</span>
+                                      <p className="text-xs text-muted-foreground">
+                                        PNG, JPG, GIF up to 10MB
+                                      </p>
+                                    </div>
+                                  </div>
+                                  {fileField.value && (
+                                    <div className="mt-4 flex items-center justify-between bg-muted p-3 rounded-md">
+                                      <div className="flex items-center space-x-2">
+                                        <div className="w-12 h-12 relative overflow-hidden bg-primary/10 rounded flex items-center justify-center">
+                                          {/* image preview */}
+                                          <Image src={URL.createObjectURL(fileField.value)} alt={fileField.value.name} className="w-full h-full object-cover" fill />
+                                        </div>
+                                        <span className="text-sm font-medium truncate">
+                                          {fileField.value.name}
+                                        </span>
+                                      </div>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          fileField.onChange(null);
+                                          const input = document.getElementById("logo-upload") as HTMLInputElement;
+                                          if (input) input.value = "";
+                                        }}
+                                        className="h-8 w-8 p-0"
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="firmName"
@@ -101,6 +183,9 @@ export default function FirmInformationStep({
                     </FormItem>
                   )}
                 />
+
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 <FormField
                   control={form.control}
@@ -224,7 +309,7 @@ export default function FirmInformationStep({
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="mt-6">
             <CardHeader>
               <CardTitle>Leadership & Contact</CardTitle>
               <CardDescription>

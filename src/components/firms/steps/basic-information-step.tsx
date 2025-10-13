@@ -31,7 +31,6 @@ interface StepProps {
 
 interface BasicInformationForm {
   firmName: string;
-  logoUrl?: string;
   foundedYear: string;
   country: string;
   headquarters: string;
@@ -61,7 +60,6 @@ export default function BasicInformationStep({
   const form = useForm<BasicInformationForm>({
     defaultValues: {
       firmName: (data.firmName as string) || "",
-      logoUrl: (data.logoUrl as string) || "",
       foundedYear: (data.foundedYear as string) || "",
       country: (data.country as string) || "",
       headquarters: (data.headquarters as string) || "",
@@ -109,26 +107,6 @@ export default function BasicInformationStep({
                   <FormControl>
                     <Input placeholder="e.g., FTMO" {...field} />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Logo URL */}
-            <FormField
-              control={form.control}
-              name="logoUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Logo URL</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="url"
-                      placeholder="https://example.com/logo.png"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>URL to the firm&apos;s logo image</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
