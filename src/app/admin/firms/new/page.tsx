@@ -5,24 +5,32 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
-import BasicInformationStep from "@/components/firms/steps/basic-information-step";
-import ChallengeTypesStep from "@/components/firms/steps/challenge-types-step";
-import RulesPoliciesStep from "@/components/firms/steps/rules-policies-step";
-import PayoutInsightsStep from "@/components/firms/steps/payout-insights-step";
-import AdditionalSpecsStep from "@/components/firms/steps/additional-specs-step";
+import FirmInformationStep from "@/components/firms/steps/firm-information-step";
+import SocialCommunicationStep from "@/components/firms/steps/social-communication-step";
+import TradingPlatformsStep from "@/components/firms/steps/trading-platforms-step";
+import PayoutFinancialStep from "@/components/firms/steps/payout-financial-step";
+import ChallengeInformationStep from "@/components/firms/steps/challenge-information-step";
+import TradingEnvironmentStep from "@/components/firms/steps/trading-environment-step";
+import PricingPromotionsStep from "@/components/firms/steps/pricing-promotions-step";
+import SupportOperationsStep from "@/components/firms/steps/support-operations-step";
+import TransparencyVerificationStep from "@/components/firms/steps/transparency-verification-step";
+import AdministrationAuditStep from "@/components/firms/steps/administration-audit-step";
 
 const steps = [
-  { id: 1, name: "Basic Information", component: BasicInformationStep },
-  { id: 2, name: "Challenge Types", component: ChallengeTypesStep },
-  { id: 3, name: "Rules & Policies", component: RulesPoliciesStep },
-  { id: 4, name: "Payout Insights", component: PayoutInsightsStep },
-  { id: 5, name: "Additional Specs", component: AdditionalSpecsStep },
+  { id: 1, name: "Firm Information", component: FirmInformationStep },
+  { id: 2, name: "Social & Communication", component: SocialCommunicationStep },
+  { id: 3, name: "Trading Platforms", component: TradingPlatformsStep },
+  { id: 4, name: "Payout & Financial", component: PayoutFinancialStep },
+  { id: 5, name: "Challenge Information", component: ChallengeInformationStep },
+  { id: 6, name: "Trading Environment", component: TradingEnvironmentStep },
+  { id: 7, name: "Pricing & Promotions", component: PricingPromotionsStep },
+  { id: 8, name: "Support & Operations", component: SupportOperationsStep },
+  { id: 9, name: "Transparency & Verification", component: TransparencyVerificationStep },
+  { id: 10, name: "Administration & Audit", component: AdministrationAuditStep },
 ];
 
 export default function NewFirm() {
-  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [formData, setFormData] = useState<Record<string, unknown>>({});
@@ -32,7 +40,7 @@ export default function NewFirm() {
   const handleStepComplete = (stepData: Record<string, unknown>) => {
     // Save step data
     setFormData((prev) => ({ ...prev, ...stepData }));
-    
+
     // Mark step as completed
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps((prev) => [...prev, currentStep]);
@@ -83,88 +91,76 @@ export default function NewFirm() {
         }
       />
 
-      {/* Stepper Navigation */}
-        <nav aria-label="Progress">
-          <ol className="flex items-center justify-between">
-            {steps.map((step, stepIdx) => (
-              <li
-                key={step.id}
-                className={`relative ${
-                  stepIdx !== steps.length - 1 ? "pr-8 sm:pr-20 flex-1" : ""
-                }`}
-              >
-                {/* Connector Line */}
-                {stepIdx !== steps.length - 1 && (
-                  <div
-                    className="absolute top-1/2 -translate-y-1/2 left-4 -ml-px mt-0.5 h-0.5 w-full"
-                    aria-hidden="true"
-                  >
-                    <div
-                      className={`h-full w-full ${
-                        completedSteps.includes(step.id) || currentStep > step.id
-                          ? "bg-primary"
-                          : "bg-muted"
-                      }`}
-                    />
-                  </div>
-                )}
+      <section className="grid grid-cols-12 gap-6">
+        {/* Form Step Content */}
+        <Card className="p-6 col-span-9">
+          {CurrentStepComponent && (
+            <CurrentStepComponent
+              data={formData}
+              onNext={handleStepComplete}
+              onPrevious={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
+              isFirstStep={currentStep === 1}
+              isLastStep={currentStep === steps.length}
+            />
+          )}
+        </Card>
 
-                <button
-                  onClick={() => setCurrentStep(step.id)}
-                  className="group relative flex items-center bg-background"
-                >
-                  <span className="flex items-center px-6 py-4 text-sm font-medium">
-                    <span
-                      className={`flex h-9 w-9 items-center justify-center rounded-full ${
-                        completedSteps.includes(step.id)
-                          ? "bg-primary"
-                          : currentStep === step.id
-                          ? "border-2 border-primary bg-background"
-                          : "border-2 border-muted bg-background"
-                      }`}
-                    >
-                      {completedSteps.includes(step.id) ? (
-                        <Check className="h-5 w-5 text-primary-foreground" />
-                      ) : (
-                        <span
-                          className={`${
+        {/* Stepper Navigation */}
+        <nav aria-label="Progress" className="col-span-3">
+          <Card className="p-4">
+            <h3 className="text-lg font-semibold">Form Progress</h3>
+            <ol className="space-y-3">
+              {steps.map((step) => (
+                <li key={step.id}>
+                  <button
+                    onClick={() => setCurrentStep(step.id)}
+                    className={`w-full text-left p-3 rounded-lg transition-colors ${
+                      currentStep === step.id
+                        ? "bg-primary text-primary-foreground"
+                        : completedSteps.includes(step.id)
+                        ? "bg-primary/10 text-primary border border-primary/20"
+                        : "bg-muted hover:bg-muted/80"
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <span
+                        className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
+                          completedSteps.includes(step.id)
+                            ? "bg-primary text-primary-foreground"
+                            : currentStep === step.id
+                            ? "bg-primary-foreground text-primary"
+                            : "bg-muted-foreground text-muted"
+                        }`}
+                      >
+                        {completedSteps.includes(step.id) ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          step.id
+                        )}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className={`text-sm font-medium ${
                             currentStep === step.id
+                              ? "text-primary-foreground"
+                              : completedSteps.includes(step.id)
                               ? "text-primary"
                               : "text-muted-foreground"
                           }`}
                         >
-                          {step.id}
-                        </span>
-                      )}
-                    </span>
-                    <span
-                      className={`ml-4 text-sm font-medium ${
-                        currentStep === step.id
-                          ? "text-foreground"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {step.name}
-                    </span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ol>
+                          {step.name}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </Card>
         </nav>
+      </section>
 
-      {/* Form Step Content */}
-      <Card className="p-6 w-full">
-        {CurrentStepComponent && (
-          <CurrentStepComponent
-            data={formData}
-            onNext={handleStepComplete}
-            onPrevious={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
-            isFirstStep={currentStep === 1}
-            isLastStep={currentStep === steps.length}
-          />
-        )}
-      </Card>
+
     </div>
   );
 }
