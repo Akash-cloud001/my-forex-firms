@@ -26,9 +26,6 @@ interface StepProps {
 interface TradingPlatformsForm {
   tradingPlatforms: string;
   dataFeedsLiquidityProviders: string;
-  averageExecutionLatency: string;
-  serverRegions: string;
-  platformIncidents12m: string;
 }
 
 export default function TradingPlatformsStep({
@@ -40,9 +37,6 @@ export default function TradingPlatformsStep({
     defaultValues: {
       tradingPlatforms: (data.tradingPlatforms as string) || "",
       dataFeedsLiquidityProviders: (data.dataFeedsLiquidityProviders as string) || "",
-      averageExecutionLatency: (data.averageExecutionLatency as string) || "",
-      serverRegions: (data.serverRegions as string) || "",
-      platformIncidents12m: (data.platformIncidents12m as string) || "",
     },
   });
 
@@ -104,79 +98,6 @@ export default function TradingPlatformsStep({
                     </FormControl>
                     <FormDescription>
                       List all liquidity providers and data sources
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance & Infrastructure</CardTitle>
-              <CardDescription>
-                Technical specifications and performance metrics
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="averageExecutionLatency"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Average Execution Latency</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="< 50ms or 10-30ms"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Typical order execution speed
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="serverRegions"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Server Regions</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="London, New York, Tokyo, etc."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Available server locations
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="platformIncidents12m"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Platform Incidents (12m)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Describe any major platform incidents in the last 12 months..."
-                        className="min-h-[100px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Document any significant downtime, technical issues, or incidents
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

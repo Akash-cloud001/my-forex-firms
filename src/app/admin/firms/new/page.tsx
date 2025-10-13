@@ -10,27 +10,23 @@ import { Check } from "lucide-react";
 import { useFirmFormStore } from "@/stores/firmFormStore";
 import { toast } from "sonner";
 import FirmInformationStep from "@/components/firms/steps/firm-information-step";
-import SocialCommunicationStep from "@/components/firms/steps/social-communication-step";
 import TradingPlatformsStep from "@/components/firms/steps/trading-platforms-step";
 import PayoutFinancialStep from "@/components/firms/steps/payout-financial-step";
 import ChallengeInformationStep from "@/components/firms/steps/challenge-information-step";
 import TradingEnvironmentStep from "@/components/firms/steps/trading-environment-step";
-import PricingPromotionsStep from "@/components/firms/steps/pricing-promotions-step";
 import SupportOperationsStep from "@/components/firms/steps/support-operations-step";
 import TransparencyVerificationStep from "@/components/firms/steps/transparency-verification-step";
 import AdministrationAuditStep from "@/components/firms/steps/administration-audit-step";
 
 const steps = [
   { id: 1, name: "Firm Information", component: FirmInformationStep },
-  { id: 2, name: "Social & Communication", component: SocialCommunicationStep },
-  { id: 3, name: "Trading Platforms", component: TradingPlatformsStep },
-  { id: 4, name: "Payout & Financial", component: PayoutFinancialStep },
-  { id: 5, name: "Challenge Information", component: ChallengeInformationStep },
-  { id: 6, name: "Trading Environment", component: TradingEnvironmentStep },
-  { id: 7, name: "Pricing & Promotions", component: PricingPromotionsStep },
-  { id: 8, name: "Support & Operations", component: SupportOperationsStep },
-  { id: 9, name: "Transparency & Verification", component: TransparencyVerificationStep },
-  { id: 10, name: "Administration & Audit", component: AdministrationAuditStep },
+  { id: 2, name: "Trading Platforms", component: TradingPlatformsStep },
+  { id: 3, name: "Payout & Financial", component: PayoutFinancialStep },
+  { id: 4, name: "Challenge Information", component: ChallengeInformationStep },
+  { id: 5, name: "Trading Environment", component: TradingEnvironmentStep },
+  { id: 6, name: "Support & Operations", component: SupportOperationsStep },
+  { id: 7, name: "Transparency & Verification", component: TransparencyVerificationStep },
+  { id: 8, name: "Administration & Audit", component: AdministrationAuditStep },
 ];
 
 export default function NewFirm() {

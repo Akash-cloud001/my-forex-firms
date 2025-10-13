@@ -19,26 +19,11 @@ interface FirmFormData {
   status?: 'active' | 'paused' | 'suspended' | 'closed';
   shortDescription?: string;
 
-  // Step 2: Social & Communication
-  twitterUrl?: string;
-  instagramUrl?: string;
-  linkedinUrl?: string;
-  youtubeUrl?: string;
-  discordInviteLink?: string;
-  telegramLink?: string;
-  statusTrustPageUrl?: string;
-  supportEmail?: string;
-  supportChatUrl?: string;
-  supportHours?: string;
-
-  // Step 3: Trading Platforms
+  // Step 2: Trading Platforms
   tradingPlatforms?: string;
   dataFeedsLiquidityProviders?: string;
-  averageExecutionLatency?: string;
-  serverRegions?: string;
-  platformIncidents12m?: string;
 
-  // Step 4: Payout & Financial
+  // Step 3: Payout & Financial
   profitSplit?: string;
   firstPayoutTiming?: string;
   regularPayoutCycle?: string;
@@ -52,7 +37,7 @@ interface FirmFormData {
   monthlyPayoutCounts?: string;
   payoutProofLinks?: string;
 
-  // Step 5: Challenge Information
+  // Step 4: Challenge Information
   challenges?: Array<{
     challengeName: string;
     challengeType: '1-step' | '2-step' | 'instant' | 'hybrid';
@@ -73,7 +58,7 @@ interface FirmFormData {
     termsLastUpdated?: string;
   }>;
 
-  // Step 6: Trading Environment
+  // Step 5: Trading Environment
   typicalSpreads?: string;
   commissions?: string;
   slippageSwapPolicies?: string;
@@ -93,21 +78,17 @@ interface FirmFormData {
   hedgingNotes?: string;
   scalpingNotes?: string;
 
-  // Step 7: Pricing & Promotions
-  priceTable?: string;
-  discountsCoupons?: string;
-  refundPolicy?: string;
-
-  // Step 8: Support & Operations
+  // Step 6: Support & Operations
   supportChannels?: string;
   averageFirstResponseTime?: string;
   averageResolutionTime?: string;
+  supportHours?: string;
   escalationPolicy?: string;
   kycRequirements?: string;
   restrictedCountries?: string;
   amlComplianceLink?: string;
 
-  // Step 9: Transparency & Verification
+  // Step 7: Transparency & Verification
   ceoPublic?: boolean;
   entityOfficeVerified?: boolean;
   termsPublicUpdated?: boolean;
@@ -115,7 +96,7 @@ interface FirmFormData {
   thirdPartyAudit?: boolean;
   transparencyNotes?: string;
 
-  // Step 10: Administration & Audit
+  // Step 8: Administration & Audit
   dataSource?: 'firm' | 'mff' | 'community';
   verifiedBy?: string;
   verificationDate?: string;
@@ -416,6 +397,6 @@ export const useFirmFormProgress = () => {
     isDraft,
     isSubmitting,
     lastSavedAt,
-    progressPercentage: (completedSteps.length / 10) * 100
+    progressPercentage: (completedSteps.length / 8) * 100
   };
 };

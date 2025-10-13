@@ -20,19 +20,7 @@ const LogoFileSchema = new Schema({
   mimeType: { type: String, required: true }
 }, { _id: false });
 
-// Social Media Schema
-const SocialMediaSchema = new Schema({
-  twitterUrl: { type: String, trim: true },
-  instagramUrl: { type: String, trim: true },
-  linkedinUrl: { type: String, trim: true },
-  youtubeUrl: { type: String, trim: true },
-  discordInviteLink: { type: String, trim: true },
-  telegramLink: { type: String, trim: true },
-  statusTrustPageUrl: { type: String, trim: true },
-  supportEmail: { type: String, trim: true, lowercase: true },
-  supportChatUrl: { type: String, trim: true },
-  supportHours: { type: String, trim: true }
-}, { _id: false });
+// Social Media Schema (removed - no longer used)
 
 // Trading Infrastructure Schema
 const TradingInfrastructureSchema = new Schema({
@@ -45,10 +33,7 @@ const TradingInfrastructureSchema = new Schema({
     type: String, 
     required: true, 
     trim: true 
-  }],
-  averageExecutionLatency: { type: String, trim: true },
-  serverRegions: [{ type: String, trim: true }],
-  platformIncidents12m: { type: String, trim: true }
+  }]
 }, { _id: false });
 
 // Payout Financial Schema
@@ -124,12 +109,7 @@ const ChallengeTypeSchema = new Schema({
   termsLastUpdated: { type: Date }
 }, { _id: false });
 
-// Pricing Promotions Schema
-const PricingPromotionsSchema = new Schema({
-  priceTable: { type: String, required: true, trim: true },
-  discountsCoupons: { type: String, trim: true },
-  refundPolicy: { type: String, required: true, trim: true }
-}, { _id: false });
+// Pricing Promotions Schema (removed - no longer used)
 
 // Support Operations Schema
 const SupportOperationsSchema = new Schema({
@@ -140,6 +120,7 @@ const SupportOperationsSchema = new Schema({
   }],
   averageFirstResponseTime: { type: String, trim: true },
   averageResolutionTime: { type: String, trim: true },
+  supportHours: { type: String, trim: true },
   escalationPolicy: { type: String, trim: true },
   kycRequirements: { type: String, trim: true },
   restrictedCountries: [{ type: String, trim: true }],
@@ -266,12 +247,10 @@ const FirmSchema = new Schema({
   },
 
   // Nested Schemas (Best Practice: Reference sub-schemas)
-  socialMedia: { type: SocialMediaSchema },
   tradingInfrastructure: { type: TradingInfrastructureSchema },
   payoutFinancial: { type: PayoutFinancialSchema },
   challenges: { type: [ChallengeTypeSchema], default: [] },
   tradingEnvironment: { type: TradingEnvironmentSchema },
-  pricingPromotions: { type: PricingPromotionsSchema },
   supportOperations: { type: SupportOperationsSchema },
   transparencyVerification: { type: TransparencyVerificationSchema },
   administrationAudit: { type: AdministrationAuditSchema },
@@ -543,25 +522,11 @@ export interface IChallengeType {
   termsLastUpdated?: Date;
 }
 
-export interface ISocialMedia {
-  twitterUrl?: string;
-  instagramUrl?: string;
-  linkedinUrl?: string;
-  youtubeUrl?: string;
-  discordInviteLink?: string;
-  telegramLink?: string;
-  statusTrustPageUrl?: string;
-  supportEmail?: string;
-  supportChatUrl?: string;
-  supportHours?: string;
-}
+// ISocialMedia interface removed - no longer used
 
 export interface ITradingInfrastructure {
   tradingPlatforms: string[];
   dataFeedsLiquidityProviders: string[];
-  averageExecutionLatency?: string;
-  serverRegions?: string[];
-  platformIncidents12m?: string;
 }
 
 export interface IPayoutFinancial {
@@ -608,16 +573,13 @@ export interface ITradingEnvironment {
   ruleDetails?: IRuleDetails;
 }
 
-export interface IPricingPromotions {
-  priceTable: string;
-  discountsCoupons?: string;
-  refundPolicy: string;
-}
+// IPricingPromotions interface removed - no longer used
 
 export interface ISupportOperations {
   supportChannels: string[];
   averageFirstResponseTime?: string;
   averageResolutionTime?: string;
+  supportHours?: string;
   escalationPolicy?: string;
   kycRequirements?: string;
   restrictedCountries?: string[];
@@ -663,12 +625,10 @@ export interface IFirm extends Document {
   shortDescription: string;
   
   // Nested Objects
-  socialMedia?: ISocialMedia;
   tradingInfrastructure?: ITradingInfrastructure;
   payoutFinancial?: IPayoutFinancial;
   challenges?: IChallengeType[];
   tradingEnvironment?: ITradingEnvironment;
-  pricingPromotions?: IPricingPromotions;
   supportOperations?: ISupportOperations;
   transparencyVerification?: ITransparencyVerification;
   administrationAudit?: IAdministrationAudit;
@@ -698,7 +658,7 @@ export interface IFirm extends Document {
 
 export type FirmCreateInput = Omit<IFirm, '_id' | 'createdAt' | 'updatedAt' | 'version' | 'fullName'>;
 export type FirmUpdateInput = Partial<Omit<IFirm, '_id' | 'createdAt' | 'updatedAt' | 'version' | 'fullName'>>;
-export type FirmPublicData = Pick<IFirm, 'firmName' | 'logoUrl' | 'logoFile' | 'legalEntityName' | 'jurisdiction' | 'yearFounded' | 'officialWebsite' | 'status' | 'shortDescription' | 'socialMedia' | 'tradingInfrastructure' | 'payoutFinancial' | 'challenges' | 'tradingEnvironment' | 'pricingPromotions' | 'supportOperations' | 'transparencyVerification'>;
+export type FirmPublicData = Pick<IFirm, 'firmName' | 'logoUrl' | 'logoFile' | 'legalEntityName' | 'jurisdiction' | 'yearFounded' | 'officialWebsite' | 'status' | 'shortDescription' | 'tradingInfrastructure' | 'payoutFinancial' | 'challenges' | 'tradingEnvironment' | 'supportOperations' | 'transparencyVerification'>;
 
 // Create and export the model
 const Firm = mongoose.models.Firm || mongoose.model<IFirm>('Firm', FirmSchema);

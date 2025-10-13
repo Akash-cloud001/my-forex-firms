@@ -27,6 +27,7 @@ interface SupportOperationsForm {
   supportChannels: string;
   averageFirstResponseTime: string;
   averageResolutionTime: string;
+  supportHours: string;
   escalationPolicy: string;
   kycRequirements: string;
   restrictedCountries: string;
@@ -43,6 +44,7 @@ export default function SupportOperationsStep({
       supportChannels: (data.supportChannels as string) || "",
       averageFirstResponseTime: (data.averageFirstResponseTime as string) || "",
       averageResolutionTime: (data.averageResolutionTime as string) || "",
+      supportHours: (data.supportHours as string) || "",
       escalationPolicy: (data.escalationPolicy as string) || "",
       kycRequirements: (data.kycRequirements as string) || "",
       restrictedCountries: (data.restrictedCountries as string) || "",
@@ -115,6 +117,20 @@ export default function SupportOperationsStep({
                       <FormLabel>Average Resolution Time</FormLabel>
                       <FormControl>
                         <Input placeholder="< 24 hours" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="supportHours"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Support Hours</FormLabel>
+                      <FormControl>
+                        <Input placeholder="24/7, Mon-Fri 9AM-6PM, etc." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
