@@ -30,6 +30,7 @@ import {
   ShieldAlert,
   Link2,
   ChevronDown,
+  Mail,
 } from "lucide-react";
 
 const navigationItems = [
@@ -63,6 +64,12 @@ const navigationItems = [
     icon: Link2,
     hasSubmenu: false,
   },
+  {
+    title: "Newsletter",
+    url: "/admin/newsletter",
+    icon: Mail,
+    hasSubmenu: false,
+  },  
 ];
 
 export default function AppSidebar() {
