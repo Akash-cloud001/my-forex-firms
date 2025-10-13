@@ -1,46 +1,47 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import type { Mongoose } from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI!;
-const MONGODB_URI_NAME = process.env.MONGODB_URI_NAME || "myforexfirms";
 
 if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable");
+  throw new Error('Please define the MONGODB_URI environment variable');
 }
 
-interface MongooseCache {
-  conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
+// Global mongoose cache
+declare global {
+  var mongoose: {
+    conn: Mongoose | null;
+    promise: Promise<Mongoose> | null;
+  } | undefined;
 }
 
-// Initialize cache
-if (!global.mongoose) {
-  global.mongoose = { conn: null, promise: null };
-}
+let cached = global.mongoose;
 
-const cached = global.mongoose as MongooseCache;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 
 async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
+  if (cached!.conn) {
+    return cached!.conn;
   }
 
-  if (!cached.promise) {
+  if (!cached!.promise) {
     const opts = {
       bufferCommands: false,
-      dbName: MONGODB_URI_NAME,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts);
+    cached!.promise = mongoose.connect(MONGODB_URI, opts);
   }
 
   try {
-    cached.conn = await cached.promise;
+    cached!.conn = await cached!.promise;
   } catch (e) {
-    cached.promise = null;
+    cached!.promise = null;
     throw e;
   }
 
-  return cached.conn;
+  return cached!.conn;
 }
 
 export default connectDB;

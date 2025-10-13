@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { useFirmFormStore } from "@/stores/firmFormStore";
+import { toast } from "sonner";
 import FirmInformationStep from "@/components/firms/steps/firm-information-step";
 import SocialCommunicationStep from "@/components/firms/steps/social-communication-step";
 import TradingPlatformsStep from "@/components/firms/steps/trading-platforms-step";
@@ -31,48 +34,52 @@ const steps = [
 ];
 
 export default function NewFirm() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [formData, setFormData] = useState<Record<string, unknown>>({});
+  const router = useRouter();
+  const {
+    currentStep,
+    completedSteps,
+    formData,
+    isSubmitting,
+    setCurrentStep,
+    updateStepData,
+    markStepCompleted,
+    saveDraft,
+    submitForm,
+    clearErrors
+  } = useFirmFormStore();
 
   const CurrentStepComponent = steps.find((s) => s.id === currentStep)?.component;
 
-  const handleStepComplete = (stepData: Record<string, unknown>) => {
-    // Save step data
-    setFormData((prev) => ({ ...prev, ...stepData }));
-
-    // Mark step as completed
-    if (!completedSteps.includes(currentStep)) {
-      setCompletedSteps((prev) => [...prev, currentStep]);
-    }
-
-    // Move to next step or finish
+  const handleStepComplete = async (stepData: Record<string, unknown>) => {
+    updateStepData(stepData);
+    markStepCompleted(currentStep);
+    
     if (currentStep < steps.length) {
-      setCurrentStep((prev) => prev + 1);
+      setCurrentStep(currentStep + 1);
     } else {
-      // Final submission
-      handleFinalSubmit();
-    }
-  };
-
-  const handleFinalSubmit = async () => {
-    try {
-      // TODO: Submit all form data to API
-      console.log("Final form data:", formData);
-      // router.push("/admin/firms");
-    } catch (error) {
-      console.error("Error submitting form:", error);
+      const result = await submitForm();
+      if (result.success) {
+        toast.success('Firm created successfully!');
+        router.push('/admin/firms');
+      } else {
+        toast.error(result.error || 'Failed to create firm');
+      }
     }
   };
 
   const handleSaveDraft = async () => {
-    try {
-      // TODO: Save current progress as draft
-      console.log("Saving draft:", formData);
-    } catch (error) {
-      console.error("Error saving draft:", error);
+    const result = await saveDraft();
+    if (result.success) {
+      toast.success('Draft saved successfully');
+    } else {
+      toast.error(result.error || 'Failed to save draft');
     }
   };
+
+  // Clear errors when component mounts
+  useEffect(() => {
+    clearErrors();
+  }, [clearErrors]);
 
   return (
     <div className="p-6 space-y-6 ">
@@ -81,8 +88,12 @@ export default function NewFirm() {
         description="Create a new forex firm profile with all required information."
         actions={
           <div className="flex gap-2">
-            <Button variant="outline" onClick={handleSaveDraft}>
-              Save Draft
+            <Button 
+              variant="outline" 
+              onClick={handleSaveDraft}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Draft'}
             </Button>
             <Button variant="outline" asChild>
               <Link href="/admin/firms">Cancel</Link>
@@ -98,7 +109,7 @@ export default function NewFirm() {
             <CurrentStepComponent
               data={formData}
               onNext={handleStepComplete}
-              onPrevious={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
+              onPrevious={() => setCurrentStep(Math.max(1, currentStep - 1))}
               isFirstStep={currentStep === 1}
               isLastStep={currentStep === steps.length}
             />

@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, no-var */
-import mongoose from "mongoose";
+import type { Mongoose } from 'mongoose';
 
 declare global {
   var mongoose:
     | {
-        conn: typeof mongoose | null;
-        promise: Promise<typeof mongoose> | null;
+        conn: Mongoose | null;
+        promise: Promise<Mongoose> | null;
       }
     | undefined;
 }

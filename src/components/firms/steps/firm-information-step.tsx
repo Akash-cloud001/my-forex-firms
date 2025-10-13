@@ -1,7 +1,9 @@
 "use client";
 
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useFirmFormStore } from "@/stores/firmFormStore";
 import {
   Form,
   FormControl,
@@ -46,32 +48,54 @@ interface FirmInformationForm {
   officialWebsite: string;
   status: "active" | "paused" | "suspended" | "closed";
   shortDescription: string;
+  [key: string]: unknown;
 }
 
 export default function FirmInformationStep({
-  data,
   onNext,
   isFirstStep,
 }: StepProps) {
+  const { formData, updateStepData } = useFirmFormStore();
+  
   const form = useForm<FirmInformationForm>({
     defaultValues: {
-      firmName: (data.firmName as string) || "",
-      logoUrl: (data.logoUrl as string) || "",
-      logoFile: null,
-      legalEntityName: (data.legalEntityName as string) || "",
-      registrationNumber: (data.registrationNumber as string) || "",
-      jurisdiction: (data.jurisdiction as string) || "",
-      yearFounded: (data.yearFounded as string) || "",
-      headquartersAddress: (data.headquartersAddress as string) || "",
-      ceoFounderName: (data.ceoFounderName as string) || "",
-      leadershipLinks: (data.leadershipLinks as string) || "",
-      officialWebsite: (data.officialWebsite as string) || "",
-      status: (data.status as "active" | "paused" | "suspended" | "closed") || "active",
-      shortDescription: (data.shortDescription as string) || "",
+      firmName: formData.firmName || "",
+      logoUrl: formData.logoUrl || "",
+      logoFile: formData.logoFile || null,
+      legalEntityName: formData.legalEntityName || "",
+      registrationNumber: formData.registrationNumber || "",
+      jurisdiction: formData.jurisdiction || "",
+      yearFounded: formData.yearFounded || "",
+      headquartersAddress: formData.headquartersAddress || "",
+      ceoFounderName: formData.ceoFounderName || "",
+      leadershipLinks: formData.leadershipLinks || "",
+      officialWebsite: formData.officialWebsite || "",
+      status: formData.status || "active",
+      shortDescription: formData.shortDescription || "",
     },
   });
 
+  // Update form when store data changes
+  useEffect(() => {
+    form.reset({
+      firmName: formData.firmName || "",
+      logoUrl: formData.logoUrl || "",
+      logoFile: formData.logoFile || null,
+      legalEntityName: formData.legalEntityName || "",
+      registrationNumber: formData.registrationNumber || "",
+      jurisdiction: formData.jurisdiction || "",
+      yearFounded: formData.yearFounded || "",
+      headquartersAddress: formData.headquartersAddress || "",
+      ceoFounderName: formData.ceoFounderName || "",
+      leadershipLinks: formData.leadershipLinks || "",
+      officialWebsite: formData.officialWebsite || "",
+      status: formData.status || "active",
+      shortDescription: formData.shortDescription || "",
+    });
+  }, [formData, form]);
+
   const onSubmit = (formData: FirmInformationForm) => {
+    updateStepData(formData);
     onNext(formData as unknown as Record<string, unknown>);
   };
 
@@ -97,7 +121,7 @@ export default function FirmInformationStep({
                 <FormField
                   control={form.control}
                   name="logoUrl"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Firm Logo/Image</FormLabel>
                       <FormControl>

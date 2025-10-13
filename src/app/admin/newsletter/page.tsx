@@ -75,7 +75,7 @@ export default function AdminNewsletter() {
   });
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [deleting, setDeleting] = useState(false);
