@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Firm from '@/models/Firm';
+import { uploadFileToBunnyCDN } from '@/lib/bunnycdn';
 
 // Type for form data processing
 interface FormDataRecord {
@@ -102,41 +103,52 @@ export async function POST(request: NextRequest) {
     
     const contentType = request.headers.get('content-type');
     let firmData: FormDataRecord = {};
+    let logoFile: File | null = null;
     
-    if (contentType?.includes('application/json')) {
-      // Handle JSON data
-      firmData = await request.json();
-    } else {
-      // Handle form data
+    if (contentType?.includes('multipart/form-data')) {
+      // Handle FormData (with file upload)
       const formData = await request.formData();
       
-      // Process form data
       for (const [key, value] of formData.entries()) {
         if (key === 'logoFile' && value instanceof File) {
-          // Handle file upload - for now, store file info
-          firmData.logoFile = {
-            filename: value.name,
-            size: value.size,
-            mimeType: value.type,
-            url: '' // Will be set after upload to cloud storage
-          };
-        } else if (key === 'challenges' && typeof value === 'string') {
-          // Parse JSON fields
+          logoFile = value;
+        } else if (typeof value === 'string') {
           try {
             firmData[key] = JSON.parse(value);
           } catch {
             firmData[key] = value;
           }
-        } else if (typeof value === 'string' && (value === 'true' || value === 'false')) {
-          // Convert string booleans
-          firmData[key] = value === 'true';
-        } else if (typeof value === 'string' && !isNaN(Number(value)) && key.includes('year')) {
-          // Convert year fields to numbers
-          firmData[key] = parseInt(value);
-        } else {
-          firmData[key] = value;
         }
       }
+    } else {
+      // Handle JSON data
+      firmData = await request.json();
+    }
+    
+    // Handle logo file upload to BunnyCDN
+    if (logoFile) {
+      try {
+        const fileBuffer = Buffer.from(await logoFile.arrayBuffer());
+        const bunnyFile = await uploadFileToBunnyCDN(
+          fileBuffer,
+          logoFile.name,
+          logoFile.type,
+          'firm-logos'
+        );
+
+        firmData.logoUrl = bunnyFile.url;
+        firmData.logoFile = bunnyFile;
+      } catch (error) {
+        console.error('Error uploading logo to BunnyCDN:', error);
+        return NextResponse.json(
+          { error: 'Failed to upload logo file' },
+          { status: 500 }
+        );
+      }
+    } else {
+      // Ensure logoUrl is empty string if no logo file
+      firmData.logoUrl = '';
+      firmData.logoFile = null;
     }
     
     // Set system fields

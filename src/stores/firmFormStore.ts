@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 // Types based on the form structure
 interface FirmFormData {
@@ -121,16 +120,16 @@ interface FirmFormState {
   markStepCompleted: (step: number) => void;
   markStepIncomplete: (step: number) => void;
   saveDraft: () => Promise<{ success: boolean; error?: string }>;
+  autoSaveDraft: () => Promise<{ success: boolean; error?: string; firmId?: string }>;
   submitForm: () => Promise<{ success: boolean; error?: string; firmId?: string }>;
   resetForm: () => void;
+  loadFromLocalStorage: () => boolean;
   setErrors: (errors: Record<string, string[]>) => void;
   clearErrors: () => void;
   loadDraft: (draftId: string) => Promise<{ success: boolean; error?: string }>;
 }
 
-export const useFirmFormStore = create<FirmFormState>()(
-  persist(
-    (set, get) => ({
+export const useFirmFormStore = create<FirmFormState>()((set, get) => ({
       // Initial State
       currentStep: 1,
       completedSteps: [],
@@ -227,6 +226,41 @@ export const useFirmFormStore = create<FirmFormState>()(
           set({ isSubmitting: false });
         }
       },
+
+      autoSaveDraft: async () => {
+        const { formData, currentStep, completedSteps } = get();
+        set({ isSubmitting: true, errors: {} });
+        
+        try {
+          // Save to local storage instead of server
+          const draftData = {
+            formData,
+            currentStep,
+            completedSteps,
+            timestamp: Date.now(),
+            isDraft: true
+          };
+
+          // Store in local storage
+          localStorage.setItem('firmFormDraft', JSON.stringify(draftData));
+          
+          set({ 
+            isDraft: true,
+            lastSavedAt: new Date()
+          });
+
+          console.log('Draft saved to local storage');
+          return { success: true };
+        } catch (error) {
+          console.error('Error auto-saving draft:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to auto-save draft' 
+          };
+        } finally {
+          set({ isSubmitting: false });
+        }
+      },
       
       submitForm: async () => {
         const { formData } = get();
@@ -252,6 +286,7 @@ export const useFirmFormStore = create<FirmFormState>()(
           });
 
           formDataToSend.append('isDraft', 'false');
+          formDataToSend.append('isPublished', 'false');
 
           const response = await fetch('/api/firms', {
             method: 'POST',
@@ -264,9 +299,19 @@ export const useFirmFormStore = create<FirmFormState>()(
           }
 
           const result = await response.json();
-          set({ 
+          
+          // Clear local storage after successful submission
+          localStorage.removeItem('firmFormDraft');
+          
+          // Reset form after successful submission
+          set({
+            currentStep: 1,
+            completedSteps: [],
+            formData: {},
             isDraft: false,
-            lastSavedAt: new Date()
+            isSubmitting: false,
+            errors: {},
+            lastSavedAt: undefined
           });
 
           return { success: true, firmId: result.firmId };
@@ -287,6 +332,9 @@ export const useFirmFormStore = create<FirmFormState>()(
       },
       
       resetForm: () => {
+        // Clear local storage when resetting
+        localStorage.removeItem('firmFormDraft');
+        
         set({
           currentStep: 1,
           completedSteps: [],
@@ -295,6 +343,27 @@ export const useFirmFormStore = create<FirmFormState>()(
           errors: {},
           lastSavedAt: undefined
         });
+      },
+
+      loadFromLocalStorage: () => {
+        try {
+          const localDraft = localStorage.getItem('firmFormDraft');
+          if (localDraft) {
+            const draftData = JSON.parse(localDraft);
+            set({
+              formData: draftData.formData,
+              currentStep: draftData.currentStep || 1,
+              completedSteps: draftData.completedSteps || [],
+              isDraft: true,
+              lastSavedAt: draftData.timestamp ? new Date(draftData.timestamp) : undefined
+            });
+            return true;
+          }
+          return false;
+        } catch (error) {
+          console.error('Error loading from local storage:', error);
+          return false;
+        }
       },
       
       setErrors: (errors) => {
@@ -309,7 +378,22 @@ export const useFirmFormStore = create<FirmFormState>()(
         set({ isSubmitting: true, errors: {} });
         
         try {
-          const response = await fetch(`/api/firms/draft/${draftId}`);
+          // Try to load from local storage first
+          const localDraft = localStorage.getItem('firmFormDraft');
+          if (localDraft) {
+            const draftData = JSON.parse(localDraft);
+            set({
+              formData: draftData.formData,
+              currentStep: draftData.currentStep || 1,
+              completedSteps: draftData.completedSteps || [],
+              isDraft: true,
+              lastSavedAt: draftData.timestamp ? new Date(draftData.timestamp) : undefined
+            });
+            return { success: true };
+          }
+
+          // Fallback to server if no local draft
+          const response = await fetch(`/api/firms/${draftId}`);
           
           if (!response.ok) {
             throw new Error('Failed to load draft');
@@ -318,7 +402,7 @@ export const useFirmFormStore = create<FirmFormState>()(
           const draftData = await response.json();
           
           set({
-            formData: draftData.formData || {},
+            formData: draftData,
             currentStep: draftData.currentStep || 1,
             completedSteps: draftData.completedSteps || [],
             isDraft: true,
@@ -341,18 +425,7 @@ export const useFirmFormStore = create<FirmFormState>()(
           set({ isSubmitting: false });
         }
       }
-    }),
-    {
-      name: 'firm-form-storage',
-      partialize: (state) => ({
-        currentStep: state.currentStep,
-        completedSteps: state.completedSteps,
-        formData: state.formData,
-        isDraft: state.isDraft,
-        lastSavedAt: state.lastSavedAt
-      })
-    }
-  )
+    })
 );
 
 // Helper hooks for specific form sections

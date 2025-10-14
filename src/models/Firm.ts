@@ -167,9 +167,14 @@ const FirmSchema = new Schema({
     trim: true,
     validate: {
       validator: function(v: string) {
-        return !v || /^https?:\/\/.+/.test(v);
+        // Allow empty string, null, undefined, or valid HTTP/HTTPS URL
+        if (!v || v === '' || v === null || v === undefined) {
+          return true;
+        }
+        // Check if it's a valid HTTP/HTTPS URL
+        return /^https?:\/\/.+/.test(v);
       },
-      message: 'Logo URL must be a valid HTTP/HTTPS URL'
+      message: 'Logo URL must be a valid HTTP/HTTPS URL or empty'
     }
   },
   logoFile: { type: LogoFileSchema },
@@ -288,7 +293,6 @@ const FirmSchema = new Schema({
 // ============================================================================
 
 // Basic indexes for common queries
-FirmSchema.index({ firmName: 1 });
 FirmSchema.index({ status: 1 });
 FirmSchema.index({ jurisdiction: 1 });
 FirmSchema.index({ yearFounded: 1 });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Firm from '@/models/Firm';
+import { uploadFileToBunnyCDN, deleteFileFromBunnyCDN } from '@/lib/bunnycdn';
 
 // Type for form data processing
 interface FormDataRecord {
@@ -15,59 +16,67 @@ interface MongoQuery {
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
     const contentType = request.headers.get('content-type');
-    let firmData: FormDataRecord = {};
-    
-    if (contentType?.includes('application/json')) {
-      // Handle JSON data
-      firmData = await request.json();
-    } else {
-      // Handle form data
+    let draftData: FormDataRecord = {};
+    let logoFile: File | null = null;
+
+    if (contentType?.includes('multipart/form-data')) {
       const formData = await request.formData();
       
-      // Process form data
       for (const [key, value] of formData.entries()) {
         if (key === 'logoFile' && value instanceof File) {
-          // Handle file upload
-          firmData.logoFile = {
-            filename: value.name,
-            size: value.size,
-            mimeType: value.type,
-            url: '' // Will be set after upload to cloud storage
-          };
-        } else if (key === 'challenges' && typeof value === 'string') {
-          // Parse JSON fields
+          logoFile = value;
+        } else if (typeof value === 'string') {
           try {
-            firmData[key] = JSON.parse(value);
+            draftData[key] = JSON.parse(value);
           } catch {
-            firmData[key] = value;
+            draftData[key] = value;
           }
-        } else if (typeof value === 'string' && (value === 'true' || value === 'false')) {
-          // Convert string booleans
-          firmData[key] = value === 'true';
-        } else if (typeof value === 'string' && !isNaN(Number(value)) && key.includes('year')) {
-          // Convert year fields to numbers
-          firmData[key] = parseInt(value);
-        } else {
-          firmData[key] = value;
         }
       }
+    } else {
+      draftData = await request.json();
     }
-    
+
+    // Handle logo file upload to BunnyCDN for drafts
+    if (logoFile) {
+      try {
+        const fileBuffer = Buffer.from(await logoFile.arrayBuffer());
+        const bunnyFile = await uploadFileToBunnyCDN(
+          fileBuffer,
+          logoFile.name,
+          logoFile.type,
+          'draft-logos' // Store drafts in a separate folder
+        );
+
+        draftData.logoUrl = bunnyFile.url;
+        draftData.logoFile = bunnyFile;
+      } catch (error) {
+        console.error('Error uploading draft logo to BunnyCDN:', error);
+        return NextResponse.json(
+          { error: 'Failed to upload logo file' },
+          { status: 500 }
+        );
+      }
+    } else {
+      // Ensure logoUrl is empty string if no logo file
+      draftData.logoUrl = '';
+      draftData.logoFile = null;
+    }
+
     // Set draft-specific fields
-    firmData.isDraft = true;
-    firmData.isPublished = false;
+    draftData.isDraft = true;
+    draftData.isPublished = false;
     
     // Use provided user IDs or default
-    if (!firmData.createdBy) {
-      firmData.createdBy = 'current-user-id'; // TODO: Get from auth
+    if (!draftData.createdBy) {
+      draftData.createdBy = 'current-user-id'; // TODO: Get from auth
     }
-    if (!firmData.lastModifiedBy) {
-      firmData.lastModifiedBy = 'current-user-id';
+    if (!draftData.lastModifiedBy) {
+      draftData.lastModifiedBy = 'current-user-id';
     }
     
-    const firm = new Firm(firmData);
+    const firm = new Firm(draftData);
     await firm.save();
     
     return NextResponse.json({ firm, firmId: firm._id });

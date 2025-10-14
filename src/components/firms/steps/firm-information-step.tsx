@@ -1,9 +1,10 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useFirmFormStore } from "@/stores/firmFormStore";
+import { preventEnterSubmit } from "@/lib/formUtils";
 import {
   Form,
   FormControl,
@@ -26,12 +27,46 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 
+// FilePreview component to handle URL cleanup
+function FilePreview({ file }: { file: File }) {
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (file instanceof File) {
+      const url = URL.createObjectURL(file);
+      setObjectUrl(url);
+      
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    }
+  }, [file]);
+
+  if (!objectUrl) {
+    return (
+      <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+        Loading...
+      </div>
+    );
+  }
+
+  return (
+    <Image 
+      src={objectUrl} 
+      alt={file.name} 
+      className="w-full h-full object-cover" 
+      fill 
+    />
+  );
+}
+
 interface StepProps {
   data: Record<string, unknown>;
   onNext: (data: Record<string, unknown>) => void;
   onPrevious: () => void;
   isFirstStep: boolean;
   isLastStep: boolean;
+  onDataChange?: (data: Record<string, unknown>) => void;
 }
 
 interface FirmInformationForm {
@@ -52,56 +87,88 @@ interface FirmInformationForm {
 }
 
 export default function FirmInformationStep({
+  data,
   onNext,
   isFirstStep,
+  onDataChange,
 }: StepProps) {
-  const { formData, updateStepData } = useFirmFormStore();
+  const { formData: storeFormData, updateStepData } = useFirmFormStore();
+  
+  // Use provided data (for edit mode) or store data (for create mode)
+  const formData = data || storeFormData;
   
   const form = useForm<FirmInformationForm>({
     defaultValues: {
-      firmName: formData.firmName || "",
-      logoUrl: formData.logoUrl || "",
-      logoFile: formData.logoFile || null,
-      legalEntityName: formData.legalEntityName || "",
-      registrationNumber: formData.registrationNumber || "",
-      jurisdiction: formData.jurisdiction || "",
-      yearFounded: formData.yearFounded || "",
-      headquartersAddress: formData.headquartersAddress || "",
-      ceoFounderName: formData.ceoFounderName || "",
-      leadershipLinks: formData.leadershipLinks || "",
-      officialWebsite: formData.officialWebsite || "",
-      status: formData.status || "active",
-      shortDescription: formData.shortDescription || "",
+      firmName: (formData.firmName as string) || "",
+      logoUrl: (formData.logoUrl as string) || "",
+      logoFile: (formData.logoFile as File | null) || null,
+      legalEntityName: (formData.legalEntityName as string) || "",
+      registrationNumber: (formData.registrationNumber as string) || "",
+      jurisdiction: (formData.jurisdiction as string) || "",
+      yearFounded: (formData.yearFounded as string) || "",
+      headquartersAddress: (formData.headquartersAddress as string) || "",
+      ceoFounderName: (formData.ceoFounderName as string) || "",
+      leadershipLinks: (formData.leadershipLinks as string) || "",
+      officialWebsite: (formData.officialWebsite as string) || "",
+      status: (formData.status as "active" | "paused" | "suspended" | "closed") || "active",
+      shortDescription: (formData.shortDescription as string) || "",
     },
   });
 
-  // Update form when store data changes
+  // Update form when data changes
   useEffect(() => {
+    // Handle logoFile - if it's a File (new upload), use it; otherwise use null
+    const logoFile = formData.logoFile;
+    const isFileObject = logoFile instanceof File;
+    
     form.reset({
-      firmName: formData.firmName || "",
-      logoUrl: formData.logoUrl || "",
-      logoFile: formData.logoFile || null,
-      legalEntityName: formData.legalEntityName || "",
-      registrationNumber: formData.registrationNumber || "",
-      jurisdiction: formData.jurisdiction || "",
-      yearFounded: formData.yearFounded || "",
-      headquartersAddress: formData.headquartersAddress || "",
-      ceoFounderName: formData.ceoFounderName || "",
-      leadershipLinks: formData.leadershipLinks || "",
-      officialWebsite: formData.officialWebsite || "",
-      status: formData.status || "active",
-      shortDescription: formData.shortDescription || "",
+      firmName: (formData.firmName as string) || "",
+      logoUrl: (formData.logoUrl as string) || "",
+      logoFile: isFileObject ? logoFile : null,
+      legalEntityName: (formData.legalEntityName as string) || "",
+      registrationNumber: (formData.registrationNumber as string) || "",
+      jurisdiction: (formData.jurisdiction as string) || "",
+      yearFounded: (formData.yearFounded as string) || "",
+      headquartersAddress: (formData.headquartersAddress as string) || "",
+      ceoFounderName: (formData.ceoFounderName as string) || "",
+      leadershipLinks: (formData.leadershipLinks as string) || "",
+      officialWebsite: (formData.officialWebsite as string) || "",
+      status: (formData.status as "active" | "paused" | "suspended" | "closed") || "active",
+      shortDescription: (formData.shortDescription as string) || "",
     });
   }, [formData, form]);
 
+
   const onSubmit = (formData: FirmInformationForm) => {
-    updateStepData(formData);
+    // Only update store if we're in create mode (no data prop provided)
+    if (!data) {
+      updateStepData(formData);
+    }
+    // Always call onNext to update parent form data
     onNext(formData as unknown as Record<string, unknown>);
   };
 
+  // Watch for form changes and update parent data in edit mode
+  useEffect(() => {
+    if (data && onDataChange) { // Only in edit mode (when data prop is provided)
+      const subscription = form.watch((value) => {
+        // Only update for non-file changes to prevent logo duplication
+        const { logoFile, ...otherValues } = value;
+        if (logoFile && logoFile instanceof File) {
+          // Don't trigger onDataChange for file uploads to prevent API calls
+          return;
+        }
+        // Pass the form data without File objects
+        onDataChange(otherValues as Record<string, unknown>);
+      });
+      
+      return () => subscription.unsubscribe();
+    }
+  }, [form, onDataChange, data]);
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} onKeyDown={preventEnterSubmit} className="space-y-8">
         <div>
           <h3 className="text-lg font-semibold">Firm Information</h3>
           <p className="text-sm text-muted-foreground mb-6">
@@ -162,10 +229,28 @@ export default function FirmInformationStep({
                                       <div className="flex items-center space-x-2">
                                         <div className="w-12 h-12 relative overflow-hidden bg-primary/10 rounded flex items-center justify-center">
                                           {/* image preview */}
-                                          <Image src={URL.createObjectURL(fileField.value)} alt={fileField.value.name} className="w-full h-full object-cover" fill />
+                                          {fileField.value instanceof File ? (
+                                            <FilePreview file={fileField.value} />
+                                          ) : fileField.value && typeof fileField.value === 'object' && 'url' in fileField.value ? (
+                                            <Image 
+                                              src={(fileField.value as { url: string }).url} 
+                                              alt={(fileField.value as { filename?: string }).filename || 'Logo'} 
+                                              className="w-full h-full object-cover" 
+                                              fill 
+                                            />
+                                          ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                                              File
+                                            </div>
+                                          )}
                                         </div>
                                         <span className="text-sm font-medium truncate">
-                                          {fileField.value.name}
+                                          {fileField.value instanceof File 
+                                            ? fileField.value.name 
+                                            : fileField.value && typeof fileField.value === 'object' && 'filename' in fileField.value
+                                            ? (fileField.value as { filename: string }).filename
+                                            : 'Selected file'
+                                          }
                                         </span>
                                       </div>
                                       <Button

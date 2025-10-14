@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -18,18 +18,19 @@ import Link from "next/link";
 import Image from "next/image";
 import { 
   Building2, 
-  Eye, 
   Edit, 
   CheckCircle,
   Clock,
   AlertCircle,
   Search,
   Download,
-  Trash2,
   RefreshCw,
   TrendingUp,
-  Image as ImageIcon
+  Image as ImageIcon,
+  FileText,
+  Trash
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Firm {
   _id: string;
@@ -83,14 +84,16 @@ interface FirmsResponse {
 }
 
 export default function FirmsList() {
+  const router = useRouter();
   const [firms, setFirms] = useState<Firm[]>([]);
+  const [drafts, setDrafts] = useState<Firm[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [sortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [selectedFirms, setSelectedFirms] = useState<string[]>([]);
-  const [deleting, setDeleting] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [showDraftsModal, setShowDraftsModal] = useState(false);
+  const [draftsLoading, setDraftsLoading] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -125,6 +128,68 @@ export default function FirmsList() {
     }
   }, [pagination.limit, search, sortBy, sortOrder]);
 
+  const fetchDrafts = useCallback(async () => {
+    try {
+      setDraftsLoading(true);
+      const response = await fetch('/api/firms?isDraft=true');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch drafts');
+      }
+      
+      const data = await response.json();
+      setDrafts(data.firms || []);
+    } catch (err) {
+      console.error('Error fetching drafts:', err);
+    } finally {
+      setDraftsLoading(false);
+    }
+  }, []);
+
+  const handleDeleteDraft = async (draftId: string) => {
+    if (!confirm('Are you sure you want to delete this draft?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/firms/${draftId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete draft');
+      }
+
+      setDrafts(prev => prev.filter(draft => draft._id !== draftId));
+    } catch (error) {
+      console.error('Error deleting draft:', error);
+      alert('Failed to delete draft');
+    }
+  };
+
+  const handleCleanupDrafts = async () => {
+    if (!confirm('Are you sure you want to delete all drafts older than 30 days?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/firms/cleanup-drafts', {
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to cleanup drafts');
+      }
+
+      const result = await response.json();
+      alert(`Cleaned up ${result.deletedCount} old drafts`);
+      fetchDrafts();
+    } catch (error) {
+      console.error('Error cleaning up drafts:', error);
+      alert('Failed to cleanup drafts');
+    }
+  };
+
   useEffect(() => {
     fetchFirms();
   }, [fetchFirms, pagination.page]);
@@ -134,42 +199,6 @@ export default function FirmsList() {
     fetchFirms();
   };
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedFirms(firms.map((firm) => firm._id));
-    } else {
-      setSelectedFirms([]);
-    }
-  };
-
-  const handleSelectFirm = (firmId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedFirms((prev) => [...prev, firmId]);
-    } else {
-      setSelectedFirms((prev) => prev.filter((id) => id !== firmId));
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    if (selectedFirms.length === 0) return;
-
-    if (!confirm(`Are you sure you want to delete ${selectedFirms.length} firm(s)?`)) {
-      return;
-    }
-
-    try {
-      setDeleting(true);
-      // Implement bulk delete API call here
-      console.log('Bulk delete firms:', selectedFirms);
-      setSelectedFirms([]);
-      fetchFirms();
-    } catch (error) {
-      console.error('Error deleting firms:', error);
-      alert('Failed to delete firms');
-    } finally {
-      setDeleting(false);
-    }
-  };
 
   const handleExport = async () => {
     try {
@@ -241,6 +270,16 @@ export default function FirmsList() {
         description={`Search, filter, and manage all forex firms on the platform. ${pagination.total} firms found.`}
         actions={
           <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowDraftsModal(true);
+                fetchDrafts();
+              }}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              View Drafts ({drafts.length})
+            </Button>
             <Button
               variant="outline"
               onClick={handleExport}
@@ -358,23 +397,6 @@ export default function FirmsList() {
             </div>
           </div>
 
-          {/* Bulk Actions */}
-          {selectedFirms.length > 0 && (
-            <div className="flex items-center gap-4 mb-4 p-3 bg-muted/50 rounded-lg">
-              <span className="text-sm font-medium">
-                {selectedFirms.length} selected
-              </span>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDelete}
-                disabled={deleting}
-              >
-                <Trash2 className="h-4 w-4 mr-1" />
-                Delete Selected
-              </Button>
-            </div>
-          )}
 
           {/* Table */}
           <div className="relative overflow-x-auto">
@@ -397,15 +419,6 @@ export default function FirmsList() {
               <table className="w-full text-sm">
                 <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
                   <tr>
-                    <th className="p-3 text-left">
-                      <Checkbox
-                        checked={
-                          selectedFirms.length === firms.length &&
-                          firms.length > 0
-                        }
-                        onCheckedChange={handleSelectAll}
-                      />
-                    </th>
                     <th className="p-3 text-left">Firm</th>
                     <th className="p-3 text-left">
                       <div className="flex items-center space-x-1">
@@ -425,15 +438,7 @@ export default function FirmsList() {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {firms.map((firm) => (
-                    <tr key={firm._id} className="hover:bg-muted/30">
-                      <td className="p-3">
-                        <Checkbox
-                          checked={selectedFirms.includes(firm._id)}
-                          onCheckedChange={(checked) =>
-                            handleSelectFirm(firm._id, checked as boolean)
-                          }
-                        />
-                      </td>
+                    <tr key={firm._id} className="hover:bg-primary/10 cursor-pointer transition-all duration-100" onClick={() => router.push(`/admin/firms/${firm._id}`)}>
                       <td className="p-3">
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center overflow-hidden">
@@ -472,20 +477,23 @@ export default function FirmsList() {
                       <td className="p-3 text-muted-foreground">
                         {formatDate(firm.createdAt)}
                       </td>
-                      <td className="p-3">
-                        <div className="flex items-center space-x-2">
-                          <Button variant="outline" size="sm" asChild>
-                            <Link href={`/admin/firms/${firm._id}`}>
-                              <Eye className="h-4 w-4" />
-                            </Link>
-                          </Button>
-                          <Button variant="outline" size="sm" asChild>
-                            <Link href={`/admin/firms/${firm._id}/edit`}>
+                        <td className="p-3">
+                          <div className="flex items-center space-x-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={(e) => { 
+                                e.preventDefault(); 
+                                e.stopPropagation(); 
+                                router.push(`/admin/firms/${firm._id}/edit`);
+                              }}
+                              onMouseDown={(e) => e.stopPropagation()}
+                              onMouseUp={(e) => e.stopPropagation()}
+                            >
                               <Edit className="h-4 w-4" />
-                            </Link>
-                          </Button>
-                        </div>
-                      </td>
+                            </Button>
+                          </div>
+                        </td>
                     </tr>
                   ))}
                 </tbody>
@@ -555,6 +563,107 @@ export default function FirmsList() {
           )}
         </CardContent>
       </Card>
+
+      {/* Drafts Modal */}
+      <Dialog open={showDraftsModal} onOpenChange={setShowDraftsModal}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Draft Firms ({drafts.length})
+            </DialogTitle>
+            <DialogDescription>
+              Manage your incomplete firm drafts. You can continue editing or delete them.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {draftsLoading ? (
+              <div className="py-8 text-center text-muted-foreground">
+                Loading drafts...
+              </div>
+            ) : drafts.length === 0 ? (
+              <div className="py-8 text-center text-muted-foreground">
+                <FileText className="w-12 h-12 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No drafts found</h3>
+                <p>You don&apos;t have any incomplete firm drafts.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {drafts.map((draft) => (
+                  <Card key={draft._id} className="p-4 cursor-pointer transition-all duration-100 hover:bg-primary/10" onClick={() => router.push(`/admin/firms/${draft._id}`)}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center overflow-hidden">
+                          {draft.logo?.url ? (
+                            <Image 
+                              src={draft.logo.url} 
+                              alt={draft.firmName}
+                              width={40}
+                              height={40}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-medium">{draft.firmName}</div>
+                          <div className="text-sm text-muted-foreground">
+                            Last updated: {formatDate(draft.updatedAt)}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                          <Clock className="w-3 h-3 mr-1" />
+                          Draft
+                        </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            router.push(`/admin/firms/new?draft=${draft._id}`);
+                          }}
+                        >
+                          Continue
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDeleteDraft(draft._id);
+                          }}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="flex justify-between">
+            <Button
+              variant="outline"
+              onClick={handleCleanupDrafts}
+              disabled={drafts.length === 0}
+            >
+              <Trash className="h-4 w-4 mr-2" />
+              Cleanup Old Drafts
+            </Button>
+            <Button onClick={() => setShowDraftsModal(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

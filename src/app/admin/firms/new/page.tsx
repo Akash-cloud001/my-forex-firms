@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import Link from "next/link";
-import { Check } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Check, AlertTriangle } from "lucide-react";
 import { useFirmFormStore } from "@/stores/firmFormStore";
 import { toast } from "sonner";
 import FirmInformationStep from "@/components/firms/steps/firm-information-step";
@@ -29,8 +29,14 @@ const steps = [
   { id: 8, name: "Administration & Audit", component: AdministrationAuditStep },
 ];
 
-export default function NewFirm() {
+function NewFirmContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [loadingDraft, setLoadingDraft] = useState(false);
+  
   const {
     currentStep,
     completedSteps,
@@ -39,9 +45,12 @@ export default function NewFirm() {
     setCurrentStep,
     updateStepData,
     markStepCompleted,
-    saveDraft,
+    autoSaveDraft,
     submitForm,
-    clearErrors
+    clearErrors,
+    resetForm,
+    loadDraft,
+    loadFromLocalStorage
   } = useFirmFormStore();
 
   const CurrentStepComponent = steps.find((s) => s.id === currentStep)?.component;
@@ -49,13 +58,23 @@ export default function NewFirm() {
   const handleStepComplete = async (stepData: Record<string, unknown>) => {
     updateStepData(stepData);
     markStepCompleted(currentStep);
+    setHasUnsavedChanges(true);
     
+    // Auto-save draft on each step completion
     if (currentStep < steps.length) {
+      try {
+        await autoSaveDraft();
+        toast.success('Progress saved automatically');
+      } catch (error) {
+        console.warn('Auto-save failed:', error);
+      }
       setCurrentStep(currentStep + 1);
     } else {
+      // Form is complete, submit and clear draft
       const result = await submitForm();
       if (result.success) {
-        toast.success('Firm created successfully!');
+        toast.success('Firm created successfully! Draft cleared.');
+        setHasUnsavedChanges(false);
         router.push('/admin/firms');
       } else {
         toast.error(result.error || 'Failed to create firm');
@@ -64,18 +83,76 @@ export default function NewFirm() {
   };
 
   const handleSaveDraft = async () => {
-    const result = await saveDraft();
+    const result = await autoSaveDraft();
     if (result.success) {
       toast.success('Draft saved successfully');
+      setHasUnsavedChanges(false);
     } else {
       toast.error(result.error || 'Failed to save draft');
     }
   };
 
-  // Clear errors when component mounts
+  const handleNavigation = (path: string) => {
+    if (hasUnsavedChanges) {
+      setPendingNavigation(path);
+      setShowWarningModal(true);
+    } else {
+      router.push(path);
+    }
+  };
+
+  const handleConfirmNavigation = () => {
+    if (pendingNavigation) {
+      setHasUnsavedChanges(false);
+      router.push(pendingNavigation);
+    }
+    setShowWarningModal(false);
+    setPendingNavigation(null);
+  };
+
+  const handleCancelNavigation = () => {
+    setShowWarningModal(false);
+    setPendingNavigation(null);
+  };
+
+  // Route change warning
   useEffect(() => {
-    clearErrors();
-  }, [clearErrors]);
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  // Load from local storage on mount
+  useEffect(() => {
+    const loaded = loadFromLocalStorage();
+    if (loaded) {
+      setHasUnsavedChanges(true);
+    }
+  }, []);
+
+  // Load draft if specified in URL
+  useEffect(() => {
+    const draftId = searchParams.get('draft');
+    if (draftId) {
+      setLoadingDraft(true);
+      loadDraft(draftId).then((result) => {
+        if (result.success) {
+          toast.success('Draft loaded successfully');
+          setHasUnsavedChanges(true);
+        } else {
+          toast.error(result.error || 'Failed to load draft');
+        }
+        setLoadingDraft(false);
+      });
+    }
+    // Don't reset form automatically - let the form start fresh naturally
+  }, [searchParams, loadDraft]);
 
   return (
     <div className="p-6 space-y-6 ">
@@ -91,8 +168,11 @@ export default function NewFirm() {
             >
               {isSubmitting ? 'Saving...' : 'Save Draft'}
             </Button>
-            <Button variant="outline" asChild>
-              <Link href="/admin/firms">Cancel</Link>
+            <Button 
+              variant="outline" 
+              onClick={() => handleNavigation('/admin/firms')}
+            >
+              Cancel
             </Button>
           </div>
         }
@@ -101,7 +181,11 @@ export default function NewFirm() {
       <section className="grid grid-cols-12 gap-6">
         {/* Form Step Content */}
         <Card className="p-6 col-span-9">
-          {CurrentStepComponent && (
+          {loadingDraft ? (
+            <div className="py-8 text-center text-muted-foreground">
+              Loading draft...
+            </div>
+          ) : CurrentStepComponent ? (
             <CurrentStepComponent
               data={formData}
               onNext={handleStepComplete}
@@ -109,7 +193,7 @@ export default function NewFirm() {
               isFirstStep={currentStep === 1}
               isLastStep={currentStep === steps.length}
             />
-          )}
+          ) : null}
         </Card>
 
         {/* Stepper Navigation */}
@@ -167,7 +251,36 @@ export default function NewFirm() {
         </nav>
       </section>
 
-
+      {/* Warning Modal */}
+      <Dialog open={showWarningModal} onOpenChange={setShowWarningModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Unsaved Changes
+            </DialogTitle>
+            <DialogDescription>
+              You have unsaved changes. If you leave now, your progress will be saved as a draft, but you may lose some recent changes.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelNavigation}>
+              Stay on Page
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmNavigation}>
+              Leave Anyway
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+export default function NewFirm() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading...</div>}>
+      <NewFirmContent />
+    </Suspense>
   );
 }

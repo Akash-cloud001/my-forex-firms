@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { preventEnterSubmit } from "@/lib/formUtils";
 import {
   Form,
   FormControl,
@@ -88,7 +89,7 @@ export default function BasicInformationStep({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} onKeyDown={preventEnterSubmit} className="space-y-8">
         <div>
           <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
           <p className="text-sm text-muted-foreground mb-6">
