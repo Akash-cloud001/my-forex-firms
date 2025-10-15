@@ -70,6 +70,12 @@ const navigationItems = [
     icon: Mail,
     hasSubmenu: false,
   },  
+  {
+    title: "Live Firms",
+    url: "/admin/live-firms",
+    icon: Building2,
+    hasSubmenu: false,
+  },
 ];
 
 export default function AppSidebar() {

@@ -52,6 +52,7 @@ interface Firm {
   createdBy: string;
   lastModifiedBy: string;
   version: number;
+  logoUrl?: string;
   logo?: {
     url?: string;
     filename?: string;
@@ -432,7 +433,7 @@ export default function FirmsList() {
                     </th>
                     <th className="p-3 text-left">Status</th>
                     <th className="p-3 text-left">Published</th>
-                    <th className="p-3 text-left">Created</th>
+                    <th className="p-3 text-left">Total Challenges</th>
                     <th className="p-3 text-left">Actions</th>
                   </tr>
                 </thead>
@@ -442,9 +443,9 @@ export default function FirmsList() {
                       <td className="p-3">
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center overflow-hidden">
-                            {firm.logo?.url ? (
+                            {firm.logoUrl ? (
                               <Image 
-                                src={firm.logo.url} 
+                                src={firm?.logoUrl || ''} 
                                 alt={firm.firmName}
                                 width={40}
                                 height={40}
@@ -472,10 +473,11 @@ export default function FirmsList() {
                         </Badge>
                       </td>
                       <td className="p-3">
-                        {getStatusBadge(firm)}
+                        {/* {getStatusBadge(firm)} */}
+                        {firm.yearFounded}
                       </td>
                       <td className="p-3 text-muted-foreground">
-                        {formatDate(firm.createdAt)}
+                        {firm.challenges?.length}
                       </td>
                         <td className="p-3">
                           <div className="flex items-center space-x-2">

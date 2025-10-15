@@ -24,6 +24,7 @@ interface Firm {
   yearFounded: number;
   headquartersAddress: string;
   ceoFounderName?: string;
+  leadershipLinks?: string;
   officialWebsite: string;
   status: 'active' | 'paused' | 'suspended' | 'closed';
   shortDescription: string;
@@ -35,40 +36,99 @@ interface Firm {
   createdBy: string;
   lastModifiedBy: string;
   version: number;
-  logo?: {
-    url?: string;
-    filename?: string;
-    originalName?: string;
+  trustPilotRating?: string;
+  logoUrl?: string;
+  logoFile?: {
+    filename: string;
+    url: string;
+    size: number;
+    mimeType: string;
   };
   tradingInfrastructure?: {
     tradingPlatforms: string[];
-    supportedAssets: string[];
-    leverage: string;
-    minimumDeposit: string;
-    maximumDrawdown: string;
+    dataFeedsLiquidityProviders: string[];
   };
   payoutFinancial?: {
     profitSplit: string;
+    firstPayoutTiming: string;
+    regularPayoutCycle: string;
+    minimumPayoutAmount: string;
+    averagePayoutProcessingTime: string;
+    fastestSlowestPayoutDuration: string;
     payoutMethods: string[];
-    minimumPayout: string;
-    maximumPayout: string;
+    payoutFeesFxCosts: string;
+    totalPayoutsAllTime: string;
+    largestSinglePayout: string;
+    monthlyPayoutCounts: string;
+    payoutProofLinks: string[];
   };
   challenges?: Array<{
     challengeName: string;
     challengeType: string;
+    accountSizesPricing: string;
     profitSplit: string;
-    accountSize: string;
-    maximumDrawdown: string;
+    leverageBreakdown: string;
+    timeLimits?: string;
+    minimumTradingDays?: string;
+    step1Step2Targets?: string;
+    dailyMaxDrawdown?: string;
+    refundTerms?: string;
+    scalingPlan?: string;
+    allowedInstruments?: string;
+    rules?: string;
+    maxExposureLots?: string;
+    bonusPromoPolicy?: string;
+    termsUrl?: string;
+    termsLastUpdated?: string;
   }>;
+  tradingEnvironment?: {
+    typicalSpreads: string;
+    commissions: string;
+    slippageSwapPolicies: string;
+    riskDeskModel: string;
+    copyTradeProviders: string[];
+    mobileSupport: string[];
+    ruleMatrix: {
+      newsTrading: boolean;
+      weekendHolding: boolean;
+      eaUsage: boolean;
+      copyTrading: boolean;
+      hedging: boolean;
+      scalping: boolean;
+    };
+    ruleDetails: {
+      newsTradingNotes: string;
+      weekendHoldingNotes: string;
+      eaUsageNotes: string;
+      copyTradingNotes: string;
+      hedgingNotes: string;
+      scalpingNotes: string;
+    };
+  };
   supportOperations?: {
     supportChannels: string[];
+    averageFirstResponseTime: string;
+    averageResolutionTime: string;
     supportHours: string;
-    responseTime: string;
+    escalationPolicy: string;
+    kycRequirements: string;
+    restrictedCountries: string[];
+    amlComplianceLink: string;
   };
   transparencyVerification?: {
-    regulatoryCompliance: string[];
-    auditReports: string[];
-    transparencyScore: number;
+    ceoPublic: boolean;
+    entityOfficeVerified: boolean;
+    termsPublicUpdated: boolean;
+    payoutProofsPublic: boolean;
+    thirdPartyAudit: boolean;
+    transparencyNotes: string;
+  };
+  administrationAudit?: {
+    dataSource: string;
+    verifiedBy: string;
+    verificationDate: string;
+    nextReviewDate?: string;
+    changelogNotes: string;
   };
   analytics?: {
     totalViews: number;
@@ -85,6 +145,7 @@ interface Firm {
     }>;
   };
 }
+
 
 export default function FirmDetail({ params }: { params: Promise<{ id: string }> }) {
   const [firm, setFirm] = useState<Firm | null>(null);
@@ -125,6 +186,23 @@ export default function FirmDetail({ params }: { params: Promise<{ id: string }>
     fetchFirm();
   }, [firmId]);
 
+  const getStatusBadge = (firm: Firm) => {
+    if (firm.isPublished) {
+      return <Badge variant="default" className="bg-success text-white"><CheckCircle className="w-3 h-3 mr-1" />Published</Badge>;
+    } else {
+      return <Badge variant="outline" className="bg-destructive text-white border-none"><AlertCircle className="w-3 h-3 mr-1" />Not Published</Badge>;
+    }
+  };
+
+  const getDraftBadge = (firm: Firm) => {
+    if (firm.isDraft) {
+      return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800"><AlertCircle className="w-3 h-3 mr-1" />Draft</Badge>;
+    } else {
+      return <Badge variant="outline" className="bg-green-300 border-none text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Completed</Badge>;
+    }
+  };
+
+
   if (loading) {
     return (
       <div className="p-6 space-y-6">
@@ -160,15 +238,6 @@ export default function FirmDetail({ params }: { params: Promise<{ id: string }>
     );
   }
 
-  const getStatusBadge = (firm: Firm) => {
-    if (firm.isPublished) {
-      return <Badge variant="default" className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Published</Badge>;
-    } else if (firm.isDraft) {
-      return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800"><Clock className="w-3 h-3 mr-1" />Draft</Badge>;
-    } else {
-      return <Badge variant="outline" className="bg-gray-100 text-gray-800"><AlertCircle className="w-3 h-3 mr-1" />Unknown</Badge>;
-    }
-  };
 
   return (
     <div className="p-6 space-y-6">
@@ -184,7 +253,7 @@ export default function FirmDetail({ params }: { params: Promise<{ id: string }>
           </Button>
           <div className="flex items-center space-x-2">
             {getStatusBadge(firm)}
-            
+            {getDraftBadge(firm)}
             <Button variant="ghost" size="sm" className="text-white border-white hover:bg-white" asChild>
               <Link href={`/admin/firms/${firmId}/edit`}>
                 <Edit className="w-4 h-4 mr-2" />
