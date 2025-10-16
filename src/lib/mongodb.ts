@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import type { Mongoose } from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI!;
+const DATABASE_NAME = 'myForexFirms';
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');
@@ -29,6 +30,7 @@ async function connectDB() {
   if (!cached!.promise) {
     const opts = {
       bufferCommands: false,
+      dbName: DATABASE_NAME,
     };
 
     cached!.promise = mongoose.connect(MONGODB_URI, opts);

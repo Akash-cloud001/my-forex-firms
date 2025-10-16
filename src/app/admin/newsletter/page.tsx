@@ -439,9 +439,9 @@ export default function AdminNewsletter() {
                         Math.abs(page - pagination.page) <= 1
                     )
                     .map((page, idx, arr) => (
-                      <>
+                      <div key={idx}>
                         {idx > 0 && arr[idx - 1] !== page - 1 && (
-                          <span key={`ellipsis-${page}`} className="px-2">
+                          <span className="px-2">
                             ...
                           </span>
                         )}
@@ -455,7 +455,7 @@ export default function AdminNewsletter() {
                         >
                           {page}
                         </Button>
-                      </>
+                      </div>
                     ))}
                 </div>
                 <Button

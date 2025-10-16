@@ -693,6 +693,6 @@ export type FirmUpdateInput = Partial<Omit<IFirm, '_id' | 'createdAt' | 'updated
 export type FirmPublicData = Pick<IFirm, 'firmName' | 'logoUrl' | 'logoFile' | 'legalEntityName' | 'jurisdiction' | 'yearFounded' | 'officialWebsite' | 'status' | 'shortDescription' | 'tradingInfrastructure' | 'payoutFinancial' | 'challenges' | 'tradingEnvironment' | 'supportOperations' | 'transparencyVerification'>;
 
 // Create and export the model
-const Firm = mongoose.models.Firm || mongoose.model<IFirm>('Firm', FirmSchema);
+const Firm = mongoose.models.Firm || mongoose.model<IFirm>('Firm', FirmSchema, 'firms');
 
 export default Firm;

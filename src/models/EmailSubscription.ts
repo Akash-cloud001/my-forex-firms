@@ -44,7 +44,7 @@ EmailSubscriptionSchema.index({ email: 1 }, { unique: true });
 
 const EmailSubscription =
   models.EmailSubscription ||
-  mongoose.model<IEmailSubscription>("EmailSubscription", EmailSubscriptionSchema);
+  mongoose.model<IEmailSubscription>("EmailSubscription", EmailSubscriptionSchema, 'emailsubscriptions');
 
 export default EmailSubscription;
 
