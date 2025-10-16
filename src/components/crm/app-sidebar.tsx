@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import {
   Sidebar,
   SidebarContent,
@@ -32,6 +33,7 @@ import {
   ChevronDown,
   Mail,
 } from "lucide-react";
+import Image from "next/image";
 
 const navigationItems = [
   {
@@ -82,6 +84,7 @@ export default function AppSidebar() {
   const { state } = useSidebar()
   const pathname = usePathname();
   const router = useRouter(); 
+  const { user } = useUser();
   const [openSubmenus, setOpenSubmenus] = React.useState<Record<string, boolean>>({});
   
   const toggleSubmenu = (itemUrl: string) => {
@@ -280,7 +283,7 @@ export default function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       
-      <SidebarFooter className={`"border border-t border-sidebar-border ${state === "expanded" ? "p-4" : "px-2 py-4"} "`}
+      <SidebarFooter className={`"border border-t border-sidebar-border cursor-pointer ${state === "expanded" ? "p-4" : "px-2 py-4"} "`}
       onClick={() => {
         router.push("/admin/profile");
       }}
@@ -288,19 +291,44 @@ export default function AppSidebar() {
         {state !== "expanded" ? (
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="text-base font-medium flex items-center gap-2 cursor-pointer">
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-semibold">
-                  A
-                </div>
+              <div className="text-base font-medium flex items-center gap-2 relative">
+                {user?.imageUrl ? (
+                  <Image 
+                    src={user.imageUrl} 
+                    alt={user.fullName || "User"} 
+                    className="h-8 w-8 rounded-full object-cover"
+                    width={32}
+                    height={32}
+                    priority
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-semibold">
+                    {user?.firstName?.charAt(0) || user?.emailAddresses?.[0]?.emailAddress?.charAt(0) || "U"}
+                  </div>
+                )}
               </div>
             </TooltipTrigger>
-            <TooltipContent side="right">
-              Admin Name
+            <TooltipContent side="right" className="text-sm">
+              {user?.fullName || user?.emailAddresses?.[0]?.emailAddress || "User"}
             </TooltipContent>
           </Tooltip>
         ) : (
           <div className="text-base font-medium flex items-center gap-2">
-            <span>Admin Name</span>
+            {user?.imageUrl ? (
+              <Image 
+              src={user.imageUrl} 
+              alt={user.fullName || "User"} 
+              className=" rounded-full object-cover"
+              width={32}
+              height={32}
+                priority
+              />
+            ) : (
+              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-semibold">
+                {user?.firstName?.charAt(0) || user?.emailAddresses?.[0]?.emailAddress?.charAt(0) || "U"}
+              </div>
+            )}
+            <span className="text-sm">{user?.fullName || user?.emailAddresses?.[0]?.emailAddress || "User"}</span>
           </div>
         )}
       </SidebarFooter>

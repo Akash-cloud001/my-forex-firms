@@ -24,6 +24,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { SignOutButton } from "@clerk/nextjs"
+import { useState } from "react"
+import LogoutConfirmation from "../profile/LogoutConfirmation"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -261,7 +264,19 @@ function SidebarTrigger({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { toggleSidebar, state } = useSidebar()
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    setShowLogoutModal(false);
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutModal(false);
+  };
   return (
     <section className="h-[53px] pl-4 pr-8 bg-background flex items-center justify-between fixed z-10 border-b border-sidebar-border" style={{ width: `calc(100% - ${state === "expanded" ? SIDEBAR_WIDTH : SIDEBAR_WIDTH_ICON_COLLAPSED})` }}>
       <div className="flex items-center gap-2">
@@ -292,10 +307,15 @@ function SidebarTrigger({
 
       {/* toogle functionality */}
       <div className="flex items-center justify-center gap-2">
-          <Button variant="outline" className="text-primary font-semibold" >
+          <Button variant="outline" className="text-primary font-semibold cursor-pointer" onClick={handleLogoutClick}>
             <User /> Log out
           </Button>
       </div>
+      <LogoutConfirmation
+        isOpen={showLogoutModal}
+        onClose={handleLogoutCancel}
+        onConfirm={handleLogoutConfirm}
+      />
     </section>
   )
 }
