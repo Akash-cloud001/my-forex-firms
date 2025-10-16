@@ -150,6 +150,26 @@ const AdministrationAuditSchema = new Schema({
   changelogNotes: { type: String, trim: true }
 }, { _id: false });
 
+// Reviews Schema
+const ReviewsSchema = new Schema({
+  trustPilotRating: { 
+    type: Number, 
+    min: [0, 'Rating cannot be less than 0'],
+    max: [5, 'Rating cannot be more than 5'],
+    default: 0
+  },
+  totalLikes: { 
+    type: Number, 
+    min: [0, 'Likes cannot be negative'],
+    default: 0
+  },
+  totalDislikes: { 
+    type: Number, 
+    min: [0, 'Dislikes cannot be negative'],
+    default: 0
+  }
+}, { _id: false });
+
 // ============================================================================
 // MAIN FIRM SCHEMA (Best Practice: Simplified main schema)
 // ============================================================================
@@ -259,6 +279,7 @@ const FirmSchema = new Schema({
   supportOperations: { type: SupportOperationsSchema },
   transparencyVerification: { type: TransparencyVerificationSchema },
   administrationAudit: { type: AdministrationAuditSchema },
+  reviews: { type: ReviewsSchema },
 
   // System Fields
   createdBy: { 
@@ -607,6 +628,12 @@ export interface IAdministrationAudit {
   changelogNotes?: string;
 }
 
+export interface IReviews {
+  trustPilotRating: number;
+  totalLikes: number;
+  totalDislikes: number;
+}
+
 // ============================================================================
 // MAIN FIRM INTERFACE (Best Practice: Clean, well-typed interface)
 // ============================================================================
@@ -636,6 +663,7 @@ export interface IFirm extends Document {
   supportOperations?: ISupportOperations;
   transparencyVerification?: ITransparencyVerification;
   administrationAudit?: IAdministrationAudit;
+  reviews?: IReviews;
 
   // System Fields
   createdAt: Date;

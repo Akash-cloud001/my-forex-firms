@@ -33,6 +33,11 @@ interface Firm {
     size: number;
     mimeType: string;
   };
+  reviews?: {
+    trustPilotRating: number;
+    totalLikes: number;
+    totalDislikes: number;
+  };
 }
 
 interface OverviewTabProps {
@@ -140,6 +145,20 @@ export function OverviewTab({ firm }: OverviewTabProps) {
                 <label className="text-sm font-medium text-muted-foreground">Last Updated</label>
                 <p className="font-medium capitalize">{formatDate(firm.updatedAt)}</p>
               </div>
+              {firm.reviews && (
+                <>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">TrustPilot Rating</label>
+                    <p className="font-medium">{firm.reviews.trustPilotRating}/5 ⭐</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Community Rating</label>
+                    <p className="font-medium">
+                      👍 {firm.reviews.totalLikes} | 👎 {firm.reviews.totalDislikes}
+                    </p>
+                  </div>
+                </>
+              )}
               {/* <div>
                 <label className="text-sm font-medium text-muted-foreground">Version</label>
                 <p className="font-medium">v{firm.version}</p>

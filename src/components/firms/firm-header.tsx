@@ -24,7 +24,11 @@ interface Firm {
     originalName?: string;
   };
   logoUrl?: string;
-  trustPilotRating?: string;
+  reviews?: {
+    trustPilotRating: number;
+    totalLikes: number;
+    totalDislikes: number;
+  };
 }
 
 interface FirmHeaderProps {
@@ -97,7 +101,7 @@ export function FirmHeader({ firm, firmId }: FirmHeaderProps) {
                 <div className="flex items-center space-x-2">
                   <span className="text-gray-300">Trust Pilot:</span>
                   <div className="flex items-center space-x-1">
-                    <span className="font-semibold">{firm.trustPilotRating ? firm.trustPilotRating : 'N/A'}</span>
+                    <span className="font-semibold">{firm.reviews?.trustPilotRating ? firm.reviews.trustPilotRating : 'N/A'}</span>
                     <Star className="w-3 h-3 text-yellow-400 fill-current" />
                   </div>
                 </div>

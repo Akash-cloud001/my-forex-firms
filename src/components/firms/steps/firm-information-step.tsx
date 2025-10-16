@@ -83,6 +83,7 @@ interface FirmInformationForm {
   officialWebsite: string;
   status: "active" | "paused" | "suspended" | "closed";
   shortDescription: string;
+  trustPilotRating: string;
   [key: string]: unknown;
 }
 
@@ -112,6 +113,7 @@ export default function FirmInformationStep({
       officialWebsite: (formData.officialWebsite as string) || "",
       status: (formData.status as "active" | "paused" | "suspended" | "closed") || "active",
       shortDescription: (formData.shortDescription as string) || "",
+      trustPilotRating: (formData.trustPilotRating as string) || "",
     },
   });
 
@@ -135,6 +137,7 @@ export default function FirmInformationStep({
       officialWebsite: (formData.officialWebsite as string) || "",
       status: (formData.status as "active" | "paused" | "suspended" | "closed") || "active",
       shortDescription: (formData.shortDescription as string) || "",
+      trustPilotRating: (formData.trustPilotRating as string) || "",
     });
   }, [formData, form]);
 
@@ -459,6 +462,30 @@ export default function FirmInformationStep({
                       </FormControl>
                       <FormDescription>
                         Public profiles (LinkedIn, Twitter, etc.)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="trustPilotRating"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>TrustPilot Rating</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="5"
+                          step="0.1"
+                          placeholder="4.5"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        TrustPilot rating (0-5 stars)
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

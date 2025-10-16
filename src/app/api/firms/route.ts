@@ -151,16 +151,117 @@ export async function POST(request: NextRequest) {
       firmData.logoFile = null;
     }
     
-    // Set system fields
-    if (!firmData.createdBy) {
-      firmData.createdBy = 'current-user-id'; // TODO: Get from auth
-    }
-    if (!firmData.lastModifiedBy) {
-      firmData.lastModifiedBy = 'current-user-id';
-    }
-    firmData.isDraft = firmData.isDraft !== false; // Default to true unless explicitly false
+    // Transform flat form data into nested schema structure
+    const transformedData = {
+      // Basic Information (Step 1)
+      firmName: firmData.firmName,
+      logoUrl: firmData.logoUrl,
+      logoFile: firmData.logoFile,
+      legalEntityName: firmData.legalEntityName,
+      registrationNumber: firmData.registrationNumber,
+      jurisdiction: firmData.jurisdiction,
+      yearFounded: firmData.yearFounded,
+      headquartersAddress: firmData.headquartersAddress,
+      ceoFounderName: firmData.ceoFounderName,
+      leadershipLinks: firmData.leadershipLinks,
+      officialWebsite: firmData.officialWebsite,
+      status: firmData.status,
+      shortDescription: firmData.shortDescription,
+      reviews:{
+        trustPilotRating: firmData.trustPilotRating || 0,
+        totalLikes: firmData.totalLikes || 0,
+        totalDislikes: firmData.totalDislikes || 0,
+      },
+      // Trading Infrastructure (Step 2)
+      tradingInfrastructure: {
+        tradingPlatforms: firmData.tradingPlatforms ? [firmData.tradingPlatforms] : [],
+        dataFeedsLiquidityProviders: firmData.dataFeedsLiquidityProviders ? [firmData.dataFeedsLiquidityProviders] : []
+      },
+      
+      // Payout Financial (Step 3)
+      payoutFinancial: {
+        profitSplit: firmData.profitSplit,
+        firstPayoutTiming: firmData.firstPayoutTiming,
+        regularPayoutCycle: firmData.regularPayoutCycle,
+        minimumPayoutAmount: firmData.minimumPayoutAmount,
+        averagePayoutProcessingTime: firmData.averagePayoutProcessingTime,
+        fastestSlowestPayoutDuration: firmData.fastestSlowestPayoutDuration,
+        payoutMethods: firmData.payoutMethods ? [firmData.payoutMethods] : [],
+        payoutFeesFxCosts: firmData.payoutFeesFxCosts,
+        totalPayoutsAllTime: firmData.totalPayoutsAllTime,
+        largestSinglePayout: firmData.largestSinglePayout,
+        monthlyPayoutCounts: firmData.monthlyPayoutCounts,
+        payoutProofLinks: firmData.payoutProofLinks ? [firmData.payoutProofLinks] : []
+      },
+      
+      // Challenges (Step 4) - already in correct format
+      challenges: firmData.challenges || [],
+      
+      // Trading Environment (Step 5)
+      tradingEnvironment: {
+        typicalSpreads: firmData.typicalSpreads,
+        commissions: firmData.commissions,
+        slippageSwapPolicies: firmData.slippageSwapPolicies,
+        riskDeskModel: firmData.riskDeskModel,
+        copyTradeProviders: firmData.copyTradeProviders ? [firmData.copyTradeProviders] : [],
+        mobileSupport: firmData.mobileSupport ? [firmData.mobileSupport] : [],
+        ruleMatrix: {
+          newsTrading: firmData.newsTrading || false,
+          weekendHolding: firmData.weekendHolding || false,
+          eaUsage: firmData.eaUsage || false,
+          copyTrading: firmData.copyTrading || false,
+          hedging: firmData.hedging || false,
+          scalping: firmData.scalping || false
+        },
+        ruleDetails: {
+          newsTradingNotes: firmData.newsTradingNotes,
+          weekendHoldingNotes: firmData.weekendHoldingNotes,
+          eaUsageNotes: firmData.eaUsageNotes,
+          copyTradingNotes: firmData.copyTradingNotes,
+          hedgingNotes: firmData.hedgingNotes,
+          scalpingNotes: firmData.scalpingNotes
+        }
+      },
+      
+      // Support Operations (Step 6)
+      supportOperations: {
+        supportChannels: firmData.supportChannels ? [firmData.supportChannels] : [],
+        averageFirstResponseTime: firmData.averageFirstResponseTime,
+        averageResolutionTime: firmData.averageResolutionTime,
+        supportHours: firmData.supportHours,
+        escalationPolicy: firmData.escalationPolicy,
+        kycRequirements: firmData.kycRequirements,
+        restrictedCountries: firmData.restrictedCountries ? [firmData.restrictedCountries] : [],
+        amlComplianceLink: firmData.amlComplianceLink
+      },
+      
+      // Transparency Verification (Step 7)
+      transparencyVerification: {
+        ceoPublic: firmData.ceoPublic || false,
+        entityOfficeVerified: firmData.entityOfficeVerified || false,
+        termsPublicUpdated: firmData.termsPublicUpdated || false,
+        payoutProofsPublic: firmData.payoutProofsPublic || false,
+        thirdPartyAudit: firmData.thirdPartyAudit || false,
+        transparencyNotes: firmData.transparencyNotes
+      },
+      
+      // Administration Audit (Step 8)
+      administrationAudit: {
+        dataSource: firmData.dataSource,
+        verifiedBy: firmData.verifiedBy,
+        verificationDate: firmData.verificationDate,
+        nextReviewDate: firmData.nextReviewDate,
+        changelogNotes: firmData.changelogNotes
+      },
+      
+      // System fields
+      createdBy: firmData.createdBy || 'current-user-id',
+      lastModifiedBy: firmData.lastModifiedBy || 'current-user-id',
+      isDraft: firmData.isDraft !== false,
+      isPublished: firmData.isPublished || false
+    };
     
-    const firm = new Firm(firmData);
+    const firm = new Firm(transformedData);
     await firm.save();
     
     return NextResponse.json({ firm, firmId: firm._id });
