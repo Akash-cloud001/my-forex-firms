@@ -39,6 +39,14 @@ interface AdministrationAuditForm {
   changelogNotes: string;
 }
 
+interface AdministrationAuditData {
+  dataSource?: "firm" | "mff" | "community";
+  verifiedBy?: string;
+  verificationDate?: string | Date;
+  nextReviewDate?: string | Date | null;
+  changelogNotes?: string;
+}
+
 export default function AdministrationAuditStep({
   data,
   onNext,
@@ -46,11 +54,11 @@ export default function AdministrationAuditStep({
 }: StepProps) {
   const form = useForm<AdministrationAuditForm>({
     defaultValues: {
-      dataSource: (data.dataSource as "firm" | "mff" | "community") || "firm",
-      verifiedBy: (data.verifiedBy as string) || "",
-      verificationDate: (data.verificationDate as string) || "",
-      nextReviewDate: (data.nextReviewDate as string) || "",
-      changelogNotes: (data.changelogNotes as string) || "",
+      dataSource: ((data.administrationAudit as AdministrationAuditData)?.dataSource as "firm" | "mff" | "community") || (data.dataSource as "firm" | "mff" | "community") || "firm",
+      verifiedBy: ((data.administrationAudit as AdministrationAuditData)?.verifiedBy as string) || (data.verifiedBy as string) || "",
+      verificationDate: ((data.administrationAudit as AdministrationAuditData)?.verificationDate ? new Date((data.administrationAudit as AdministrationAuditData).verificationDate!).toISOString().split('T')[0] : "") || (data.verificationDate as string) || "",
+      nextReviewDate: ((data.administrationAudit as AdministrationAuditData)?.nextReviewDate ? new Date((data.administrationAudit as AdministrationAuditData).nextReviewDate!).toISOString().split('T')[0] : "") || (data.nextReviewDate as string) || "",
+      changelogNotes: ((data.administrationAudit as AdministrationAuditData)?.changelogNotes as string) || (data.changelogNotes as string) || "",
     },
   });
 
@@ -132,6 +140,7 @@ export default function AdministrationAuditStep({
                         <Input
                           type="date"
                           {...field}
+                          value={field.value || ""}
                         />
                       </FormControl>
                       <FormMessage />
@@ -149,6 +158,7 @@ export default function AdministrationAuditStep({
                         <Input
                           type="date"
                           {...field}
+                          value={field.value || ""}
                         />
                       </FormControl>
                       <FormDescription>

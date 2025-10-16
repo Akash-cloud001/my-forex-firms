@@ -40,12 +40,12 @@ export default function TransparencyVerificationStep({
 }: StepProps) {
   const form = useForm<TransparencyVerificationForm>({
     defaultValues: {
-      ceoPublic: (data.ceoPublic as boolean) || false,
-      entityOfficeVerified: (data.entityOfficeVerified as boolean) || false,
-      termsPublicUpdated: (data.termsPublicUpdated as boolean) || false,
-      payoutProofsPublic: (data.payoutProofsPublic as boolean) || false,
-      thirdPartyAudit: (data.thirdPartyAudit as boolean) || false,
-      transparencyNotes: (data.transparencyNotes as string) || "",
+      ceoPublic: ((data.transparencyVerification as Record<string, unknown>)?.ceoPublic as boolean) || (data.ceoPublic as boolean) || false,
+      entityOfficeVerified: ((data.transparencyVerification as Record<string, unknown>)?.entityOfficeVerified as boolean) || (data.entityOfficeVerified as boolean) || false,
+      termsPublicUpdated: ((data.transparencyVerification as Record<string, unknown>)?.termsPublicUpdated as boolean) || (data.termsPublicUpdated as boolean) || false,
+      payoutProofsPublic: ((data.transparencyVerification as Record<string, unknown>)?.payoutProofsPublic as boolean) || (data.payoutProofsPublic as boolean) || false,
+      thirdPartyAudit: ((data.transparencyVerification as Record<string, unknown>)?.thirdPartyAudit as boolean) || (data.thirdPartyAudit as boolean) || false,
+      transparencyNotes: ((data.transparencyVerification as Record<string, unknown>)?.transparencyNotes as string) || (data.transparencyNotes as string) || "",
     },
   });
 

@@ -22,6 +22,7 @@ interface StepProps {
   onPrevious: () => void;
   isFirstStep: boolean;
   isLastStep: boolean;
+  onDataChange?: (data: Record<string, unknown>) => void;
 }
 
 interface PayoutFinancialForm {
@@ -43,26 +44,35 @@ export default function PayoutFinancialStep({
   data,
   onNext,
   onPrevious,
+  onDataChange,
 }: StepProps) {
   const form = useForm<PayoutFinancialForm>({
     defaultValues: {
-      profitSplit: (data.profitSplit as string) || "",
-      firstPayoutTiming: (data.firstPayoutTiming as string) || "",
-      regularPayoutCycle: (data.regularPayoutCycle as string) || "",
-      minimumPayoutAmount: (data.minimumPayoutAmount as string) || "",
-      averagePayoutProcessingTime: (data.averagePayoutProcessingTime as string) || "",
-      fastestSlowestPayoutDuration: (data.fastestSlowestPayoutDuration as string) || "",
-      payoutMethods: (data.payoutMethods as string) || "",
-      payoutFeesFxCosts: (data.payoutFeesFxCosts as string) || "",
-      totalPayoutsAllTime: (data.totalPayoutsAllTime as string) || "",
-      largestSinglePayout: (data.largestSinglePayout as string) || "",
-      monthlyPayoutCounts: (data.monthlyPayoutCounts as string) || "",
-      payoutProofLinks: (data.payoutProofLinks as string) || "",
+      profitSplit: ((data.payoutFinancial as Record<string, unknown>)?.profitSplit as string) || (data.profitSplit as string) || "",
+      firstPayoutTiming: ((data.payoutFinancial as Record<string, unknown>)?.firstPayoutTiming as string) || (data.firstPayoutTiming as string) || "",
+      regularPayoutCycle: ((data.payoutFinancial as Record<string, unknown>)?.regularPayoutCycle as string) || (data.regularPayoutCycle as string) || "",
+      minimumPayoutAmount: ((data.payoutFinancial as Record<string, unknown>)?.minimumPayoutAmount as string) || (data.minimumPayoutAmount as string) || "",
+      averagePayoutProcessingTime: ((data.payoutFinancial as Record<string, unknown>)?.averagePayoutProcessingTime as string) || (data.averagePayoutProcessingTime as string) || "",
+      fastestSlowestPayoutDuration: ((data.payoutFinancial as Record<string, unknown>)?.fastestSlowestPayoutDuration as string) || (data.fastestSlowestPayoutDuration as string) || "",
+      payoutMethods: (((data.payoutFinancial as Record<string, unknown>)?.payoutMethods as string[])?.[0] as string) || (data.payoutMethods as string) || "",
+      payoutFeesFxCosts: ((data.payoutFinancial as Record<string, unknown>)?.payoutFeesFxCosts as string) || (data.payoutFeesFxCosts as string) || "",
+      totalPayoutsAllTime: ((data.payoutFinancial as Record<string, unknown>)?.totalPayoutsAllTime as string) || (data.totalPayoutsAllTime as string) || "",
+      largestSinglePayout: ((data.payoutFinancial as Record<string, unknown>)?.largestSinglePayout as string) || (data.largestSinglePayout as string) || "",
+      monthlyPayoutCounts: ((data.payoutFinancial as Record<string, unknown>)?.monthlyPayoutCounts as string) || (data.monthlyPayoutCounts as string) || "",
+      payoutProofLinks: (((data.payoutFinancial as Record<string, unknown>)?.payoutProofLinks as string[])?.[0] as string) || (data.payoutProofLinks as string) || "",
     },
   });
 
   const onSubmit = (formData: PayoutFinancialForm) => {
     onNext(formData as unknown as Record<string, unknown>);
+  };
+
+  const handleDataChange = (fieldName: string, value: string) => {
+    if (onDataChange) {
+      const currentData = form.getValues();
+      const updatedData = { ...currentData, [fieldName]: value };
+      onDataChange(updatedData);
+    }
   };
 
   return (
@@ -94,6 +104,10 @@ export default function PayoutFinancialStep({
                         <Input
                           placeholder="80/20 or 70/30"
                           {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            handleDataChange('profitSplit', e.target.value);
+                          }}
                         />
                       </FormControl>
                       <FormDescription>

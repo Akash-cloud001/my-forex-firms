@@ -22,6 +22,7 @@ interface StepProps {
   onPrevious: () => void;
   isFirstStep: boolean;
   isLastStep: boolean;
+  onDataChange?: (data: Record<string, unknown>) => void;
 }
 
 interface TradingPlatformsForm {
@@ -33,16 +34,25 @@ export default function TradingPlatformsStep({
   data,
   onNext,
   onPrevious,
+  onDataChange,
 }: StepProps) {
   const form = useForm<TradingPlatformsForm>({
     defaultValues: {
-      tradingPlatforms: (data.tradingPlatforms as string) || "",
-      dataFeedsLiquidityProviders: (data.dataFeedsLiquidityProviders as string) || "",
+      tradingPlatforms: (((data.tradingInfrastructure as Record<string, unknown>)?.tradingPlatforms as string[])?.[0] as string) || (data.tradingPlatforms as string) || "",
+      dataFeedsLiquidityProviders: (((data.tradingInfrastructure as Record<string, unknown>)?.dataFeedsLiquidityProviders as string[])?.[0] as string) || (data.dataFeedsLiquidityProviders as string) || "",
     },
   });
 
   const onSubmit = (formData: TradingPlatformsForm) => {
     onNext(formData as unknown as Record<string, unknown>);
+  };
+
+  const handleDataChange = (fieldName: string, value: string) => {
+    if (onDataChange) {
+      const currentData = form.getValues();
+      const updatedData = { ...currentData, [fieldName]: value };
+      onDataChange(updatedData);
+    }
   };
 
   return (
@@ -73,6 +83,10 @@ export default function TradingPlatformsStep({
                       <Input
                         placeholder="MT4, MT5, cTrader, TradingView, etc."
                         {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          handleDataChange('tradingPlatforms', e.target.value);
+                        }}
                       />
                     </FormControl>
                     <FormDescription>
@@ -95,6 +109,10 @@ export default function TradingPlatformsStep({
                         placeholder="LMAX, Interactive Brokers, FXCM, etc."
                         className="min-h-[80px]"
                         {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          handleDataChange('dataFeedsLiquidityProviders', e.target.value);
+                        }}
                       />
                     </FormControl>
                     <FormDescription>

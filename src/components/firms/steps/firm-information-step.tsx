@@ -72,7 +72,7 @@ interface StepProps {
 interface FirmInformationForm {
   firmName: string;
   logoUrl: string;
-  logoFile: File | null;
+  logoFile: File | { url: string; filename: string } | null;
   legalEntityName: string;
   registrationNumber: string;
   jurisdiction: string;
@@ -123,10 +123,13 @@ export default function FirmInformationStep({
     const logoFile = formData.logoFile;
     const isFileObject = logoFile instanceof File;
     
+    // For edit mode, if we have logoUrl but no logoFile, we should show the existing logo
+    const hasExistingLogo = !isFileObject && (formData.logoUrl as string);
+    
     form.reset({
       firmName: (formData.firmName as string) || "",
       logoUrl: (formData.logoUrl as string) || "",
-      logoFile: isFileObject ? logoFile : null,
+      logoFile: isFileObject ? logoFile : (hasExistingLogo ? { url: formData.logoUrl as string, filename: "existing-logo" } : null),
       legalEntityName: (formData.legalEntityName as string) || "",
       registrationNumber: (formData.registrationNumber as string) || "",
       jurisdiction: (formData.jurisdiction as string) || "",
@@ -227,11 +230,11 @@ export default function FirmInformationStep({
                                       </p>
                                     </div>
                                   </div>
-                                  {fileField.value && (
+                                  {(fileField.value || form.getValues("logoUrl")) && (
                                     <div className="mt-4 flex items-center justify-between bg-muted p-3 rounded-md">
                                       <div className="flex items-center space-x-2">
                                         <div className="w-12 h-12 relative overflow-hidden bg-primary/10 rounded flex items-center justify-center">
-                                          {/* image preview */}
+                                          {/* Show existing logo from URL if no new file uploaded */}
                                           {fileField.value instanceof File ? (
                                             <FilePreview file={fileField.value} />
                                           ) : fileField.value && typeof fileField.value === 'object' && 'url' in fileField.value ? (
@@ -241,20 +244,34 @@ export default function FirmInformationStep({
                                               className="w-full h-full object-cover" 
                                               fill 
                                             />
+                                          ) : form.getValues("logoUrl") ? (
+                                            <Image 
+                                              src={form.getValues("logoUrl")} 
+                                              alt="Existing Logo" 
+                                              className="w-full h-full object-cover" 
+                                              fill 
+                                            />
                                           ) : (
                                             <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
                                               File
                                             </div>
                                           )}
                                         </div>
-                                        <span className="text-sm font-medium truncate">
-                                          {fileField.value instanceof File 
-                                            ? fileField.value.name 
-                                            : fileField.value && typeof fileField.value === 'object' && 'filename' in fileField.value
-                                            ? (fileField.value as { filename: string }).filename
-                                            : 'Selected file'
-                                          }
-                                        </span>
+                                        <div className="flex flex-col">
+                                          <span className="text-sm font-medium truncate">
+                                            {fileField.value instanceof File 
+                                              ? fileField.value.name 
+                                              : fileField.value && typeof fileField.value === 'object' && 'filename' in fileField.value
+                                              ? (fileField.value as { filename: string }).filename
+                                              : form.getValues("logoUrl") 
+                                              ? "Current Logo"
+                                              : 'Selected file'
+                                            }
+                                          </span>
+                                          {form.getValues("logoUrl") && !fileField.value && (
+                                            <span className="text-xs text-muted-foreground">Click to replace</span>
+                                          )}
+                                        </div>
                                       </div>
                                       <Button
                                         type="button"
@@ -262,6 +279,7 @@ export default function FirmInformationStep({
                                         size="sm"
                                         onClick={() => {
                                           fileField.onChange(null);
+                                          form.setValue("logoUrl", "");
                                           const input = document.getElementById("logo-upload") as HTMLInputElement;
                                           if (input) input.value = "";
                                         }}

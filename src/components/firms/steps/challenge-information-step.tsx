@@ -63,7 +63,14 @@ export default function ChallengeInformationStep({
 }: StepProps) {
   const form = useForm<ChallengeInformationForm>({
     defaultValues: {
-      challenges: (data.challenges as ChallengeType[]) || [
+      challenges: (data.challenges as ChallengeType[])?.map(challenge => ({
+        ...challenge,
+        termsLastUpdated: challenge.termsLastUpdated ? 
+          (typeof challenge.termsLastUpdated === 'string' ? 
+            challenge.termsLastUpdated : 
+            new Date(challenge.termsLastUpdated).toISOString().split('T')[0]
+          ) : "",
+      })) || [
         {
           challengeName: "",
           challengeType: "1-step",
@@ -447,6 +454,7 @@ export default function ChallengeInformationStep({
                             <Input
                               type="date"
                               {...field}
+                              value={field.value || ""}
                             />
                           </FormControl>
                           <FormMessage />

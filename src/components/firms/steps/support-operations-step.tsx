@@ -42,14 +42,14 @@ export default function SupportOperationsStep({
 }: StepProps) {
   const form = useForm<SupportOperationsForm>({
     defaultValues: {
-      supportChannels: (data.supportChannels as string) || "",
-      averageFirstResponseTime: (data.averageFirstResponseTime as string) || "",
-      averageResolutionTime: (data.averageResolutionTime as string) || "",
-      supportHours: (data.supportHours as string) || "",
-      escalationPolicy: (data.escalationPolicy as string) || "",
-      kycRequirements: (data.kycRequirements as string) || "",
-      restrictedCountries: (data.restrictedCountries as string) || "",
-      amlComplianceLink: (data.amlComplianceLink as string) || "",
+      supportChannels: (((data.supportOperations as Record<string, unknown>)?.supportChannels as string[])?.[0] as string) || (data.supportChannels as string) || "",
+      averageFirstResponseTime: ((data.supportOperations as Record<string, unknown>)?.averageFirstResponseTime as string) || (data.averageFirstResponseTime as string) || "",
+      averageResolutionTime: ((data.supportOperations as Record<string, unknown>)?.averageResolutionTime as string) || (data.averageResolutionTime as string) || "",
+      supportHours: ((data.supportOperations as Record<string, unknown>)?.supportHours as string) || (data.supportHours as string) || "",
+      escalationPolicy: ((data.supportOperations as Record<string, unknown>)?.escalationPolicy as string) || (data.escalationPolicy as string) || "",
+      kycRequirements: ((data.supportOperations as Record<string, unknown>)?.kycRequirements as string) || (data.kycRequirements as string) || "",
+      restrictedCountries: (((data.supportOperations as Record<string, unknown>)?.restrictedCountries as string[])?.[0] as string) || (data.restrictedCountries as string) || "",
+      amlComplianceLink: ((data.supportOperations as Record<string, unknown>)?.amlComplianceLink as string) || (data.amlComplianceLink as string) || "",
     },
   });
 
