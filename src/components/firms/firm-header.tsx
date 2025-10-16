@@ -1,8 +1,6 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import Image from "next/image";
 import { 
   Building2, Star, 
@@ -36,16 +34,7 @@ interface FirmHeaderProps {
   firmId: string;
 }
 
-export function FirmHeader({ firm, firmId }: FirmHeaderProps) {
-  
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+export function FirmHeader({ firm }: FirmHeaderProps) {
 
   const getYearsInOperation = (yearFounded: number) => {
     return new Date().getFullYear() - yearFounded;

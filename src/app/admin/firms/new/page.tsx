@@ -47,8 +47,6 @@ function NewFirmContent() {
     markStepCompleted,
     autoSaveDraft,
     submitForm,
-    clearErrors,
-    resetForm,
     loadDraft,
     loadFromLocalStorage
   } = useFirmFormStore();
@@ -134,7 +132,7 @@ function NewFirmContent() {
     if (loaded) {
       setHasUnsavedChanges(true);
     }
-  }, []);
+  }, [loadFromLocalStorage]);
 
   // Load draft if specified in URL
   useEffect(() => {

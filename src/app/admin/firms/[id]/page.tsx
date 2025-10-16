@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
-import { AlertCircle, ArrowLeft, CheckCircle, Clock, Edit, MoreHorizontal } from "lucide-react";
+import { AlertCircle, ArrowLeft, CheckCircle, Edit, MoreHorizontal } from "lucide-react";
 import { FirmHeader } from "@/components/firms/firm-header";
 import { OverviewTab } from "@/components/firms/overview-tab";
 import { TradingTab } from "@/components/firms/trading-tab";

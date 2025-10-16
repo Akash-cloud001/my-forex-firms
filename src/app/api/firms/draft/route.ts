@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Firm from '@/models/Firm';
-import { uploadFileToBunnyCDN, deleteFileFromBunnyCDN } from '@/lib/bunnycdn';
+import { uploadFileToBunnyCDN } from '@/lib/bunnycdn';
 
 // Type for form data processing
 interface FormDataRecord {

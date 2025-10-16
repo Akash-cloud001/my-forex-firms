@@ -33,7 +33,7 @@ export async function PUT(
     const { id } = await params;
     const contentType = request.headers.get('content-type');
     
-    let updateData: any = {};
+    let updateData: Record<string, unknown> = {};
     let logoFile: File | null = null;
 
     if (contentType?.includes('multipart/form-data')) {
@@ -99,7 +99,8 @@ export async function PUT(
     }
 
     // Remove fields that shouldn't be updated directly
-    const { _id, createdAt, createdBy, version, ...rest } = updateData;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { _id, createdAt, createdBy, version, ...rest } = updateData as Record<string, unknown>;
     
     // Update firm in MongoDB
     const updatedFirm = await Firm.findByIdAndUpdate(
@@ -118,7 +119,7 @@ export async function PUT(
     }
 
     return NextResponse.json(updatedFirm);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating firm:', error);
     return NextResponse.json(
       { error: 'Failed to update firm' },

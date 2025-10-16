@@ -159,7 +159,7 @@ export function TradingTab({ firm }: TradingTabProps) {
                 </Badge>
                 {
                   Object.entries(firm.tradingEnvironment.ruleMatrix)
-                    .filter(([_, value]) => value) // only keep truthy values
+                    .filter(([, value]) => value) // only keep truthy values
                     .map(([key]) => (
                       <Badge key={key} variant="outline" className="capitalize">
                         {key}
@@ -173,7 +173,7 @@ export function TradingTab({ firm }: TradingTabProps) {
                 </Badge>
                 {
                   Object.entries(firm.tradingEnvironment.ruleMatrix)
-                    .filter(([_, value]) => !value) // only keep truthy values
+                    .filter(([, value]) => !value) // only keep truthy values
                     .map(([key]) => (
                       <Badge key={key} variant="outline" className="capitalize">
                         {key}

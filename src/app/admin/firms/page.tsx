@@ -21,7 +21,6 @@ import {
   Edit, 
   CheckCircle,
   Clock,
-  AlertCircle,
   Search,
   Download,
   RefreshCw,
@@ -236,15 +235,6 @@ export default function FirmsList() {
     }
   };
 
-  const getStatusBadge = (firm: Firm) => {
-    if (firm.isPublished) {
-      return <Badge variant="default" className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Published</Badge>;
-    } else if (firm.isDraft) {
-      return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800"><Clock className="w-3 h-3 mr-1" />Draft</Badge>;
-    } else {
-      return <Badge variant="outline" className="bg-gray-100 text-gray-800"><AlertCircle className="w-3 h-3 mr-1" />Unknown</Badge>;
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {

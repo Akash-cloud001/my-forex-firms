@@ -54,9 +54,6 @@ export function OverviewTab({ firm }: OverviewTabProps) {
     });
   };
 
-  const getYearsInOperation = (yearFounded: number) => {
-    return new Date().getFullYear() - yearFounded;
-  };
 
   return (
     <div className="space-y-6">

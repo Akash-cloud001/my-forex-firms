@@ -77,9 +77,9 @@ export const uploadFileToBunnyCDN = async (
     }
 
     throw new Error(`BunnyCDN upload failed: ${response.status} - ${response.data}`);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error uploading to BunnyCDN:', error);
-    throw new Error(`Failed to upload file to BunnyCDN: ${error.message}`);
+    throw new Error(`Failed to upload file to BunnyCDN: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 
@@ -103,10 +103,10 @@ export const deleteFileFromBunnyCDN = async (fileUrl: string): Promise<void> => 
     } else {
       console.warn(`Unexpected response when deleting file: ${response.status}`);
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting from BunnyCDN:', error);
     // Don't throw error for delete operations to prevent blocking updates
-    console.warn(`Failed to delete file from BunnyCDN: ${error.message}`);
+    console.warn(`Failed to delete file from BunnyCDN: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 
@@ -122,7 +122,7 @@ export const checkFileExistsInBunnyCDN = async (fileUrl: string): Promise<boolea
     
     const response = await bunnyCDNClient.head(filePath);
     return response.status === 200;
-  } catch (error) {
+  } catch {
     return false;
   }
 };
@@ -132,7 +132,12 @@ export const checkFileExistsInBunnyCDN = async (fileUrl: string): Promise<boolea
  * @param fileUrl - The full CDN URL of the file
  * @returns Promise<any> - File metadata
  */
-export const getFileInfoFromBunnyCDN = async (fileUrl: string): Promise<any> => {
+export const getFileInfoFromBunnyCDN = async (fileUrl: string): Promise<{
+  exists: boolean;
+  size?: string;
+  lastModified?: string;
+  contentType?: string;
+}> => {
   try {
     const url = new URL(fileUrl);
     const filePath = url.pathname.substring(1);
@@ -144,7 +149,7 @@ export const getFileInfoFromBunnyCDN = async (fileUrl: string): Promise<any> => 
       lastModified: response.headers['last-modified'],
       contentType: response.headers['content-type'],
     };
-  } catch (error) {
+  } catch {
     return { exists: false };
   }
 };
@@ -154,11 +159,12 @@ export const getFileInfoFromBunnyCDN = async (fileUrl: string): Promise<any> => 
  * @param error - The error object from BunnyCDN API
  * @returns string - User-friendly error message
  */
-export const handleBunnyCDNError = (error: any): string => {
-  if (error.response) {
+export const handleBunnyCDNError = (error: unknown): string => {
+  if (error && typeof error === 'object' && 'response' in error) {
+    const axiosError = error as { response: { status: number; data?: { message?: string }; statusText: string } };
     // BunnyCDN API returned an error
-    const status = error.response.status;
-    const message = error.response.data?.message || error.response.statusText;
+    const status = axiosError.response.status;
+    const message = axiosError.response.data?.message || axiosError.response.statusText;
     
     switch (status) {
       case 401:
@@ -174,10 +180,10 @@ export const handleBunnyCDNError = (error: any): string => {
       default:
         return `BunnyCDN error: ${status} - ${message}`;
     }
-  } else if (error.request) {
+  } else if (error && typeof error === 'object' && 'request' in error) {
     return 'Network error connecting to BunnyCDN. Please check your internet connection.';
   } else {
-    return `BunnyCDN configuration error: ${error.message}`;
+    return `BunnyCDN configuration error: ${error instanceof Error ? error.message : 'Unknown error'}`;
   }
 };
 
@@ -197,7 +203,7 @@ export const uploadFileToBunnyCDNWithRetry = async (
   folder: string = 'logos',
   maxRetries: number = 3
 ): Promise<BunnyCDNFile> => {
-  let lastError: any;
+  let lastError: unknown;
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
