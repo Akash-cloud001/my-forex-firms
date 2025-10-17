@@ -1,23 +1,20 @@
 "use client";
 
 import React, { useState } from 'react';
-import { User } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Save } from 'lucide-react';
 
-interface PersonalInfoFormProps {
-  user: User;
-}
-
-export default function PersonalInfoForm({ user }: PersonalInfoFormProps) {
+export default function PersonalInfoForm() {
+  const { user, isLoaded, isSignedIn } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: user.firstName || "",
-    lastName: user.lastName || "",
-    username: user.username || "",
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    username: user?.username || "",
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -35,12 +32,32 @@ export default function PersonalInfoForm({ user }: PersonalInfoFormProps) {
 
   const handleCancel = () => {
     setFormData({
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
-      username: user.username || "",
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
+      username: user?.username || "",
     });
     setIsEditing(false);
   };
+
+  if (!isLoaded) {
+    return (
+      <Card>
+        <CardContent>
+          <p>Loading personal information...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!isSignedIn || !user) {
+    return (
+      <Card>
+        <CardContent>
+          <p>Please sign in to view your personal information.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

@@ -1,9 +1,6 @@
 "use client";
 
 import { SignIn } from '@clerk/nextjs';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Shield, TrendingUp, Users, Star, ArrowRight, CheckCircle } from 'lucide-react';
 
 export default function Page() {
   return (

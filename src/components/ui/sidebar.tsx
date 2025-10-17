@@ -24,7 +24,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { SignOutButton } from "@clerk/nextjs"
 import { useState } from "react"
 import LogoutConfirmation from "../profile/LogoutConfirmation"
 

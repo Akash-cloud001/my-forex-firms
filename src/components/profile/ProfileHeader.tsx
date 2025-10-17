@@ -1,7 +1,8 @@
 "use client";
 
 import React from 'react';
-import { User } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,11 +11,30 @@ import { Separator } from '@/components/ui/separator';
 import { User as UserIcon, Camera } from 'lucide-react';
 import Image from 'next/image';
 
-interface ProfileHeaderProps {
-  user: User;
-}
 
-export default function ProfileHeader({ user }: ProfileHeaderProps) {
+export default function ProfileHeader() {
+  const { user, isLoaded, isSignedIn } = useUser();
+
+  if (!isLoaded) {
+    return (
+      <Card>
+        <CardContent>
+          <p>Loading profile information...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!isSignedIn || !user) {
+    return (
+      <Card>
+        <CardContent>
+          <p>Please sign in to view your profile information.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>

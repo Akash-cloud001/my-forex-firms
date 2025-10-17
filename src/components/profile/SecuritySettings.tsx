@@ -1,16 +1,13 @@
 "use client";
 
 import React from 'react';
-import { User } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Shield, Key, Mail, Globe } from 'lucide-react';
 
-interface SecuritySettingsProps {
-  user: User;
-}
-
-export default function SecuritySettings({ user }: SecuritySettingsProps) {
+export default function SecuritySettings() {
+  const { user, isLoaded, isSignedIn } = useUser();
   const handleChangePassword = () => {
     // TODO: Implement password change logic
     console.log('Change password clicked');
@@ -25,6 +22,26 @@ export default function SecuritySettings({ user }: SecuritySettingsProps) {
     // TODO: Implement 2FA setup logic
     console.log('Enable 2FA clicked');
   };
+
+  if (!isLoaded) {
+    return (
+      <Card>
+        <CardContent>
+          <p>Loading security settings...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!isSignedIn || !user) {
+    return (
+      <Card>
+        <CardContent>
+          <p>Please sign in to view your security settings.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

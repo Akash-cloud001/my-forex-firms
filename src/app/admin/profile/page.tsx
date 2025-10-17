@@ -45,13 +45,13 @@ export default function ProfilePage() {
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
-          <ProfileHeader user={user} />
-          <PersonalInfoForm user={user} />
-          <AccountInfo user={user} />
+          <ProfileHeader  />
+          <PersonalInfoForm  />
+          <AccountInfo  />
         </TabsContent>
 
         <TabsContent value="security" className="space-y-6">
-          <SecuritySettings user={user} />
+          <SecuritySettings  />
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6">
