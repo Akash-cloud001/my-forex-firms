@@ -191,3 +191,21 @@
     background: var(--grad-btn);
   }
 }
+.cl-socialButtons>button {
+  background: linear-gradient(115deg, rgba(246, 101, 53, 0.5) 0%, rgba(103, 39, 17, 0.4) 100%);
+  color: white;
+  border-radius: 10px;
+}
+.cl-dividerRow .cl-dividerLine{
+  background: rgba(255, 255, 255, 0.234);
+}
+.cl-dividerRow .cl-dividerText{
+  color: rgba(255, 255, 255, 0.4);
+}
+.cl-input{
+ background: red !important;
+}
+.cl-formFieldHintText{
+  color: rgba(255, 255, 255, 0.4) !important;
+  font-size: 8px !important;
+}
