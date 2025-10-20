@@ -41,3 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 /docs
+/scripts
+/src/app/admin/test/
+/src/app/admin/seed/
+/src/app/api/admin/seed/
