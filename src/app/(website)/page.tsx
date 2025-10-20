@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-
 type formData = {
   email: string;
 }
@@ -45,11 +44,11 @@ export default function Page() {
 
   return (
     <section className="min-h-screen w-full bg-background flex flex-col items-center justify-between pt-6 md:pt-10 pb-5 px-4 sm:px-6 md:px-10">
-      <div className="flex items-center justify-between gap-3 max-w-7xl mx-auto w-full">
-        <h1 className="text-primary text-shadow-primary font-mont text-2xl sm:text-3xl md:text-4xl font-semibold text-center tracking-tighter">
-          My Forex Firms
+      <div className="flex items-center justify-center gap-3 max-w-7xl mx-auto w-full">
+        <h1 className="text-primary text-shadow-primary font-mont text-2xl sm:text-3xl md:text-4xl font-semibold text-center tracking-tighter flex gap-3 items-center justify-center">
+          <Image src="/logo.svg" alt="my forex firms logo" height={50} width={50} /> My Forex Firms
         </h1>
-        <div className="flex gap-1">
+        {/* <div className="flex gap-1">
         <SignedOut>
           <SignInButton>
             <Button variant="outline" className="btn-grad hover:text-white">
@@ -65,7 +64,7 @@ export default function Page() {
         <SignedIn>
           <UserButton />
         </SignedIn>
-        </div>
+        </div> */}
       </div>
       <div className="flex flex-col items-center justify-center">
         <Image
