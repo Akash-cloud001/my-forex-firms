@@ -3,7 +3,6 @@
 import React from 'react';
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -12,14 +11,15 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { LogOut } from 'lucide-react';
+import {SignOutButton} from '@clerk/nextjs';
+import { Button } from '../ui/button';
 
 interface LogoutConfirmationProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
 }
 
-export default function LogoutConfirmation({ isOpen, onClose, onConfirm }: LogoutConfirmationProps) {
+export default function LogoutConfirmation({ isOpen, onClose }: LogoutConfirmationProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
@@ -34,16 +34,12 @@ export default function LogoutConfirmation({ isOpen, onClose, onConfirm }: Logou
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel className="text-white cursor-pointer">Cancel</AlertDialogCancel>
-          <AlertDialogAction 
-            onClick={() => {
-              onConfirm();
-              onClose();
-            }}
-            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground cursor-pointer"
-          >
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </AlertDialogAction>
+          <SignOutButton>
+            <Button variant="destructive" className="bg-destructive hover:bg-destructive/90 text-destructive-foreground cursor-pointer">
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
+          </SignOutButton>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
