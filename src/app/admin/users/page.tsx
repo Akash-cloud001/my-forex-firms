@@ -203,7 +203,7 @@ export default function UsersPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 text-white">
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
@@ -218,27 +218,27 @@ export default function UsersPage() {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Change User Role</AlertDialogTitle>
+                        <AlertDialogTitle className="text-white">Change User Role</AlertDialogTitle>
                         <AlertDialogDescription>
                           Select a new role for {user.firstName} {user.lastName} ({user.email})
                         </AlertDialogDescription>
                       </AlertDialogHeader>
-                      <div className="py-4">
+                      <div className="py-4 text-white space-y-2">
                         <Label htmlFor="role-select">Role</Label>
                         <Select value={newRole} onValueChange={setNewRole}>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select a role" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="user">User</SelectItem>
-                            <SelectItem value="editor">Editor</SelectItem>
-                            <SelectItem value="moderator">Moderator</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="user" className="text-white">User</SelectItem>
+                            <SelectItem value="editor" className="text-white">Editor</SelectItem>
+                            <SelectItem value="moderator" className="text-white">Moderator</SelectItem>
+                            <SelectItem value="admin" className="text-white">Admin</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="text-white">Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={confirmRoleChange}
                           disabled={isUpdating || !newRole || newRole === selectedUser?.role}
