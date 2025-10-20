@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 
 const isPublicRoute = createRouteMatcher([
   '/',
@@ -6,9 +7,90 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)'
 ])
 
+const isDashboardRoute = createRouteMatcher([
+  '/admin(.*)'
+])
+
+const isAdminRoute = createRouteMatcher([
+  '/admin/users(.*)',
+  '/api/admin(.*)'
+])
+
 export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
     await auth.protect()
+    
+    // Check dashboard routes for email-based access
+    if (isDashboardRoute(req)) {
+      const { userId } = await auth()
+      
+      if (!userId) {
+        return NextResponse.redirect(new URL('/sign-in', req.url))
+      }
+
+      try {
+        // We need to get the user's email from the database or use a different approach
+        // Since we can't use currentUser() in middleware, let's use the clerkClient
+        const { clerkClient } = await import('@clerk/nextjs/server')
+        const clerk = await clerkClient()
+        const user = await clerk.users.getUser(userId)
+        
+        const userEmail = user.emailAddresses?.[0]?.emailAddress
+
+        console.log('🔍 Middleware Debug:')
+        console.log('- User ID:', userId)
+        console.log('- User Email Addresses:', user.emailAddresses?.map(e => e.emailAddress))
+        console.log('- Primary Email:', userEmail)
+
+        if (!userEmail) {
+          console.log('❌ No email found in user object')
+          return NextResponse.redirect(new URL('/', req.url))
+        }
+
+        // Check admin status using Clerk user metadata
+        console.log('🔍 Checking admin status for:', userEmail.toLowerCase())
+        
+        // Check if user has admin role in Clerk metadata
+        const isAdmin = user.publicMetadata?.role === 'admin' || 
+                       user.privateMetadata?.role === 'admin' ||
+                       user.unsafeMetadata?.role === 'admin'
+
+        console.log('🔍 Admin check result:', isAdmin ? 'ADMIN FOUND' : 'NOT ADMIN')
+        console.log('🔍 User metadata:', {
+          public: user.publicMetadata,
+          private: user.privateMetadata,
+          unsafe: user.unsafeMetadata
+        })
+
+        if (!isAdmin) {
+          console.log('❌ User is not an admin, redirecting to home')
+          // Redirect non-admin users to home page
+          return NextResponse.redirect(new URL('/', req.url))
+        }
+
+        console.log('✅ Admin access granted')
+        // Allow admin to proceed
+        return NextResponse.next()
+
+      } catch (error) {
+        console.error('❌ Middleware error:', error)
+        // If there's a database error, allow access for now
+        // You might want to change this behavior based on your needs
+        return NextResponse.next()
+      }
+    }
+    
+    // Check admin routes
+    if (isAdminRoute(req)) {
+      const { userId } = await auth()
+      
+      if (!userId) {
+        return NextResponse.redirect(new URL('/sign-in', req.url))
+      }
+      
+      // For now, we'll let the API routes handle role checking
+      // This ensures the user is authenticated before reaching the API
+    }
   }
 })
 

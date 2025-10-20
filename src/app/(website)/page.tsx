@@ -3,8 +3,10 @@ import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SignInButton, SignOutButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
-type formData={
+type formData = {
   email: string;
 }
 export default function Page() {
@@ -12,7 +14,7 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  
+
   const onSubmit = async (data: formData) => {
     setIsLoading(true);
     setErrorMessage(""); // Clear any previous errors
@@ -43,14 +45,27 @@ export default function Page() {
 
   return (
     <section className="min-h-screen w-full bg-background flex flex-col items-center justify-between pt-6 md:pt-10 pb-5 px-4 sm:px-6 md:px-10">
-      <h1 className="text-primary text-shadow-primary font-mont text-2xl sm:text-3xl md:text-4xl font-semibold text-center tracking-tighter">
-        My Forex Firms
-      </h1>
+      <div className="flex items-center justify-between gap-3 max-w-7xl mx-auto w-full">
+        <h1 className="text-primary text-shadow-primary font-mont text-2xl sm:text-3xl md:text-4xl font-semibold text-center tracking-tighter">
+          My Forex Firms
+        </h1>
+        <SignedOut>
+          <SignInButton />
+          <SignUpButton>
+            <Button variant="outline" className="btn-grad hover:text-white">
+              Sign Up
+            </Button>
+          </SignUpButton>
+        </SignedOut>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
+      </div>
       <div className="flex flex-col items-center justify-center">
-        <Image 
-          src="/images/coming-soon/coming-bg.png" 
-          alt="coming soon" 
-          width={450} 
+        <Image
+          src="/images/coming-soon/coming-bg.png"
+          alt="coming soon"
+          width={450}
           height={450}
           className="w-[280px] sm:w-[350px] md:w-[450px] h-auto"
         />
@@ -78,9 +93,9 @@ export default function Page() {
             <p className="font-geist-sans text-sm sm:text-base text-foreground/80 mb-4">
               {errorMessage}
             </p>
-            <button 
-              type="button" 
-              onClick={() => setErrorMessage("")} 
+            <button
+              type="button"
+              onClick={() => setErrorMessage("")}
               className="btn-grad px-6 py-2"
             >
               Try Again
@@ -92,10 +107,10 @@ export default function Page() {
               Get Notified When {`It's`} <span className="text-primary">Live</span>
             </p>
             <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
-              <input 
-                type="email" 
-                placeholder="Enter your email" 
-                className={`input-field w-full sm:w-auto ${errors.email ? "!border-destructive" : ""}`} 
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className={`input-field w-full sm:w-auto ${errors.email ? "!border-destructive" : ""}`}
                 {...register("email", { required: true })}
               />
               <button type="submit" className="btn-grad w-full sm:w-auto max-w-xs" disabled={isLoading}>

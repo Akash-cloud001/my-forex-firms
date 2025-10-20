@@ -32,6 +32,8 @@ import {
   Link2,
   ChevronDown,
   Mail,
+  Users,
+  Shield,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -76,6 +78,18 @@ const navigationItems = [
     title: "Live Firms",
     url: "/admin/live-firms",
     icon: Building2,
+    hasSubmenu: false,
+  },
+  {
+    title: "User Management",
+    url: "/admin/users",
+    icon: Users,
+    hasSubmenu: false,
+  },
+  {
+    title: "Email Access",
+    url: "/admin/email-management",
+    icon: Shield,
     hasSubmenu: false,
   },
 ];

@@ -7,20 +7,16 @@ import { AlertTriangle, LogOut, Trash2 } from 'lucide-react';
 import LogoutConfirmation from './LogoutConfirmation';
 
 interface DangerZoneProps {
-  onSignOut: () => void;
+  onSignOut?: () => void;
 }
 
-export default function DangerZone({ onSignOut }: DangerZoneProps) {
+export default function DangerZone({ }: DangerZoneProps) {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
   };
 
-  const handleLogoutConfirm = () => {
-    onSignOut();
-    setShowLogoutModal(false);
-  };
 
   const handleLogoutCancel = () => {
     setShowLogoutModal(false);
@@ -71,7 +67,6 @@ export default function DangerZone({ onSignOut }: DangerZoneProps) {
       <LogoutConfirmation
         isOpen={showLogoutModal}
         onClose={handleLogoutCancel}
-        onConfirm={handleLogoutConfirm}
       />
     </Card>
   );

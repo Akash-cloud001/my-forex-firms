@@ -269,9 +269,6 @@ function SidebarTrigger({
     setShowLogoutModal(true);
   };
 
-  const handleLogoutConfirm = () => {
-    setShowLogoutModal(false);
-  };
 
   const handleLogoutCancel = () => {
     setShowLogoutModal(false);
@@ -313,7 +310,6 @@ function SidebarTrigger({
       <LogoutConfirmation
         isOpen={showLogoutModal}
         onClose={handleLogoutCancel}
-        onConfirm={handleLogoutConfirm}
       />
     </section>
   )
