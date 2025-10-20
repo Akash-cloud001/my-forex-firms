@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SignInButton, SignOutButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 type formData = {
   email: string;
@@ -49,10 +49,15 @@ export default function Page() {
         <h1 className="text-primary text-shadow-primary font-mont text-2xl sm:text-3xl md:text-4xl font-semibold text-center tracking-tighter">
           My Forex Firms
         </h1>
+        <div className="flex gap-1">
         <SignedOut>
-          <SignInButton />
-          <SignUpButton>
+          <SignInButton>
             <Button variant="outline" className="btn-grad hover:text-white">
+              Sign In
+            </Button>
+          </SignInButton>
+          <SignUpButton>
+            <Button variant="outline" className="text-primary hover:text-primary">
               Sign Up
             </Button>
           </SignUpButton>
@@ -60,6 +65,7 @@ export default function Page() {
         <SignedIn>
           <UserButton />
         </SignedIn>
+        </div>
       </div>
       <div className="flex flex-col items-center justify-center">
         <Image
