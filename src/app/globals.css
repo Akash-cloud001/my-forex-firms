@@ -190,6 +190,9 @@
     @apply px-4 py-[10px] rounded-full w-fit whitespace-nowrap font-geist-sans text-base font-medium tracking-tighter text-foreground;
     background: var(--grad-btn);
   }
+  .text-grad{
+    @apply text-transparent bg-clip-text bg-gradient-to-b from-[#F66435] to-[#903B1F];
+  }
 }
 .cl-socialButtons>button {
   background: linear-gradient(115deg, rgba(246, 101, 53, 0.5) 0%, rgba(103, 39, 17, 0.4) 100%);

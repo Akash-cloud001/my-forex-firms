@@ -3,8 +3,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+// Removed unused Button and Clerk imports
 type formData = {
   email: string;
 }
@@ -45,7 +44,7 @@ export default function Page() {
   return (
     <section className="min-h-screen w-full bg-background flex flex-col items-center justify-between pt-6 md:pt-10 pb-5 px-4 sm:px-6 md:px-10">
       <div className="flex items-center justify-center gap-3 max-w-7xl mx-auto w-full">
-        <h1 className="text-primary text-shadow-primary font-mont text-2xl sm:text-3xl md:text-4xl font-semibold text-center tracking-tighter flex gap-3 items-center justify-center">
+        <h1 className="text-transparent bg-clip-text bg-gradient-to-b from-[#F66435] to-[#903B1F] font-mont text-2xl sm:text-3xl md:text-4xl font-semibold text-center tracking-tighter flex gap-3 items-center justify-center">
           <Image src="/logo.svg" alt="my forex firms logo" height={50} width={50} /> My Forex Firms
         </h1>
         {/* <div className="flex gap-1">
