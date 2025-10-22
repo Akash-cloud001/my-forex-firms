@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import mongoose from 'mongoose';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     console.log('Testing MongoDB connection...');
     
@@ -11,6 +11,9 @@ export async function GET(request: NextRequest) {
     
     // Test if we can perform a simple operation
     const db = mongoose.connection.db;
+    if (!db) {
+      throw new Error('Database connection not established');
+    }
     const collections = await db.listCollections().toArray();
     
     return NextResponse.json({

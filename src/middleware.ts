@@ -16,9 +16,6 @@ const isAdminRoute = createRouteMatcher([
   '/api/admin(.*)'
 ])
 
-const isProtectedRoute = createRouteMatcher([
-  '/post-review(.*)',           // Protect review submission
-]);
 
 
 export default clerkMiddleware(async (auth, req) => {

@@ -4,36 +4,15 @@ import { auth } from '@clerk/nextjs/server';
 import Review from '@/models/Review';
 import { cleanupReviewFiles } from '@/lib/reviewFileUtils';
 
-// Type for review data
-interface ReviewData {
-  userId: string;
-  firmId?: string;
-  firmName: string;
-  customFirmName?: string;
-  issueType: string;
-  customIssueType?: string;
-  description: string;
-  rating: number;
-  files?: Array<{
-    name: string;
-    type: string;
-    size: number;
-    url: string;
-  }>;
-  status?: 'pending' | 'approved' | 'rejected';
-  isVerified?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
-    const reviewId = params.id;
+    const { id: reviewId } = await params;
     
     // Find review by ID in MongoDB
     const review = await Review.findById(reviewId);
@@ -57,7 +36,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -71,7 +50,7 @@ export async function PUT(
       );
     }
     
-    const reviewId = params.id;
+    const { id: reviewId } = await params;
     const updateData = await request.json();
     
     // Validate the update data
@@ -122,7 +101,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -136,7 +115,7 @@ export async function DELETE(
       );
     }
     
-    const reviewId = params.id;
+    const { id: reviewId } = await params;
     
     // Find the review first to access its files
     const review = await Review.findById(reviewId);

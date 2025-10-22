@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useUser, useClerk } from '@clerk/nextjs';
+import { SignedIn, useUser, useClerk } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,19 +24,32 @@ import {
   Mail, 
   Calendar, 
   Shield, 
-  Trash2, 
   Camera,
-  AlertTriangle,
-  ArrowRight
+  ArrowRight,
+  LogOut
 } from 'lucide-react';
 import Image from 'next/image';
+import LogoutConfirmation from '@/components/profile/LogoutConfirmation';
 
 export default function ProfilePage() {
   const { user, isLoaded, isSignedIn } = useUser();
   const { signOut } = useClerk();
   const router = useRouter();
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await signOut();
+      router.push('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    } finally {
+      setIsSigningOut(false);
+      setShowLogoutModal(false);
+    }
+  };
 
   if (!isLoaded) {
     return (
@@ -76,21 +89,6 @@ export default function ProfilePage() {
   }
 
 
-  const handleDeleteAccount = async () => {
-    setIsDeleting(true);
-    try {
-      // Note: Account deletion should be handled through Clerk's API
-      // This is a placeholder for the actual implementation
-      console.log('Account deletion requested');
-      // await user.delete(); // This would be the actual deletion call
-      alert('Account deletion functionality needs to be implemented with proper backend integration');
-    } catch (error) {
-      console.error('Error deleting account:', error);
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteDialog(false);
-    }
-  };
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -224,7 +222,13 @@ export default function ProfilePage() {
               </div>
             </CardContent>
           </Card>
-
+          <SignedIn>
+            <Button onClick={() => setShowLogoutModal(true)} className="mt-4">
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </SignedIn>
+         
           {/* Account Actions Card */}
           {/* <Card>
             <CardHeader>
@@ -322,6 +326,7 @@ export default function ProfilePage() {
             </CardContent>
           </Card> */}
         </div>
+        <LogoutConfirmation isOpen={showLogoutModal} onClose={() => setShowLogoutModal(false)} />
       </div>
     );
 }
