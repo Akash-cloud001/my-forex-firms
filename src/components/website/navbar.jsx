@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   SignInButton,
   SignUpButton,
@@ -16,6 +16,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Navbar = () => {
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
+  const pathname = usePathname();
+  
+  // Hide navbar on home page
+  if (pathname === '/') {
+    return null;
+  }
+  
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-background fixed inset-0">

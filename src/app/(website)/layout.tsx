@@ -7,7 +7,7 @@ const WebsiteLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <section className='bg-background min-h-screen w-full pt-12'>
+    <section className='bg-background min-h-screen w-full pt-14'>
         <Navbar />
         {children}
         <BottomBar />
