@@ -72,9 +72,9 @@ const Navbar = () => {
         </SignedOut>
         <SignedIn>
           <div onClick={() => router.push("/profile")} className="relative cursor-pointer">
-            {user.imageUrl ? (
+            {user?.imageUrl ? (
               <Image
-                src={user.imageUrl}
+                src={user?.imageUrl}
                 alt={user.fullName || "Profile"}
                 width={44}
                 height={44}
