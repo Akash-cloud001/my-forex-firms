@@ -1,5 +1,12 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
+import connectDB from '@/lib/mongodb'
+import AdminEmail from '@/models/AdminEmail'
+
+// Type for AdminEmail model
+type AdminEmailModel = {
+  findOne: (query: { email: string; status: string }) => Promise<{ email: string; status: string } | null>
+}
 
 const isPublicRoute = createRouteMatcher([
   '/',
@@ -31,8 +38,7 @@ export default clerkMiddleware(async (auth, req) => {
       }
 
       try {
-        // We need to get the user's email from the database or use a different approach
-        // Since we can't use currentUser() in middleware, let's use the clerkClient
+        // Get user's email from Clerk directly (middleware context)
         const { clerkClient } = await import('@clerk/nextjs/server')
         const clerk = await clerkClient()
         const user = await clerk.users.getUser(userId)
@@ -49,20 +55,20 @@ export default clerkMiddleware(async (auth, req) => {
           return NextResponse.redirect(new URL('/', req.url))
         }
 
-        // Check admin status using Clerk user metadata
+        // Check admin status using database admin emails
         console.log('🔍 Checking admin status for:', userEmail.toLowerCase())
         
-        // Check if user has admin role in Clerk metadata
-        const isAdmin = user.publicMetadata?.role === 'admin' || 
-                       user.privateMetadata?.role === 'admin' ||
-                       user.unsafeMetadata?.role === 'admin'
+        // Connect to database and check if email is in admin list
+        await connectDB()
+        const adminEmail = await (AdminEmail as unknown as AdminEmailModel).findOne({ 
+          email: userEmail.toLowerCase(), 
+          status: 'active' 
+        })
+
+        const isAdmin = !!adminEmail
 
         console.log('🔍 Admin check result:', isAdmin ? 'ADMIN FOUND' : 'NOT ADMIN')
-        console.log('🔍 User metadata:', {
-          public: user.publicMetadata,
-          private: user.privateMetadata,
-          unsafe: user.unsafeMetadata
-        })
+        console.log('🔍 Admin email found:', adminEmail)
 
         if (!isAdmin) {
           console.log('❌ User is not an admin, redirecting to home')

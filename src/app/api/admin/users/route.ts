@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth, clerkClient } from '@clerk/nextjs/server';
+import { isCurrentUserAdmin } from '@/lib/adminAuth';
 
 export async function GET(request: Request) {
   try {
@@ -9,10 +10,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Verify admin role
-    const clerk = await clerkClient();
-    const currentUser = await clerk.users.getUser(userId);
-    if (currentUser.publicMetadata?.role !== 'admin') {
+    // Verify admin role using centralized auth
+    const isUserAdmin = await isCurrentUserAdmin();
+    
+    if (!isUserAdmin) {
       return NextResponse.json(
         { error: 'Admin access required' }, 
         { status: 403 }
@@ -26,6 +27,7 @@ export async function GET(request: Request) {
     // If specific userId is requested, fetch that user
     if (targetUserId) {
       try {
+        const clerk = await clerkClient();
         const targetUser = await clerk.users.getUser(targetUserId);
         const userData = {
           id: targetUser.id,
@@ -39,7 +41,7 @@ export async function GET(request: Request) {
         };
         
         return NextResponse.json({ user: userData });
-      } catch (error) {
+      } catch {
         return NextResponse.json(
           { error: 'User not found' }, 
           { status: 404 }
@@ -53,6 +55,7 @@ export async function GET(request: Request) {
     const offset = (page - 1) * limit;
 
     // Fetch users from Clerk
+    const clerk = await clerkClient();
     const usersResponse = await clerk.users.getUserList({
       limit,
       offset,

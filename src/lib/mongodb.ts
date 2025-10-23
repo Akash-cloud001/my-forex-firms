@@ -18,13 +18,31 @@ declare global {
   } | undefined;
 }
 
-let cached = global.mongoose;
+// Check if we're in a Node.js environment
+const isNode = typeof global !== 'undefined';
 
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+let cached = isNode ? (global as typeof globalThis & { mongoose?: { conn: unknown; promise: Promise<unknown> | null } }).mongoose : undefined;
+
+if (!cached && isNode) {
+  cached = (global as typeof globalThis & { mongoose: { conn: unknown; promise: Promise<unknown> | null } }).mongoose = { conn: null, promise: null };
 }
 
 async function connectDB() {
+  // If not in Node.js environment, connect directly without caching
+  if (!isNode) {
+    const opts = {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 30000, // 30 seconds
+      socketTimeoutMS: 45000, // 45 seconds
+      connectTimeoutMS: 30000, // 30 seconds
+      maxPoolSize: 10, // Maintain up to 10 socket connections
+      minPoolSize: 5, // Maintain a minimum of 5 socket connections
+      maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
+    };
+
+    return await mongoose.connect(MONGODB_URI!, opts);
+  }
+
   if (cached?.conn) {
     return cached.conn;
   }

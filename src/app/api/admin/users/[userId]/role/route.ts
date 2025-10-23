@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, clerkClient } from '@clerk/nextjs/server';
+import { isCurrentUserAdmin } from '@/lib/adminAuth';
 
 export async function PUT(
   request: NextRequest,
@@ -16,12 +17,10 @@ export async function PUT(
       );
     }
 
-    // Get current user and verify admin role
-    const clerk = await clerkClient();
-    const adminUser = await clerk.users.getUser(adminUserId);
-    const adminRole = adminUser.publicMetadata?.role;
+    // Verify admin role using centralized auth
+    const isUserAdmin = await isCurrentUserAdmin();
 
-    if (adminRole !== 'admin') {
+    if (!isUserAdmin) {
       return NextResponse.json(
         { error: 'Only admins can change user roles' }, 
         { status: 403 }
@@ -50,6 +49,7 @@ export async function PUT(
     }
 
     // Update the user's role in Clerk
+    const clerk = await clerkClient();
     const updatedUser = await clerk.users.updateUserMetadata(targetUserId, {
       publicMetadata: {
         role: role,
