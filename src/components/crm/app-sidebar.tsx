@@ -51,8 +51,8 @@ const navigationItems = [
     hasSubmenu: false,
   },
   {
-    title: "Complaints",
-    url: "/admin/complaints",
+    title: "Reviews",
+    url: "/admin/reviews",
     icon: AlertCircle,
     hasSubmenu: false,
   },

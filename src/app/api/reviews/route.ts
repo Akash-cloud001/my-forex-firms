@@ -37,9 +37,13 @@ interface MongoSort {
   [key: string]: 1 | -1;
 }
 
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
+    
+    // Get user authentication
+    const { userId: authenticatedUserId } = await auth();
     
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
@@ -58,6 +62,26 @@ export async function GET(request: NextRequest) {
     
     const query: MongoQuery = {};
     
+    // If userId is provided in query params, use it (for admin access)
+    // Otherwise, filter by authenticated user for user-specific access
+    if (userId) {
+      query.userId = userId;
+    } else if (authenticatedUserId) {
+      // For regular users, only show their own reviews
+      query.userId = authenticatedUserId;
+    } else {
+      // If no authentication and no userId specified, return empty results
+      return NextResponse.json({
+        reviews: [],
+        pagination: {
+          page,
+          limit,
+          total: 0,
+          totalPages: 0
+        }
+      });
+    }
+    
     // Build query filters
     if (firmId) query.firmId = firmId;
     if (firmName) query.firmName = { $regex: firmName, $options: 'i' };
@@ -65,7 +89,6 @@ export async function GET(request: NextRequest) {
     if (rating) query.rating = parseInt(rating);
     if (status) query.status = status;
     if (isVerified) query.isVerified = isVerified === 'true';
-    if (userId) query.userId = userId;
     
     // Date range filter
     if (dateRangeStart || dateRangeEnd) {

@@ -75,17 +75,17 @@ const Navbar = () => {
             {user?.imageUrl ? (
               <Image
                 src={user?.imageUrl}
-                alt={user.fullName || "Profile"}
+                alt={user?.fullName || "Profile"}
                 width={44}
                 height={44}
                 className="rounded-full object-cover border-4 border-background shadow-lg"
               />
             ) : (
               <Avatar className="h-11 w-11 border-4 border-background shadow-lg">
-                <AvatarImage src={user.imageUrl} />
+                <AvatarImage src={user?.imageUrl} />
                 <AvatarFallback className="text-2xl font-semibold">
-                  {user.firstName?.charAt(0) ||
-                    user.emailAddresses[0]?.emailAddress?.charAt(0) ||
+                  {user?.firstName?.charAt(0) ||
+                    user?.emailAddresses?.[0]?.emailAddress?.charAt(0) ||
                     "U"}
                 </AvatarFallback>
               </Avatar>
