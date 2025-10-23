@@ -16,12 +16,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Navbar = () => {
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
-  const pathname = usePathname();
+  // const pathname = usePathname();
   
-  // Hide navbar on home page
-  if (pathname === '/') {
-    return null;
-  }
+  // // Hide navbar on home page
+  // if (pathname === '/') {
+  //   return null;
+  // }
   
   if (!isLoaded) {
     return (
