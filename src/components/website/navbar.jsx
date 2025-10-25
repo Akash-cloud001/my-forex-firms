@@ -19,9 +19,9 @@ const Navbar = () => {
   const pathname = usePathname();
   
   // Hide navbar on home page
-  if (pathname === '/') {
-    return null;
-  }
+  // if (pathname === '/') {
+  //   return null;
+  // }
   
   if (!isLoaded) {
     return (

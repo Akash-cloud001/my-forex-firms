@@ -240,7 +240,7 @@ export async function POST(request: NextRequest) {
       firmId: reviewData.firmId || null,
       firmName: reviewData.firmName === 'Other' ? reviewData.customFirmName : reviewData.firmName,
       customFirmName: reviewData.firmName === 'Other' ? reviewData.customFirmName : undefined,
-      issueType: reviewData.issueType === 'other' ? reviewData.customIssueType : reviewData.issueType,
+      issueType: reviewData.issueType ? 'other' : reviewData.issueType,
       customIssueType: reviewData.issueType === 'other' ? reviewData.customIssueType : undefined,
       description: reviewData.description,
       rating: reviewData.rating,
