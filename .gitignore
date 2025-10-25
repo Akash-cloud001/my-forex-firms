@@ -45,3 +45,5 @@ next-env.d.ts
 /src/app/admin/test/
 /src/app/admin/seed/
 /src/app/api/admin/seed/
+# clerk configuration (can include secrets)
+/.clerk/
