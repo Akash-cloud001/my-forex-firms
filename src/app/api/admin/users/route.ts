@@ -19,8 +19,35 @@ export async function GET(request: Request) {
       );
     }
 
-    // Get pagination params from query string
+    // Get query params
     const { searchParams } = new URL(request.url);
+    const targetUserId = searchParams.get('userId');
+    
+    // If specific userId is requested, fetch that user
+    if (targetUserId) {
+      try {
+        const targetUser = await clerk.users.getUser(targetUserId);
+        const userData = {
+          id: targetUser.id,
+          email: targetUser.emailAddresses[0]?.emailAddress || '',
+          firstName: targetUser.firstName || '',
+          lastName: targetUser.lastName || '',
+          imageUrl: targetUser.imageUrl || '',
+          role: targetUser.publicMetadata?.role || 'user',
+          createdAt: targetUser.createdAt,
+          lastSignInAt: targetUser.lastSignInAt
+        };
+        
+        return NextResponse.json({ user: userData });
+      } catch (error) {
+        return NextResponse.json(
+          { error: 'User not found' }, 
+          { status: 404 }
+        );
+      }
+    }
+
+    // Get pagination params from query string
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = (page - 1) * limit;

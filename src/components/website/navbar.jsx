@@ -16,9 +16,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Navbar = () => {
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
-  const pathname = usePathname();
+  // const pathname = usePathname();
   
-  // Hide navbar on home page
+  // // Hide navbar on home page
   // if (pathname === '/') {
   //   return null;
   // }
@@ -72,20 +72,20 @@ const Navbar = () => {
         </SignedOut>
         <SignedIn>
           <div onClick={() => router.push("/profile")} className="relative cursor-pointer">
-            {user.imageUrl ? (
+            {user?.imageUrl ? (
               <Image
-                src={user.imageUrl}
-                alt={user.fullName || "Profile"}
+                src={user?.imageUrl}
+                alt={user?.fullName || "Profile"}
                 width={44}
                 height={44}
                 className="rounded-full object-cover border-4 border-background shadow-lg"
               />
             ) : (
               <Avatar className="h-11 w-11 border-4 border-background shadow-lg">
-                <AvatarImage src={user.imageUrl} />
+                <AvatarImage src={user?.imageUrl} />
                 <AvatarFallback className="text-2xl font-semibold">
-                  {user.firstName?.charAt(0) ||
-                    user.emailAddresses[0]?.emailAddress?.charAt(0) ||
+                  {user?.firstName?.charAt(0) ||
+                    user?.emailAddresses?.[0]?.emailAddress?.charAt(0) ||
                     "U"}
                 </AvatarFallback>
               </Avatar>

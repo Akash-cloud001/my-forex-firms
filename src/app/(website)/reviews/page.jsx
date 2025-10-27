@@ -7,21 +7,28 @@ import { Star, Calendar, MessageSquare, FileText, Image as ImageIcon, ExternalLi
 import { getReviews } from '@/lib/reviewApi'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { useUser } from '@clerk/nextjs'
 
 const ReviewsPage = () => {
+  const { user, isLoaded } = useUser()
   const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [filter, setFilter] = useState('all') // all, pending, approved, rejected
 
   useEffect(() => {
-    fetchReviews()
-  }, [filter])
+    if (isLoaded && user) {
+      fetchReviews()
+    }
+  }, [filter, isLoaded, user])
 
   const fetchReviews = async () => {
+    if (!user) return
+    
     try {
       setLoading(true)
       const response = await getReviews({
+        userId: user.id,
         status: filter === 'all' ? undefined : filter,
         sortBy: 'createdAt',
         sortOrder: 'desc'
@@ -70,7 +77,7 @@ const ReviewsPage = () => {
     return `${Math.floor(diffInSeconds / 31536000)}y ago`
   }
 
-  if (loading) {
+  if (!isLoaded || loading) {
     return (
       <div className="min-h-screen py-8">
         <div className="container mx-auto px-4 max-w-7xl">
@@ -94,6 +101,21 @@ const ReviewsPage = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen py-8">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-foreground mb-4">Your Reviews</h1>
+            <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+              <p className="text-yellow-800 dark:text-yellow-200">Please sign in to view your reviews.</p>
+            </div>
           </div>
         </div>
       </div>

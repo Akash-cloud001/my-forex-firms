@@ -5,12 +5,12 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 const bottombar = () => {
-  const pathname = usePathname();
+  // const pathname = usePathname();
   
-  // Hide bottombar on home page
-  if (pathname === '/') {
-    return null;
-  }
+  // // Hide bottombar on home page
+  // if (pathname === '/') {
+  //   return null;
+  // }
   
   return (
     <TooltipProvider>
