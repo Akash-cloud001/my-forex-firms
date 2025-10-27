@@ -39,46 +39,25 @@ export default clerkMiddleware(async (auth, req) => {
         
         const userEmail = user.emailAddresses?.[0]?.emailAddress
 
-        console.log('🔍 Middleware Debug:')
-        console.log('- User ID:', userId)
-        console.log('- User Email Addresses:', user.emailAddresses?.map(e => e.emailAddress))
-        console.log('- Primary Email:', userEmail)
-
         if (!userEmail) {
-          console.log('❌ No email found in user object')
           return NextResponse.redirect(new URL('/', req.url))
         }
 
-        // Check admin status using Clerk user metadata
-        console.log('🔍 Checking admin status for:', userEmail.toLowerCase())
-        
-        // Check if user has admin role in Clerk metadata
-        const isAdmin = user.publicMetadata?.role === 'admin' || 
-                       user.privateMetadata?.role === 'admin' ||
-                       user.unsafeMetadata?.role === 'admin'
-
-        console.log('🔍 Admin check result:', isAdmin ? 'ADMIN FOUND' : 'NOT ADMIN')
-        console.log('🔍 User metadata:', {
-          public: user.publicMetadata,
-          private: user.privateMetadata,
-          unsafe: user.unsafeMetadata
-        })
+        // Check admin status using Clerk public metadata only
+        const isAdmin = user.publicMetadata?.role === 'admin'
 
         if (!isAdmin) {
-          console.log('❌ User is not an admin, redirecting to home')
           // Redirect non-admin users to home page
           return NextResponse.redirect(new URL('/', req.url))
         }
 
-        console.log('✅ Admin access granted')
         // Allow admin to proceed
         return NextResponse.next()
 
       } catch (error) {
-        console.error('❌ Middleware error:', error)
-        // If there's a database error, allow access for now
-        // You might want to change this behavior based on your needs
-        return NextResponse.next()
+        console.error('Middleware error:', error)
+        // If there's an error, redirect to home for security
+        return NextResponse.redirect(new URL('/', req.url))
       }
     }
     

@@ -9,7 +9,7 @@ import { Shield, UserPlus, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function SetupPage() {
-  const [email, setEmail] = useState('akashparmar6561@gmail.com');
+  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
