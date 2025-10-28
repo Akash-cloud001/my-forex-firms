@@ -102,6 +102,25 @@ export async function POST(request: NextRequest) {
         existing.addedBy = userId;
         existing.addedAt = new Date();
         await existing.save();
+
+        // Also update Clerk user metadata if user exists
+        try {
+          const users = await clerk.users.getUserList({
+            emailAddress: [email]
+          });
+          if (users.data.length > 0) {
+            await clerk.users.updateUserMetadata(users.data[0].id, {
+              publicMetadata: {
+                role: 'admin',
+                roleUpdatedBy: userId,
+                roleUpdatedAt: new Date().toISOString()
+              }
+            });
+          }
+        } catch (clerkError) {
+          console.warn('Failed to update Clerk metadata for reactivated user:', clerkError);
+        }
+
         return NextResponse.json({ 
           message: 'Admin email reactivated', 
           email: existing 
@@ -117,6 +136,24 @@ export async function POST(request: NextRequest) {
     });
 
     await newAdminEmail.save();
+
+    // Also update Clerk user metadata if user exists
+    try {
+      const users = await clerk.users.getUserList({
+        emailAddress: [email]
+      });
+      if (users.data.length > 0) {
+        await clerk.users.updateUserMetadata(users.data[0].id, {
+          publicMetadata: {
+            role: 'admin',
+            roleUpdatedBy: userId,
+            roleUpdatedAt: new Date().toISOString()
+          }
+        });
+      }
+    } catch (clerkError) {
+      console.warn('Failed to update Clerk metadata for new admin user:', clerkError);
+    }
 
     return NextResponse.json({ 
       message: 'Admin email added successfully', 
@@ -178,6 +215,24 @@ export async function DELETE(request: NextRequest) {
     // Soft delete by changing status
     adminEmail.status = 'revoked';
     await adminEmail.save();
+
+    // Also remove admin role from Clerk user metadata if user exists
+    try {
+      const users = await clerk.users.getUserList({
+        emailAddress: [email]
+      });
+      if (users.data.length > 0) {
+        await clerk.users.updateUserMetadata(users.data[0].id, {
+          publicMetadata: {
+            role: 'user',
+            roleUpdatedBy: userId,
+            roleUpdatedAt: new Date().toISOString()
+          }
+        });
+      }
+    } catch (clerkError) {
+      console.warn('Failed to update Clerk metadata for revoked user:', clerkError);
+    }
 
     return NextResponse.json({ 
       message: 'Admin email removed successfully' 

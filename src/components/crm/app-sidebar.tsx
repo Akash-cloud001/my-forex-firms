@@ -81,14 +81,14 @@ const navigationItems = [
     hasSubmenu: false,
   },
   {
-    title: "User Management",
+    title: "Users",
     url: "/admin/users",
     icon: Users,
     hasSubmenu: false,
   },
   {
-    title: "Email Access",
-    url: "/admin/email-management",
+    title: "Role Management",
+    url: "/admin/role-management",
     icon: Shield,
     hasSubmenu: false,
   },

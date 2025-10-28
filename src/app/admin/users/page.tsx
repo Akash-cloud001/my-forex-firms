@@ -15,8 +15,17 @@ interface User {
   lastName: string;
   imageUrl: string;
   role: string;
+  status: string;
   createdAt: string;
   lastSignInAt: string;
+  fullName?: string;
+  phone?: string;
+  analytics?: {
+    loginCount: number;
+    lastActivity: string;
+    totalFirmsCreated: number;
+    totalReviewsCreated: number;
+  };
 }
 
 const roleColors = {
@@ -33,6 +42,20 @@ const roleLabels = {
   user: 'User'
 } as const;
 
+const statusColors = {
+  active: 'default',
+  inactive: 'secondary',
+  suspended: 'destructive',
+  pending: 'outline'
+} as const;
+
+const statusLabels = {
+  active: 'Active',
+  inactive: 'Inactive',
+  suspended: 'Suspended',
+  pending: 'Pending'
+} as const;
+
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,10 +65,11 @@ export default function UsersPage() {
     fetchUsers();
   }, []);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (search?: string) => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/users');
+      const url = search ? `/api/admin/users?search=${encodeURIComponent(search)}` : '/api/admin/users';
+      const response = await fetch(url);
       
       if (!response.ok) {
         const error = await response.json();
@@ -63,13 +87,18 @@ export default function UsersPage() {
   };
 
 
-  const filteredUsers = users.filter(user => 
-    user.role === 'user' && (
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  // Handle search with debouncing
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchTerm) {
+        fetchUsers(searchTerm);
+      } else {
+        fetchUsers();
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
 
 
   if (loading) {
@@ -119,12 +148,13 @@ export default function UsersPage() {
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">User</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Email</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Role</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Joined</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Last Sign In</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user) => (
+                {users.map((user) => (
                   <tr
                     key={user.id}
                     className="border-b border-border/30 hover:bg-card/30 transition-colors"
@@ -153,6 +183,11 @@ export default function UsersPage() {
                       </Badge>
                     </td>
                     <td className="py-4 px-4">
+                      <Badge variant={statusColors[user.status as keyof typeof statusColors]}>
+                        {statusLabels[user.status as keyof typeof statusLabels]}
+                      </Badge>
+                    </td>
+                    <td className="py-4 px-4">
                       <p className="text-sm text-muted-foreground">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </p>
@@ -167,12 +202,12 @@ export default function UsersPage() {
               </tbody>
             </table>
             
-            {filteredUsers.length === 0 && (
+            {users.length === 0 && (
               <div className="text-center py-8">
                 <UserX className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-white mb-2">No users found</h3>
                 <p className="text-muted-foreground">
-                  {searchTerm ? 'Try adjusting your search terms' : 'No users with "user" role found'}
+                  {searchTerm ? 'Try adjusting your search terms' : 'No users found in the database'}
                 </p>
               </div>
             )}

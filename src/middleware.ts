@@ -43,11 +43,12 @@ export default clerkMiddleware(async (auth, req) => {
           return NextResponse.redirect(new URL('/', req.url))
         }
 
-        // Check admin status using Clerk public metadata only
-        const isAdmin = user.publicMetadata?.role === 'admin'
+        // Check role-based access using Clerk public metadata
+        const userRole = user.publicMetadata?.role as string | undefined
+        const allowedRoles = ['admin', 'moderator', 'editor']
 
-        if (!isAdmin) {
-          // Redirect non-admin users to home page
+        if (!userRole || !allowedRoles.includes(userRole)) {
+          // Redirect users without proper roles to home page
           return NextResponse.redirect(new URL('/', req.url))
         }
 
