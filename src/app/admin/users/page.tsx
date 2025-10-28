@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
-import { Users, Search, Shield, UserX } from 'lucide-react';
+import { Users, Search, UserX, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface User {
@@ -60,6 +61,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [seeding, setSeeding] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -83,6 +85,41 @@ export default function UsersPage() {
       toast.error(errorMessage);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const seedUsers = async () => {
+    try {
+      setSeeding(true);
+      const response = await fetch('/api/admin/seed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('Users seeded successfully!');
+        
+        // Show detailed results
+        const { summary } = data;
+        if (summary.clerkImport) {
+          toast.success(`Imported ${summary.clerkImport.imported} users from Clerk`);
+        }
+        if (summary.adminEmailProcessing) {
+          toast.success(`Processed ${summary.adminEmailProcessing.seeded} admin emails`);
+        }
+        
+        // Refresh the user list
+        fetchUsers();
+      } else {
+        toast.error(data.error || 'Failed to seed users');
+      }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to seed users';
+      toast.error(errorMessage);
+    } finally {
+      setSeeding(false);
     }
   };
 
@@ -124,19 +161,25 @@ export default function UsersPage() {
             Manage user roles and permissions
           </p>
         </div>
-        <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Search users..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-64 text-white"
-                />
-              </div>
-            </div>
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-64 text-white"
+            />
           </div>
+          <Button
+            onClick={seedUsers}
+            disabled={seeding}
+            className="bg-primary hover:bg-primary/90"
+          >
+            <UserPlus className="h-4 w-4 mr-2" />
+            {seeding ? 'Seeding...' : 'Seed Users'}
+          </Button>
+        </div>
       </div>
 
       <Card className="bg-card/50 backdrop-blur-sm border-border/50">

@@ -5,9 +5,12 @@ import { CreateUserData } from '@/types/user';
 
 export async function POST(req: NextRequest) {
   try {
+    console.log('🔄 [USER-SYNC] Starting single user sync...');
+    
     // Check if user is authenticated
     const { userId: currentUserId } = await auth();
     if (!currentUserId) {
+      console.log('❌ [USER-SYNC] Unauthorized - no userId found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -15,12 +18,16 @@ export async function POST(req: NextRequest) {
     const { clerkUserId } = body;
 
     if (!clerkUserId) {
+      console.log('❌ [USER-SYNC] Missing clerkUserId');
       return NextResponse.json({ error: 'clerkUserId is required' }, { status: 400 });
     }
+
+    console.log('🔍 [USER-SYNC] Checking if user exists:', clerkUserId);
 
     // Check if user already exists
     const existingUser = await userService.getUserByUserId(clerkUserId);
     if (existingUser) {
+      console.log('⏭️ [USER-SYNC] User already exists in database');
       return NextResponse.json({
         message: 'User already exists in database',
         user: existingUser
@@ -28,12 +35,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch user details from Clerk
+    console.log('📥 [USER-SYNC] Fetching user from Clerk...');
     const clerkUser = await (await clerkClient()).users.getUser(clerkUserId);
     if (!clerkUser) {
+      console.log('❌ [USER-SYNC] User not found in Clerk');
       return NextResponse.json({ error: 'User not found in Clerk' }, { status: 404 });
     }
 
-    console.log('clerkUser', clerkUser);
+    console.log('✅ [USER-SYNC] Clerk user found:', clerkUser.emailAddresses[0]?.emailAddress);
 
     // Extract user data from Clerk
     const createUserData: CreateUserData = {
@@ -42,7 +51,8 @@ export async function POST(req: NextRequest) {
       firstName: clerkUser.firstName || '',
       lastName: clerkUser.lastName || '',
       imageUrl: clerkUser.imageUrl,
-      role: 'user', // Default role, can be updated later
+      role: (clerkUser.publicMetadata?.role as 'admin' | 'moderator' | 'editor' | 'user') || 'user', // Use Clerk role or default to 'user'
+      status: 'active', // Set to active by default
       phone: clerkUser.phoneNumbers[0]?.phoneNumber,
       clerkMetadata: {
         publicMetadata: clerkUser.publicMetadata,
@@ -53,25 +63,29 @@ export async function POST(req: NextRequest) {
 
     // Validate required fields
     if (!createUserData.email) {
+      console.log('❌ [USER-SYNC] User has no email address');
       return NextResponse.json({ 
         error: 'User has no email address' 
       }, { status: 400 });
     }
 
     if (!createUserData.firstName) {
+      console.log('❌ [USER-SYNC] User has no first name');
       return NextResponse.json({ 
         error: 'User has no first name' 
       }, { status: 400 });
     }
 
+    console.log('💾 [USER-SYNC] Creating user in database...');
     const newUser = await userService.createUser(createUserData);
+    console.log('✅ [USER-SYNC] User created successfully:', newUser.userId);
 
     return NextResponse.json({
       message: 'User synced successfully from Clerk',
       user: newUser
     });
   } catch (error) {
-    console.error('Error syncing user:', error);
+    console.error('💥 [USER-SYNC] Error syncing user:', error);
     return NextResponse.json(
       { error: 'Failed to sync user' },
       { status: 500 }
@@ -79,112 +93,14 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET method to sync all users (admin only)
-export async function GET(req: NextRequest) {
-  try {
-    // Check if user is authenticated and is admin
-    const { userId: currentUserId } = await auth();
-    if (!currentUserId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if current user is admin
-    const currentUser = await userService.getUserByUserId(currentUserId);
-    if (!currentUser || currentUser.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
-
-    // Get all Clerk users
-    const clerkUsers = await (await clerkClient()).users.getUserList();
-    
-    let syncedCount = 0;
-    let skippedCount = 0;
-    const results = [];
-
-    for (const clerkUser of clerkUsers.data) {
-      try {
-        // Check if user already exists
-        const existingUser = await userService.getUserByUserId(clerkUser.id);
-        if (existingUser) {
-          skippedCount++;
-          results.push({
-            userId: clerkUser.id,
-            email: clerkUser.emailAddresses[0]?.emailAddress,
-            status: 'skipped',
-            reason: 'Already exists'
-          });
-          continue;
-        }
-
-        // Create user data
-        const createUserData: CreateUserData = {
-          userId: clerkUser.id,
-          email: clerkUser.emailAddresses[0]?.emailAddress || '',
-          firstName: clerkUser.firstName || '',
-          lastName: clerkUser.lastName || '',
-          imageUrl: clerkUser.imageUrl,
-          role: 'user',
-          phone: clerkUser.phoneNumbers[0]?.phoneNumber,
-          clerkMetadata: {
-            publicMetadata: clerkUser.publicMetadata,
-            privateMetadata: clerkUser.privateMetadata,
-            unsafeMetadata: clerkUser.unsafeMetadata,
-          },
-        };
-
-        // Skip users without required fields
-        if (!createUserData.email || !createUserData.firstName) {
-          skippedCount++;
-          results.push({
-            userId: clerkUser.id,
-            email: clerkUser.emailAddresses[0]?.emailAddress,
-            status: 'skipped',
-            reason: 'Missing required fields'
-          });
-          continue;
-        }
-
-        const newUser = await userService.createUser(createUserData);
-        syncedCount++;
-        results.push({
-          userId: clerkUser.id,
-          email: newUser.email,
-          status: 'synced',
-          user: newUser
-        });
-
-      } catch (error) {
-        console.error(`Error syncing user ${clerkUser.id}:`, error);
-        results.push({
-          userId: clerkUser.id,
-          email: clerkUser.emailAddresses[0]?.emailAddress,
-          status: 'error',
-          error: error instanceof Error ? error.message : 'Unknown error'
-        });
-      }
-    }
-
-    return NextResponse.json({
-      message: 'Bulk sync completed',
-      summary: {
-        total: clerkUsers.data.length,
-        synced: syncedCount,
-        skipped: skippedCount,
-        errors: clerkUsers.data.length - syncedCount - skippedCount
-      },
-      results
-    });
-
-  } catch (error) {
-    console.error('Error in bulk sync:', error);
-    return NextResponse.json(
-      { error: 'Failed to sync users' },
-      { status: 500 }
-    );
-  }
+// HTTP Method Restrictions
+export async function GET() {
+  return NextResponse.json(
+    { error: 'Method not allowed. Use /api/admin/users/sync for bulk operations.' },
+    { status: 405 }
+  );
 }
 
-// HTTP Method Restrictions
 export async function PUT() {
   return NextResponse.json(
     { error: 'Method not allowed' },
