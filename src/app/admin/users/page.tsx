@@ -193,7 +193,6 @@ export default function UsersPage() {
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Role</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Joined</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Last Sign In</th>
                 </tr>
               </thead>
               <tbody>
@@ -233,11 +232,6 @@ export default function UsersPage() {
                     <td className="py-4 px-4">
                       <p className="text-sm text-muted-foreground">
                         {new Date(user.createdAt).toLocaleDateString()}
-                      </p>
-                    </td>
-                    <td className="py-4 px-4">
-                      <p className="text-sm text-muted-foreground">
-                        {user.lastSignInAt ? new Date(user.lastSignInAt).toLocaleDateString() : 'Never'}
                       </p>
                     </td>
                   </tr>
