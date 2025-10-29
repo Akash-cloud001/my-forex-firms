@@ -1,12 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
-import AdminEmail from '@/models/AdminEmail'
-
-// Type for AdminEmail model
-type AdminEmailModel = {
-  findOne: (query: { email: string; status: string }) => Promise<{ email: string; status: string } | null>
-}
 
 const isPublicRoute = createRouteMatcher([
   '/',
@@ -45,46 +38,26 @@ export default clerkMiddleware(async (auth, req) => {
         
         const userEmail = user.emailAddresses?.[0]?.emailAddress
 
-        console.log('🔍 Middleware Debug:')
-        console.log('- User ID:', userId)
-        console.log('- User Email Addresses:', user.emailAddresses?.map(e => e.emailAddress))
-        console.log('- Primary Email:', userEmail)
-
         if (!userEmail) {
-          console.log('❌ No email found in user object')
           return NextResponse.redirect(new URL('/', req.url))
         }
 
-        // Check admin status using database admin emails
-        console.log('🔍 Checking admin status for:', userEmail.toLowerCase())
-        
-        // Connect to database and check if email is in admin list
-        await connectDB()
-        const adminEmail = await (AdminEmail as unknown as AdminEmailModel).findOne({ 
-          email: userEmail.toLowerCase(), 
-          status: 'active' 
-        })
+        // Check role-based access using Clerk public metadata
+        const userRole = user.publicMetadata?.role as string | undefined
+        const allowedRoles = ['admin', 'moderator', 'editor']
 
-        const isAdmin = !!adminEmail
-
-        console.log('🔍 Admin check result:', isAdmin ? 'ADMIN FOUND' : 'NOT ADMIN')
-        console.log('🔍 Admin email found:', adminEmail)
-
-        if (!isAdmin) {
-          console.log('❌ User is not an admin, redirecting to home')
-          // Redirect non-admin users to home page
+        if (!userRole || !allowedRoles.includes(userRole)) {
+          // Redirect users without proper roles to home page
           return NextResponse.redirect(new URL('/', req.url))
         }
 
-        console.log('✅ Admin access granted')
         // Allow admin to proceed
         return NextResponse.next()
 
       } catch (error) {
-        console.error('❌ Middleware error:', error)
-        // If there's a database error, allow access for now
-        // You might want to change this behavior based on your needs
-        return NextResponse.next()
+        console.error('Middleware error:', error)
+        // If there's an error, redirect to home for security
+        return NextResponse.redirect(new URL('/', req.url))
       }
     }
     
