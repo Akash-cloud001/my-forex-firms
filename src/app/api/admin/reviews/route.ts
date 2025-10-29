@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { auth, clerkClient } from '@clerk/nextjs/server';
 import Review from '@/models/Review';
-import { isCurrentUserAdmin } from '@/lib/adminAuth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,9 +17,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check if user is admin
-    const isUserAdmin = await isCurrentUserAdmin();
-    if (!isUserAdmin) {
+    // Check if user is admin using Clerk public metadata
+    const clerkClientInstance = await clerkClient();
+    const currentUser = await clerkClientInstance.users.getUser(authenticatedUserId);
+    const isAdmin = currentUser.publicMetadata?.role === 'admin';
+    if (!isAdmin) {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }

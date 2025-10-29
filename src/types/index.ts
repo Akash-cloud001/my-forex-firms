@@ -6,6 +6,9 @@
 
 export * from './user';
 
+// Import original interface names for use in this file
+import type { IUser, IUserAnalytics, IClerkMetadata } from './user';
+
 // ============================================================================
 // CONVENIENCE RE-EXPORTS
 // ============================================================================

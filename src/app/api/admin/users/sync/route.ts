@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, clerkClient } from '@clerk/nextjs/server';
 import { userService } from '@/services/userService';
-import { CreateUserData } from '@/types/user';
+import { CreateUserData, UserRole } from '@/types/user';
 
 export async function POST(req: NextRequest) {
   try {
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
       firstName: clerkUser.firstName || '',
       lastName: clerkUser.lastName || '',
       imageUrl: clerkUser.imageUrl,
-      role: clerkUser.publicMetadata?.role || 'user', // Use Clerk role or default to 'user'
+      role: clerkUser.publicMetadata?.role as UserRole || 'user', // Use Clerk role or default to 'user'
       status: 'active', // Set to active by default
       phone: clerkUser.phoneNumbers[0]?.phoneNumber,
       clerkMetadata: {
@@ -164,7 +164,7 @@ export async function GET(req: NextRequest) {
           firstName: clerkUser.firstName || '',
           lastName: clerkUser.lastName || '',
           imageUrl: clerkUser.imageUrl,
-          role: clerkUser.publicMetadata?.role || 'user', // Use Clerk role or default to 'user'
+          role: clerkUser.publicMetadata?.role as UserRole || 'user', // Use Clerk role or default to 'user'
           status: 'active', // Set to active by default
           phone: clerkUser.phoneNumbers[0]?.phoneNumber,
           clerkMetadata: {
