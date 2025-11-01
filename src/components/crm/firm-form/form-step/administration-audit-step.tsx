@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { preventEnterSubmit } from "@/lib/formUtils";
 import {
@@ -24,11 +24,11 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface StepProps {
-  data: Record<string, unknown>;
-  onNext: (data: Record<string, unknown>) => void;
+  onNext: () => void;
   onPrevious: () => void;
   isFirstStep: boolean;
   isLastStep: boolean;
+  onSubmit?: () => void;
 }
 
 interface AdministrationAuditForm {
@@ -39,36 +39,18 @@ interface AdministrationAuditForm {
   changelogNotes: string;
 }
 
-interface AdministrationAuditData {
-  dataSource?: "firm" | "mff" | "community";
-  verifiedBy?: string;
-  verificationDate?: string | Date;
-  nextReviewDate?: string | Date | null;
-  changelogNotes?: string;
-}
-
 export default function AdministrationAuditStep({
-  data,
   onNext,
-  onPrevious,
-}: StepProps) {
-  const form = useForm<AdministrationAuditForm>({
-    defaultValues: {
-      dataSource: ((data.administrationAudit as AdministrationAuditData)?.dataSource as "firm" | "mff" | "community") || (data.dataSource as "firm" | "mff" | "community") || "firm",
-      verifiedBy: ((data.administrationAudit as AdministrationAuditData)?.verifiedBy as string) || (data.verifiedBy as string) || "",
-      verificationDate: ((data.administrationAudit as AdministrationAuditData)?.verificationDate ? new Date((data.administrationAudit as AdministrationAuditData).verificationDate!).toISOString().split('T')[0] : "") || (data.verificationDate as string) || "",
-      nextReviewDate: ((data.administrationAudit as AdministrationAuditData)?.nextReviewDate ? new Date((data.administrationAudit as AdministrationAuditData).nextReviewDate!).toISOString().split('T')[0] : "") || (data.nextReviewDate as string) || "",
-      changelogNotes: ((data.administrationAudit as AdministrationAuditData)?.changelogNotes as string) || (data.changelogNotes as string) || "",
-    },
-  });
+onPrevious,
+isFirstStep,
+isLastStep,
+  onSubmit
 
-  const onSubmit = (formData: AdministrationAuditForm) => {
-    onNext(formData as unknown as Record<string, unknown>);
-  };
+}: StepProps) {
+ const form = useFormContext(); 
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} onKeyDown={preventEnterSubmit} className="space-y-8">
         <div>
           <h3 className="text-lg font-semibold">Administration & Audit</h3>
           <p className="text-sm text-muted-foreground mb-6">
@@ -118,7 +100,7 @@ export default function AdministrationAuditStep({
                   <FormItem>
                     <FormLabel>Verified By *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Admin Name or System" {...field} />
+                      <Input placeholder="Admin Name or System"  {...field}  value={field.value ?? ""} />
                     </FormControl>
                     <FormDescription>
                       Who verified this information
@@ -195,13 +177,20 @@ export default function AdministrationAuditStep({
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between pt-6 border-t border-border">
-          <Button type="button" variant="outline" onClick={onPrevious}>
-            Previous
+         <div className="flex justify-between pt-6 border-t border-border">
+        <Button type="button" variant="outline" onClick={onPrevious}>
+          Previous
+        </Button>
+        {isLastStep ? (
+          <Button type="button" onClick={onSubmit}>
+            Submit Firm
           </Button>
-          <Button type="submit">Submit Firm</Button>
-        </div>
-      </form>
+        ) : (
+          <Button type="button" onClick={onNext}>
+            Next Step
+          </Button>
+        )}
+      </div>
     </Form>
   );
 }
