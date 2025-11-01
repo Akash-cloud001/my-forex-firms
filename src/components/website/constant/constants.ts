@@ -1,5 +1,5 @@
 // constants.ts
-import { Firm, IssueType } from './types'
+import { Firm, IssueType } from '../types/types'
 
 export const MOCK_FIRMS: Firm[] = [
   { id: '1', name: 'FTMO', verified: true },

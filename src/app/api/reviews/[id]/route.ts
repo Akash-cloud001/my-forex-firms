@@ -126,6 +126,14 @@ export async function DELETE(
       );
     }
     
+    // Check if the user owns this review
+    if (review.userId !== userId) {
+      return NextResponse.json(
+        { error: 'You can only delete your own reviews' },
+        { status: 403 }
+      );
+    }
+    
     // Clean up files from BunnyCDN
     if (review.files && review.files.length > 0) {
       await cleanupReviewFiles(review.files);

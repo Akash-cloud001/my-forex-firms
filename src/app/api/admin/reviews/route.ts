@@ -3,18 +3,6 @@ import connectDB from '@/lib/mongodb';
 import { auth, clerkClient } from '@clerk/nextjs/server';
 import Review from '@/models/Review';
 
-// Helper function to check if user is admin
-async function isAdmin(userId: string): Promise<boolean> {
-  try {
-    const clerk = await clerkClient();
-    const user = await clerk.users.getUser(userId);
-    return user.publicMetadata?.role === 'admin';
-  } catch (error) {
-    console.error('Error checking admin role:', error);
-    return false;
-  }
-}
-
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
@@ -29,9 +17,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check if user is admin
-    const isUserAdmin = await isAdmin(authenticatedUserId);
-    if (!isUserAdmin) {
+    // Check if user is admin using Clerk public metadata
+    const clerkClientInstance = await clerkClient();
+    const currentUser = await clerkClientInstance.users.getUser(authenticatedUserId);
+    const isAdmin = currentUser.publicMetadata?.role === 'admin';
+    if (!isAdmin) {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }

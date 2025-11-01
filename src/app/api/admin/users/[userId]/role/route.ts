@@ -16,12 +16,12 @@ export async function PUT(
       );
     }
 
-    // Get current user and verify admin role
+    // Verify admin role using Clerk public metadata
     const clerk = await clerkClient();
-    const adminUser = await clerk.users.getUser(adminUserId);
-    const adminRole = adminUser.publicMetadata?.role;
+    const currentUser = await clerk.users.getUser(adminUserId);
+    const isAdmin = currentUser.publicMetadata?.role === 'admin';
 
-    if (adminRole !== 'admin') {
+    if (!isAdmin) {
       return NextResponse.json(
         { error: 'Only admins can change user roles' }, 
         { status: 403 }

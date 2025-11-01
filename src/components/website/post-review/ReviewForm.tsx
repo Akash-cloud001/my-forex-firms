@@ -172,7 +172,7 @@ export const ReviewForm: React.FC = () => {
                 <ul className="text-xs text-muted-foreground list-disc list-inside space-y-1 ml-4">
                   <li>Specific dates and timeframes</li>
                   <li>Transaction or account reference numbers</li>
-                  <li>Steps you've taken to resolve the issue</li>
+                  <li>Steps you&apos;ve taken to resolve the issue</li>
                   <li>Communication received from the firm</li>
                 </ul>
               </div>
