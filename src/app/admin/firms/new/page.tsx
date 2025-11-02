@@ -2,6 +2,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,8 +10,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Check, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { steps, STORAGE_KEY } from "@/components/crm/firm-form/constants/constant";
-import { FirmFormData } from "@/components/crm/firm-form/types/form-types";
 import { getDefaultValues } from "@/components/crm/firm-form/constants/default-value";
+import { FirmFormData, firmFormSchema, stepSchemas } from "@/components/crm/firm-form/schemas/schema";
 
 function NewFirmContent() {
   const router = useRouter();
@@ -22,14 +23,17 @@ function NewFirmContent() {
   const [loadingDraft, setLoadingDraft] = useState(false);
 
   const methods = useForm<FirmFormData>({
-    defaultValues: getDefaultValues()
+    resolver: zodResolver(firmFormSchema),
+    defaultValues: getDefaultValues(),
+    mode: "onChange",
   });
 
-  const { formState: { isDirty }, watch, reset } = methods;
+  const { formState: { isDirty, errors }, watch, reset, trigger } = methods;
 
   useEffect(() => {
     console.log("Form State - isDirty:", isDirty, "Current Step:", currentStep);
-  }, [isDirty, currentStep]);
+    console.log("Form Errors:", errors);
+  }, [isDirty, currentStep, errors]);
 
   // Auto-save to localStorage
   useEffect(() => {
@@ -67,7 +71,37 @@ function NewFirmContent() {
     }
   }, [reset]);
 
-  const handleStepNext = () => {
+  const validateCurrentStep = async () => {
+    const currentSchema = stepSchemas[currentStep as keyof typeof stepSchemas];
+    if (!currentSchema) return true;
+
+    // Get field names for current step
+    const fieldNames = Object.keys(currentSchema.shape);
+    
+    // Trigger validation for current step fields
+    const isValid = await trigger(fieldNames as any);
+    
+    if (!isValid) {
+      // Show error toast with first error message
+      const firstError = Object.values(errors).find(e => e?.message);
+      if (firstError) {
+        toast.error(firstError.message as string);
+      } else {
+        toast.error("Please fill in all required fields before proceeding");
+      }
+    }
+    
+    return isValid;
+  };
+
+  const handleStepNext = async () => {
+    // Validate current step before proceeding
+    const isValid = await validateCurrentStep();
+    
+    if (!isValid) {
+      return;
+    }
+
     // Mark current step as completed
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps(prev => [...prev, currentStep]);
@@ -85,77 +119,78 @@ function NewFirmContent() {
     }
   };
 
+  const handleStepChange = async (stepId: number) => {
+    // If navigating to a future step, validate current step first
+    if (stepId > currentStep) {
+      const isValid = await validateCurrentStep();
+      if (!isValid) {
+        return;
+      }
+      
+      // Mark current step as completed
+      if (!completedSteps.includes(currentStep)) {
+        setCompletedSteps(prev => [...prev, currentStep]);
+      }
+    }
+    
+    setCurrentStep(stepId);
+  };
+
   const handleSaveDraft = () => {
     toast.success('Draft saved successfully');
   };
 
-const handleSubmit = methods.handleSubmit(async (data) => {
+ const handleSubmit = methods.handleSubmit(async (data) => {
   try {
     setIsSubmitting(true);
-    
+
     console.log("Form Data:", data);
-    
-    // Create FormData for file uploads
+
     const formDataToSend = new FormData();
-    
-    // Handle logo file separately if it exists
+
     if (data.logoFile instanceof File) {
-      formDataToSend.append('logoFile', data.logoFile);
+      formDataToSend.append("logoFile", data.logoFile);
     }
-    
-    // Append all form fields (API will handle the transformation)
+
     Object.entries(data).forEach(([key, value]) => {
-      // Skip logoFile as we already handled it
-      if (key === 'logoFile') return;
-      
+      if (key === "logoFile") return;
       if (value !== null && value !== undefined) {
-        const valueToSend = typeof value === 'object' 
-          ? JSON.stringify(value) 
-          : String(value);
+        const valueToSend =
+          typeof value === "object" ? JSON.stringify(value) : String(value);
         formDataToSend.append(key, valueToSend);
       }
     });
 
-    // Add system flags
-    formDataToSend.append('isDraft', 'false');
-    formDataToSend.append('isPublished', 'false');
+    formDataToSend.append("isDraft", "false");
+    formDataToSend.append("isPublished", "false");
 
-    // Log FormData contents for debugging
-    console.log("FormData entries being sent:");
-    for (const [key, value] of formDataToSend.entries()) {
-      if (value instanceof File) {
-        console.log(`  ${key}:`, `[File: ${value.name}]`);
-      } else {
-        console.log(`  ${key}:`, value);
-      }
-    }
-
-    // Send request
-    const response = await fetch('/api/firms', {
-      method: 'POST',
-      body: formDataToSend
+    const response = await fetch("/api/firms", {
+      method: "POST",
+      body: formDataToSend,
     });
 
+    const dataResponse = await response.json();
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to create firm');
+      throw new Error(dataResponse.error || "Failed to create firm");
     }
 
-    const result = await response.json();
-    console.log("Firm created successfully:", result);
-
-    // Clear localStorage on success
+    toast.success("Firm created successfully!");
     localStorage.removeItem(STORAGE_KEY);
-    
-    toast.success('Firm created successfully!');
-    router.push('/admin/firms');
-  } catch (error) {
-    console.error('Error creating firm:', error);
-    toast.error(error instanceof Error ? error.message : 'Failed to create firm');
+    router.push("/admin/firms");
+  } catch (error: unknown) {
+    console.error("Error creating firm:", error);
+
+    if (error instanceof Error) {
+      toast.error(error.message);
+    } else {
+      toast.error("Failed to create firm");
+    }
   } finally {
     setIsSubmitting(false);
   }
 });
+
 
   const handleNavigation = (path: string) => {
     if (isDirty) {
@@ -232,7 +267,7 @@ const handleSubmit = methods.handleSubmit(async (data) => {
                 {steps.map((step) => (
                   <li key={step.id}>
                     <button
-                      onClick={() => setCurrentStep(step.id)}
+                      onClick={() => handleStepChange(step.id)}
                       className={`w-full text-left p-3 rounded-lg transition-colors ${
                         currentStep === step.id
                           ? "bg-primary text-primary-foreground"

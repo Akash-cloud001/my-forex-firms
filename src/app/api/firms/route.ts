@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Firm from '@/models/Firm';
-import { uploadFileToBunnyCDN } from '@/lib/bunnycdn';
+// import { uploadFileToBunnyCDN } from '@/lib/bunnycdn';
 import { uploadToCloudinary } from '@/services/cloudinary';
+import { FirmValidationService } from '@/services/firm-validation-service';
 
 // Type for form data processing
 interface FormDataRecord {
@@ -106,6 +107,7 @@ export async function POST(request: NextRequest) {
     let firmData: Record<string, any> = {};
     let logoFile: File | null = null;
 
+    // Parse form data
     if (contentType?.includes("multipart/form-data")) {
       const formData = await request.formData();
 
@@ -114,7 +116,6 @@ export async function POST(request: NextRequest) {
           if (value instanceof File) {
             logoFile = value;
           } else if (value && typeof value === 'object' && 'type' in value) {
-            // Handle binary data sent as Blob
             const blobValue = value as Blob;
             logoFile = new File([blobValue], 'logo.jpg', { type: blobValue.type || 'image/jpeg' });
           }
@@ -130,6 +131,7 @@ export async function POST(request: NextRequest) {
       firmData = await request.json();
     }
 
+    // Handle logo upload first (before validation)
     if (logoFile) {
       try {
         const uploadResult = await uploadToCloudinary(logoFile);
@@ -160,7 +162,34 @@ export async function POST(request: NextRequest) {
       firmData.logoUrl = firmData.logoUrl || "";
       firmData.logoFile = null;
     }
+    // const preparedData = FirmValidationService.prepareDataForValidation(firmData);
+    // const validationResult = FirmValidationService.validateFirmData(preparedData);
+    // if (!validationResult.success) {
+    //   console.error("Validation errors:", validationResult.errors);    
+    //   return NextResponse.json(
+    //     {
+    //       error: validationResult.errorMessage,
+    //       validationErrors: validationResult.errors,
+    //       details: FirmValidationService.formatValidationErrors(validationResult.errors || []),
+    //     },
+    //     { status: 400 }
+    //   );
+    // }
 
+    // console.log(" Validation passed!");
+//  if (firmData.registrationNumber) {
+//       const existingFirm = await Firm.findOne({ registrationNumber: firmData.registrationNumber });
+//       if (existingFirm) {
+//         return NextResponse.json(
+//           {
+//             error: `A firm with registration number "${firmData.registrationNumber}" already exists.`,
+//             field: "registrationNumber",
+//           },
+//           { status: 400 }
+//         );
+//       }
+//     }
+    // Helper functions for data transformation
     const toArray = (val: any) => {
       if (!val) return [];
       if (Array.isArray(val)) return val;
@@ -169,14 +198,12 @@ export async function POST(request: NextRequest) {
       return [];
     };
 
-    // Helper to convert string booleans to actual booleans
     const toBool = (val: any) => {
       if (typeof val === "boolean") return val;
       if (typeof val === "string") return val === "true" || val === "True";
       return !!val;
     };
 
-    // Helper to convert to number
     const toNumber = (val: any) => {
       if (val === "" || val === null || val === undefined) return undefined;
       const num = Number(val);
@@ -185,6 +212,7 @@ export async function POST(request: NextRequest) {
 
     console.log("🚀 ~ POST ~ firmData:", firmData);
 
+    // Transform validated data to database format
     const transformedData = {
       // Step 1 — Basic Information
       firmName: firmData.firmName,
@@ -316,12 +344,31 @@ export async function POST(request: NextRequest) {
       isDraft: firmData.isDraft ?? false,
       isPublished: firmData.isPublished ?? false,
     };
+
+    // Save to database
     const firm = new Firm(transformedData);
     await firm.save();
 
-    return NextResponse.json({ firm, firmId: firm._id });
-  } catch (error) {
+    return NextResponse.json({ 
+      success: true,
+      firm, 
+      firmId: firm._id 
+    });
+    
+  } catch (error:unknown) {
     console.error("Error creating firm:", error);
+    
+    // Handle Mongoose validation errors
+  if (error instanceof Error && (error as any).name === "ValidationError") {
+      return NextResponse.json(
+        { 
+          error: "Database validation failed",
+          details: error.message 
+        },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
       { error: "Failed to create firm" },
       { status: 500 }

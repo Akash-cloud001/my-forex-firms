@@ -1,4 +1,4 @@
-import { FirmFormData } from "../types/form-types";
+import { FirmFormData } from "../schemas/schema";
 
 export const getDefaultValues = (): FirmFormData => ({
   // Step 1
@@ -8,14 +8,14 @@ export const getDefaultValues = (): FirmFormData => ({
   legalEntityName: "",
   registrationNumber: "",
   jurisdiction: "",
-  yearFounded: "",
+  yearFounded: '',
   headquartersAddress: "",
   ceoFounderName: "",
   leadershipLinks: "",
   officialWebsite: "",
   status: "active",
   shortDescription: "",
-  trustPilotRating: "",
+  trustPilotRating: undefined,
   
   // Step 2
   tradingPlatforms: "",
@@ -23,7 +23,7 @@ export const getDefaultValues = (): FirmFormData => ({
   
   // Step 3
   profitSplit: "",
-  firstPayoutTiming: 0,
+  firstPayoutTiming: "",
   regularPayoutCycle: "",
   minimumPayoutAmount: "",
   averagePayoutProcessingTime: "",

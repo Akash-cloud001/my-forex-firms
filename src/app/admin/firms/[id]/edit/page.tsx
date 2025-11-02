@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,9 +18,10 @@ import {
 import { Check, AlertTriangle, ArrowLeft, Save } from "lucide-react";
 import { toast } from "sonner";
 import { steps } from "@/components/crm/firm-form/constants/constant";
-import { FirmFormData } from "@/components/crm/firm-form/types/form-types";
 import { getDefaultValues } from "@/components/crm/firm-form/constants/default-value";
 import { formatDate } from "@/components/crm/firm-form/services/dateFormatter";
+import { FirmFormData } from "@/components/crm/firm-form/types/form-types";
+import { firmFormSchema, stepSchemas } from "@/components/crm/firm-form/schemas/schema";
 
 function EditFirmContent() {
   const router = useRouter();
@@ -31,19 +33,25 @@ function EditFirmContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showWarningModal, setShowWarningModal] = useState(false);
-  const [pendingNavigation, setPendingNavigation] = useState<string | null>(
-    null
-  );
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
 
-  // Single form for entire wizard with complete defaults
+  // Single form for entire wizard with Zod validation
   const methods = useForm<FirmFormData>({
+    resolver: zodResolver(firmFormSchema),
     defaultValues: getDefaultValues(),
+    mode: "onChange",
   });
 
   const {
-    formState: { isDirty },
+    formState: { isDirty, errors },
     reset,
+    trigger,
   } = methods;
+
+  useEffect(() => {
+    console.log("Form State - isDirty:", isDirty, "Current Step:", currentStep);
+    console.log("Form Errors:", errors);
+  }, [isDirty, currentStep, errors]);
 
   // Fetch firm data
   useEffect(() => {
@@ -57,8 +65,6 @@ function EditFirmContent() {
         }
 
         const data = await response.json();
-
-        // console.log("Fetched firm data:", data);
 
         // Reset form with fetched data - mapped to exact API structure
         reset({
@@ -92,7 +98,7 @@ function EditFirmContent() {
 
           // Step 3: Payout & Financial
           profitSplit: data.payoutFinancial?.profitSplit || "",
-          firstPayoutTiming: data.payoutFinancial?.firstPayoutTiming || "",
+          firstPayoutTiming: data.payoutFinancial?.firstPayoutTiming || 0,
           regularPayoutCycle: data.payoutFinancial?.regularPayoutCycle || "",
           minimumPayoutAmount: data.payoutFinancial?.minimumPayoutAmount || "",
           averagePayoutProcessingTime:
@@ -230,7 +236,38 @@ function EditFirmContent() {
     }
   }, [firmId, router, reset]);
 
-  const handleStepNext = () => {
+  // Validate current step before proceeding
+  const validateCurrentStep = async () => {
+    const currentSchema = stepSchemas[currentStep as keyof typeof stepSchemas];
+    if (!currentSchema) return true;
+
+    // Get field names for current step
+    const fieldNames = Object.keys(currentSchema.shape);
+    
+    // Trigger validation for current step fields
+    const isValid = await trigger(fieldNames as any);
+    
+    if (!isValid) {
+      // Show error toast with first error message
+      const firstError = Object.values(errors).find(e => e?.message);
+      if (firstError) {
+        toast.error(firstError.message as string);
+      } else {
+        toast.error("Please fill in all required fields before proceeding");
+      }
+    }
+    
+    return isValid;
+  };
+
+  const handleStepNext = async () => {
+    // Validate current step before proceeding
+    const isValid = await validateCurrentStep();
+    
+    if (!isValid) {
+      return;
+    }
+
     // Mark current step as completed
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps((prev) => [...prev, currentStep]);
@@ -238,6 +275,7 @@ function EditFirmContent() {
 
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
+      toast.success('Progress saved');
     }
   };
 
@@ -245,6 +283,23 @@ function EditFirmContent() {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const handleStepChange = async (stepId: number) => {
+    // If navigating to a future step, validate current step first
+    if (stepId > currentStep) {
+      const isValid = await validateCurrentStep();
+      if (!isValid) {
+        return;
+      }
+      
+      // Mark current step as completed
+      if (!completedSteps.includes(currentStep)) {
+        setCompletedSteps(prev => [...prev, currentStep]);
+      }
+    }
+    
+    setCurrentStep(stepId);
   };
 
   const handleSubmit = methods.handleSubmit(async (data) => {
@@ -268,7 +323,7 @@ function EditFirmContent() {
         }
       });
 
-      // console.log("🚀 FormData entries:");
+      console.log("🚀 FormData entries:");
       for (const [key, value] of formDataToSend.entries()) {
         console.log(`  ${key}:`, value);
       }
@@ -279,14 +334,15 @@ function EditFirmContent() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update firm");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update firm");
       }
 
       toast.success("Firm updated successfully!");
       router.push(`/admin/firms/${firmId}`);
     } catch (error) {
       console.error("Error updating firm:", error);
-      toast.error("Failed to update firm");
+      toast.error(error instanceof Error ? error.message : "Failed to update firm");
     } finally {
       setIsSubmitting(false);
     }
@@ -378,7 +434,7 @@ function EditFirmContent() {
                 {steps.map((step) => (
                   <li key={step.id}>
                     <button
-                      onClick={() => setCurrentStep(step.id)}
+                      onClick={() => handleStepChange(step.id)}
                       className={`w-full text-left p-3 rounded-lg transition-colors ${
                         currentStep === step.id
                           ? "bg-primary text-primary-foreground"
