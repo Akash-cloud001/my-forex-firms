@@ -2,110 +2,56 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Check, AlertTriangle, ArrowLeft, Save } from "lucide-react";
 import { toast } from "sonner";
-import FirmInformationStep from "@/components/firms/steps/firm-information-step";
-import TradingPlatformsStep from "@/components/firms/steps/trading-platforms-step";
-import PayoutFinancialStep from "@/components/firms/steps/payout-financial-step";
-import ChallengeInformationStep from "@/components/firms/steps/challenge-information-step";
-import TradingEnvironmentStep from "@/components/firms/steps/trading-environment-step";
-import SupportOperationsStep from "@/components/firms/steps/support-operations-step";
-import TransparencyVerificationStep from "@/components/firms/steps/transparency-verification-step";
-import AdministrationAuditStep from "@/components/firms/steps/administration-audit-step";
-import Link from "next/link";
-
-const steps = [
-  { id: 1, name: "Firm Information", component: FirmInformationStep },
-  { id: 2, name: "Trading Platforms", component: TradingPlatformsStep },
-  { id: 3, name: "Payout & Financial", component: PayoutFinancialStep },
-  { id: 4, name: "Challenge Information", component: ChallengeInformationStep },
-  { id: 5, name: "Trading Environment", component: TradingEnvironmentStep },
-  { id: 6, name: "Support & Operations", component: SupportOperationsStep },
-  { id: 7, name: "Transparency & Verification", component: TransparencyVerificationStep },
-  { id: 8, name: "Administration & Audit", component: AdministrationAuditStep },
-];
-
-interface Firm {
-  _id: string;
-  firmName: string;
-  legalEntityName: string;
-  registrationNumber: string;
-  jurisdiction: string;
-  yearFounded: number;
-  headquartersAddress: string;
-  ceoFounderName?: string;
-  officialWebsite: string;
-  status: 'active' | 'paused' | 'suspended' | 'closed';
-  shortDescription: string;
-  isDraft: boolean;
-  isPublished: boolean;
-  publishedAt?: string;
-  createdAt: string;
-  updatedAt: string;
-  createdBy: string;
-  lastModifiedBy: string;
-  version: number;
-  logo?: {
-    url?: string;
-    filename?: string;
-    originalName?: string;
-  };
-  tradingInfrastructure?: {
-    tradingPlatforms: string[];
-    supportedAssets: string[];
-    leverage: string;
-    minimumDeposit: string;
-    maximumDrawdown: string;
-  };
-  payoutFinancial?: {
-    profitSplit: string;
-    payoutMethods: string[];
-    minimumPayout: string;
-    maximumPayout: string;
-  };
-  challenges?: Array<{
-    challengeName: string;
-    challengeType: string;
-    profitSplit: string;
-    accountSize: string;
-    maximumDrawdown: string;
-  }>;
-  supportOperations?: {
-    supportChannels: string[];
-    supportHours: string;
-    responseTime: string;
-  };
-  transparencyVerification?: {
-    regulatoryCompliance: string[];
-    auditReports: string[];
-    transparencyScore: number;
-  };
-  administrationAudit?: {
-    auditFrequency: string;
-    auditScope: string[];
-    auditStandards: string[];
-    auditReports: string[];
-  };
-}
+import { steps } from "@/components/crm/firm-form/constants/constant";
+import { getDefaultValues } from "@/components/crm/firm-form/constants/default-value";
+import { formatDate } from "@/components/crm/firm-form/services/dateFormatter";
+import { FirmFormData } from "@/components/crm/firm-form/types/form-types";
+import { firmFormSchema, stepSchemas } from "@/components/crm/firm-form/schemas/schema";
 
 function EditFirmContent() {
   const router = useRouter();
   const params = useParams();
   const firmId = params.id as string;
-  
+
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [firm, setFirm] = useState<Firm | null>(null);
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Single form for entire wizard with Zod validation
+  const methods = useForm<FirmFormData>({
+    resolver: zodResolver(firmFormSchema),
+    defaultValues: getDefaultValues(),
+    mode: "onChange",
+  });
+
+  const {
+    formState: { isDirty, errors },
+    reset,
+    trigger,
+  } = methods;
+
+  useEffect(() => {
+    console.log("Form State - isDirty:", isDirty, "Current Step:", currentStep);
+    console.log("Form Errors:", errors);
+  }, [isDirty, currentStep, errors]);
 
   // Fetch firm data
   useEffect(() => {
@@ -113,21 +59,173 @@ function EditFirmContent() {
       try {
         setLoading(true);
         const response = await fetch(`/api/firms/${firmId}`);
-        
+
         if (!response.ok) {
-          throw new Error('Failed to fetch firm');
+          throw new Error("Failed to fetch firm");
         }
-        
+
         const data = await response.json();
-        setFirm(data);
-        setFormData(data);
-        
-        // Mark all steps as completed since we're editing existing data
+
+        // Reset form with fetched data - mapped to exact API structure
+        reset({
+          // Step 1: Firm Information
+          firmName: data.firmName || "",
+          logoUrl: data.logoUrl || "",
+          logoFile: null,
+          legalEntityName: data.legalEntityName || "",
+          registrationNumber: data.registrationNumber || "",
+          jurisdiction: data.jurisdiction || "",
+          yearFounded: data.yearFounded?.toString() || "",
+          headquartersAddress: data.headquartersAddress || "",
+          ceoFounderName: data.ceoFounderName || "",
+          leadershipLinks: data.leadershipLinks || "",
+          officialWebsite: data.officialWebsite || "",
+          status: data.status || "active",
+          shortDescription: data.shortDescription || "",
+          trustPilotRating: data.reviews?.trustPilotRating?.toString() || "",
+
+          // Step 2: Trading Platforms
+          tradingPlatforms: Array.isArray(
+            data.tradingInfrastructure?.tradingPlatforms
+          )
+            ? data.tradingInfrastructure.tradingPlatforms.join(", ")
+            : data.tradingInfrastructure?.tradingPlatforms || "",
+          dataFeedsLiquidityProviders: Array.isArray(
+            data.tradingInfrastructure?.dataFeedsLiquidityProviders
+          )
+            ? data.tradingInfrastructure.dataFeedsLiquidityProviders.join(", ")
+            : data.tradingInfrastructure?.dataFeedsLiquidityProviders || "",
+
+          // Step 3: Payout & Financial
+          profitSplit: data.payoutFinancial?.profitSplit || "",
+          firstPayoutTiming: data.payoutFinancial?.firstPayoutTiming || 0,
+          regularPayoutCycle: data.payoutFinancial?.regularPayoutCycle || "",
+          minimumPayoutAmount: data.payoutFinancial?.minimumPayoutAmount || "",
+          averagePayoutProcessingTime:
+            data.payoutFinancial?.averagePayoutProcessingTime || "",
+          fastestSlowestPayoutDuration:
+            data.payoutFinancial?.fastestSlowestPayoutDuration || "",
+          payoutMethods: Array.isArray(data.payoutFinancial?.payoutMethods)
+            ? data.payoutFinancial.payoutMethods.join(", ")
+            : data.payoutFinancial?.payoutMethods || "",
+          payoutFeesFxCosts: data.payoutFinancial?.payoutFeesFxCosts || "",
+          totalPayoutsAllTime: data.payoutFinancial?.totalPayoutsAllTime || "",
+          largestSinglePayout: data.payoutFinancial?.largestSinglePayout || "",
+          monthlyPayoutCounts: data.payoutFinancial?.monthlyPayoutCounts || "",
+          payoutProofLinks: Array.isArray(
+            data.payoutFinancial?.payoutProofLinks
+          )
+            ? data.payoutFinancial.payoutProofLinks.join(", ")
+            : data.payoutFinancial?.payoutProofLinks || "",
+
+          // Step 4: Challenge Information
+          challengeInformation: Array.isArray(data.challenges)
+            ? data.challenges.map((challenge: any) => ({
+                challengeName: challenge.challengeName || "",
+                challengeType: challenge.challengeType || "1-step",
+                accountSizesPricing: challenge.accountSizesPricing || "",
+                profitSplit: challenge.profitSplit || "",
+                leverageBreakdown: challenge.leverageBreakdown || "",
+                timeLimits: challenge.timeLimits || "",
+                minimumTradingDays: challenge.minimumTradingDays || "",
+                step1Step2Targets: challenge.step1Step2Targets || "",
+                dailyMaxDrawdown: challenge.dailyMaxDrawdown || "",
+                refundTerms: challenge.refundTerms || "",
+                scalingPlan: challenge.scalingPlan || "",
+                allowedInstruments: challenge.allowedInstruments || "",
+                rules: challenge.rules || "",
+                maxExposureLots: challenge.maxExposureLots || "",
+                bonusPromoPolicy: challenge.bonusPromoPolicy || "",
+                termsUrl: challenge.termsUrl || "",
+                termsLastUpdated: formatDate(challenge.termsLastUpdated),
+              }))
+            : [],
+
+          // Step 5: Trading Environment
+          typicalSpreads: data.tradingEnvironment?.typicalSpreads || "",
+          commissions: data.tradingEnvironment?.commissions || "",
+          slippageSwapPolicies:
+            data.tradingEnvironment?.slippageSwapPolicies || "",
+          riskDeskModel: data.tradingEnvironment?.riskDeskModel || "",
+          copyTradeProviders: Array.isArray(
+            data.tradingEnvironment?.copyTradeProviders
+          )
+            ? data.tradingEnvironment.copyTradeProviders.join(", ")
+            : data.tradingEnvironment?.copyTradeProviders || "",
+          mobileSupport: Array.isArray(data.tradingEnvironment?.mobileSupport)
+            ? data.tradingEnvironment.mobileSupport.join(", ")
+            : data.tradingEnvironment?.mobileSupport || "",
+          newsTrading:
+            data.tradingEnvironment?.ruleMatrix?.newsTrading || false,
+          weekendHolding:
+            data.tradingEnvironment?.ruleMatrix?.weekendHolding || false,
+          eaUsage: data.tradingEnvironment?.ruleMatrix?.eaUsage || false,
+          copyTrading:
+            data.tradingEnvironment?.ruleMatrix?.copyTrading || false,
+          hedging: data.tradingEnvironment?.ruleMatrix?.hedging || false,
+          scalping: data.tradingEnvironment?.ruleMatrix?.scalping || false,
+          newsTradingNotes:
+            data.tradingEnvironment?.ruleDetails?.newsTradingNotes || "",
+          weekendHoldingNotes:
+            data.tradingEnvironment?.ruleDetails?.weekendHoldingNotes || "",
+          eaUsageNotes:
+            data.tradingEnvironment?.ruleDetails?.eaUsageNotes || "",
+          copyTradingNotes:
+            data.tradingEnvironment?.ruleDetails?.copyTradingNotes || "",
+          hedgingNotes:
+            data.tradingEnvironment?.ruleDetails?.hedgingNotes || "",
+          scalpingNotes:
+            data.tradingEnvironment?.ruleDetails?.scalpingNotes || "",
+
+          // Step 6: Support & Operations
+          supportChannels: Array.isArray(
+            data.supportOperations?.supportChannels
+          )
+            ? data.supportOperations.supportChannels.join(", ")
+            : data.supportOperations?.supportChannels || "",
+          averageFirstResponseTime:
+            data.supportOperations?.averageFirstResponseTime || "",
+          averageResolutionTime:
+            data.supportOperations?.averageResolutionTime || "",
+          supportHours: data.supportOperations?.supportHours || "",
+          escalationPolicy: data.supportOperations?.escalationPolicy || "",
+          kycRequirements: data.supportOperations?.kycRequirements || "",
+          restrictedCountries: Array.isArray(
+            data.supportOperations?.restrictedCountries
+          )
+            ? data.supportOperations.restrictedCountries.join(", ")
+            : data.supportOperations?.restrictedCountries || "",
+          amlComplianceLink: data.supportOperations?.amlComplianceLink || "",
+
+          // Step 7: Transparency & Verification
+          ceoPublic: data.transparencyVerification?.ceoPublic || false,
+          entityOfficeVerified:
+            data.transparencyVerification?.entityOfficeVerified || false,
+          termsPublicUpdated:
+            data.transparencyVerification?.termsPublicUpdated || false,
+          payoutProofsPublic:
+            data.transparencyVerification?.payoutProofsPublic || false,
+          thirdPartyAudit:
+            data.transparencyVerification?.thirdPartyAudit || false,
+          transparencyNotes:
+            data.transparencyVerification?.transparencyNotes || "",
+
+          // Step 8: Administration & Audit
+          dataSource: data.administrationAudit?.dataSource || "firm",
+          verifiedBy: data.administrationAudit?.verifiedBy || "",
+          verificationDate: formatDate(
+            data.administrationAudit?.verificationDate
+          ),
+          nextReviewDate: formatDate(data.administrationAudit?.nextReviewDate),
+          changelogNotes: data.administrationAudit?.changelogNotes || "",
+        });
+
+        // Mark all steps as completed since we're editing
         setCompletedSteps([1, 2, 3, 4, 5, 6, 7, 8]);
       } catch (err) {
-        console.error('Error fetching firm:', err);
-        toast.error('Failed to load firm data');
-        router.push('/admin/firms');
+        console.error("Error fetching firm:", err);
+        toast.error("Failed to load firm data");
+        router.push("/admin/firms");
       } finally {
         setLoading(false);
       }
@@ -136,99 +234,122 @@ function EditFirmContent() {
     if (firmId) {
       fetchFirm();
     }
-  }, [firmId, router]);
+  }, [firmId, router, reset]);
 
-  const updateStepData = (step: number, data: Record<string, unknown>) => {
-    console.log(`Updating step ${step} with data:`, data);
-    setFormData((prev: Record<string, unknown>) => {
-      const newData = {
-        ...prev,
-        ...data
-      };
-      console.log('New form data:', newData);
-      return newData;
-    });
-    setHasUnsavedChanges(true);
-  };
+  // Validate current step before proceeding
+  const validateCurrentStep = async () => {
+    const currentSchema = stepSchemas[currentStep as keyof typeof stepSchemas];
+    if (!currentSchema) return true;
 
-  const markStepCompleted = (step: number) => {
-    if (!completedSteps.includes(step)) {
-      setCompletedSteps(prev => [...prev, step]);
-    }
-  };
-
-  const handleStepComplete = async (step: number) => {
-    markStepCompleted(step);
+    // Get field names for current step
+    const fieldNames = Object.keys(currentSchema.shape);
     
-    if (step < steps.length) {
-      setCurrentStep(step + 1);
-      toast.success(`Step ${step} completed! Moving to step ${step + 1}`);
-    } else {
-      await handleSubmit();
+    // Trigger validation for current step fields
+    const isValid = await trigger(fieldNames as any);
+    
+    if (!isValid) {
+      // Show error toast with first error message
+      const firstError = Object.values(errors).find(e => e?.message);
+      if (firstError) {
+        toast.error(firstError.message as string);
+      } else {
+        toast.error("Please fill in all required fields before proceeding");
+      }
+    }
+    
+    return isValid;
+  };
+
+  const handleStepNext = async () => {
+    // Validate current step before proceeding
+    const isValid = await validateCurrentStep();
+    
+    if (!isValid) {
+      return;
+    }
+
+    // Mark current step as completed
+    if (!completedSteps.includes(currentStep)) {
+      setCompletedSteps((prev) => [...prev, currentStep]);
+    }
+
+    if (currentStep < steps.length) {
+      setCurrentStep(currentStep + 1);
+      toast.success('Progress saved');
     }
   };
 
-  const handleSubmit = async () => {
-    try {
-      setIsSubmitting(true);
-      
-      console.log('Submitting form data:', formData);
-      
-      // Check if we have any meaningful data to update
-      if (!formData || Object.keys(formData).length === 0) {
-        toast.error('No data to update');
+  const handleStepPrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleStepChange = async (stepId: number) => {
+    // If navigating to a future step, validate current step first
+    if (stepId > currentStep) {
+      const isValid = await validateCurrentStep();
+      if (!isValid) {
         return;
       }
       
-      // Remove fields that shouldn't be updated
-      const { _id: _removedId, createdAt: _removedCreatedAt, createdBy: _removedCreatedBy, version: _removedVersion, ...updateData } = formData;
-      // Suppress unused variable warnings
-      void _removedId; void _removedCreatedAt; void _removedCreatedBy; void _removedVersion;
-      
+      // Mark current step as completed
+      if (!completedSteps.includes(currentStep)) {
+        setCompletedSteps(prev => [...prev, currentStep]);
+      }
+    }
+    
+    setCurrentStep(stepId);
+  };
+
+  const handleSubmit = methods.handleSubmit(async (data) => {
+    try {
+      setIsSubmitting(true);
+
+      console.log("📝 Form Data Object:", data);
+
       // Create FormData for file uploads
       const formDataToSend = new FormData();
-      
-      // Add all form fields to FormData
-      for (const [key, value] of Object.entries(updateData)) {
-        if (key === 'logoFile' && value instanceof File) {
-          // Append the actual File object for upload
+
+      // Add all form fields
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === "logoFile" && value instanceof File) {
           formDataToSend.append(key, value);
         } else if (value !== null && value !== undefined) {
-          // Stringify objects, convert other types to strings
-          formDataToSend.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
+          formDataToSend.append(
+            key,
+            typeof value === "object" ? JSON.stringify(value) : String(value)
+          );
         }
+      });
+
+      console.log("🚀 FormData entries:");
+      for (const [key, value] of formDataToSend.entries()) {
+        console.log(`  ${key}:`, value);
       }
-      
-      console.log('Update data being sent:', Object.fromEntries(formDataToSend.entries()));
-      
+
       const response = await fetch(`/api/firms/${firmId}`, {
-        method: 'PUT',
-        // Don't set Content-Type header for FormData - browser sets it automatically
+        method: "PUT",
         body: formDataToSend,
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('API Error:', errorData);
-        throw new Error('Failed to update firm');
+        throw new Error(errorData.error || "Failed to update firm");
       }
 
-      const updatedFirm = await response.json();
-      console.log('Updated firm:', updatedFirm);
-      
-      toast.success('Firm updated successfully!');
-      setHasUnsavedChanges(false);
+      toast.success("Firm updated successfully!");
       router.push(`/admin/firms/${firmId}`);
     } catch (error) {
-      console.error('Error updating firm:', error);
-      toast.error('Failed to update firm');
+      console.error("Error updating firm:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to update firm");
     } finally {
       setIsSubmitting(false);
     }
-  };
+  });
 
   const handleNavigation = (path: string) => {
-    if (hasUnsavedChanges) {
+    if (isDirty) {
       setPendingNavigation(path);
       setShowWarningModal(true);
     } else {
@@ -236,32 +357,18 @@ function EditFirmContent() {
     }
   };
 
-  const handleConfirmNavigation = () => {
-    if (pendingNavigation) {
-      router.push(pendingNavigation);
-    }
-    setShowWarningModal(false);
-    setPendingNavigation(null);
-  };
-
-  const handleCancelNavigation = () => {
-    setShowWarningModal(false);
-    setPendingNavigation(null);
-  };
-
   // Before unload warning
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
+      if (isDirty) {
         e.preventDefault();
-        e.returnValue = '';
+        e.returnValue = "";
       }
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges]);
-
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isDirty]);
 
   if (loading) {
     return (
@@ -275,165 +382,159 @@ function EditFirmContent() {
     );
   }
 
-  if (!firm) {
-    return (
-      <div className="p-6 space-y-6">
-        <PageHeader
-          title="Firm Not Found"
-          description="The requested firm could not be found."
-        />
-        <div className="text-center py-8">
-          <Button asChild>
-            <Link href="/admin/firms">
-              Back to Firms
-            </Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   const CurrentStepComponent = steps[currentStep - 1]?.component;
 
   return (
-    <div className="p-6 space-y-6">
-      <PageHeader
-        title="Edit Firm"
-        subtitle={firm.firmName}
-        description="Update firm profile information, ratings, and upload assets."
-        actions={
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={() => handleNavigation(`/admin/firms/${firmId}`)}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Firm
-            </Button>
-            <Button 
-              onClick={() => {
-                console.log('Save Changes clicked, current formData:', formData);
-                handleSubmit();
-              }}
-              disabled={isSubmitting}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </div>
-        }
-      />
+    <FormProvider {...methods}>
+      <div className="p-6 space-y-6">
+        <PageHeader
+          title="Edit Firm"
+          subtitle={methods.watch("firmName")}
+          description="Update firm profile information, ratings, and upload assets."
+          actions={
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => handleNavigation(`/admin/firms/${firmId}`)}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Firm
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                {isSubmitting ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          }
+        />
 
-      <section className="grid grid-cols-12 gap-6">
-        {/* Form Step Content */}
-        <Card className="p-6 col-span-9">
-        {CurrentStepComponent && (
-          <CurrentStepComponent
-            data={formData}
-            onNext={(data: Record<string, unknown>) => {
-              updateStepData(currentStep, data);
-              handleStepComplete(currentStep);
-            }}
-            onPrevious={() => setCurrentStep(Math.max(1, currentStep - 1))}
-            isFirstStep={currentStep === 1}
-            isLastStep={currentStep === steps.length}
-            onDataChange={(data: Record<string, unknown>) => {
-              updateStepData(currentStep, data);
-            }}
-          />
-        )}
-        </Card>
+        <section className="grid grid-cols-12 gap-6">
+          {/* Form Step Content */}
+          <Card className="p-6 col-span-9">
+            {CurrentStepComponent && (
+              <CurrentStepComponent
+                onNext={handleStepNext}
+                onPrevious={handleStepPrevious}
+                isFirstStep={currentStep === 1}
+                isLastStep={currentStep === steps.length}
+                onSubmit={handleSubmit}
+              />
+            )}
+          </Card>
 
-        {/* Stepper Navigation */}
-        <nav aria-label="Progress" className="col-span-3">
-          <Card className="p-4">
-            <h3 className="text-lg font-semibold">Form Progress</h3>
-            <ol className="space-y-3">
-              {steps.map((step) => (
-                <li key={step.id}>
-                  <button
-                    onClick={() => setCurrentStep(step.id)}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${
-                      currentStep === step.id
-                        ? "bg-primary text-primary-foreground"
-                        : completedSteps.includes(step.id)
-                        ? "bg-primary/10 text-primary border border-primary/20"
-                        : "bg-muted hover:bg-muted/80"
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <span
-                        className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
-                          completedSteps.includes(step.id)
-                            ? "bg-primary text-primary-foreground"
-                            : currentStep === step.id
-                            ? "bg-primary-foreground text-primary"
-                            : "bg-muted-foreground text-muted"
-                        }`}
-                      >
-                        {completedSteps.includes(step.id) ? (
-                          <Check className="h-4 w-4" />
-                        ) : (
-                          step.id
-                        )}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className={`text-sm font-medium ${
-                            currentStep === step.id
-                              ? "text-primary-foreground"
-                              : completedSteps.includes(step.id)
-                              ? "text-primary"
-                              : "text-muted-foreground"
+          {/* Stepper Navigation */}
+          <nav aria-label="Progress" className="col-span-3">
+            <Card className="p-4">
+              <h3 className="text-lg font-semibold">Form Progress</h3>
+              <ol className="space-y-3">
+                {steps.map((step) => (
+                  <li key={step.id}>
+                    <button
+                      onClick={() => handleStepChange(step.id)}
+                      className={`w-full text-left p-3 rounded-lg transition-colors ${
+                        currentStep === step.id
+                          ? "bg-primary text-primary-foreground"
+                          : completedSteps.includes(step.id)
+                          ? "bg-primary/10 text-primary border border-primary/20"
+                          : "bg-muted hover:bg-muted/80"
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <span
+                          className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
+                            completedSteps.includes(step.id)
+                              ? "bg-primary text-primary-foreground"
+                              : currentStep === step.id
+                              ? "bg-primary-foreground text-primary"
+                              : "bg-muted-foreground text-muted"
                           }`}
                         >
-                          {step.name}
-                        </p>
+                          {completedSteps.includes(step.id) ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            step.id
+                          )}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className={`text-sm font-medium ${
+                              currentStep === step.id
+                                ? "text-primary-foreground"
+                                : completedSteps.includes(step.id)
+                                ? "text-primary"
+                                : "text-muted-foreground"
+                            }`}
+                          >
+                            {step.name}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                </li>
-              ))}
-            </ol>
-          </Card>
-        </nav>
-      </section>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </Card>
+          </nav>
+        </section>
 
-      {/* Unsaved Changes Warning Modal */}
-      <Dialog open={showWarningModal} onOpenChange={setShowWarningModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-500" />
-              Unsaved Changes
-            </DialogTitle>
-            <DialogDescription>
-              You have unsaved changes. Are you sure you want to leave? Your changes will be lost.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={handleCancelNavigation} className="w-full sm:w-auto">
-              Stay on Page
-            </Button>
-            <Button variant="destructive" onClick={handleConfirmNavigation} className="w-full sm:w-auto">
-              Leave Anyway
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+        {/* Unsaved Changes Warning Modal */}
+        <Dialog open={showWarningModal} onOpenChange={setShowWarningModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                Unsaved Changes
+              </DialogTitle>
+              <DialogDescription>
+                You have unsaved changes. Are you sure you want to leave? Your
+                changes will be lost.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex flex-col sm:flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowWarningModal(false)}
+                className="w-full sm:w-auto"
+              >
+                Stay on Page
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (pendingNavigation) {
+                    router.push(pendingNavigation);
+                  }
+                  setShowWarningModal(false);
+                }}
+                className="w-full sm:w-auto"
+              >
+                Leave Anyway
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </FormProvider>
   );
 }
 
 export default function EditFirm() {
   return (
-    <Suspense fallback={
-      <div className="p-6 space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-muted rounded w-1/4 mb-4"></div>
-          <div className="h-4 bg-muted rounded w-1/2 mb-8"></div>
-          <div className="h-64 bg-muted rounded"></div>
+    <Suspense
+      fallback={
+        <div className="p-6 space-y-6">
+          <div className="animate-pulse">
+            <div className="h-8 bg-muted rounded w-1/4 mb-4"></div>
+            <div className="h-4 bg-muted rounded w-1/2 mb-8"></div>
+            <div className="h-64 bg-muted rounded"></div>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <EditFirmContent />
     </Suspense>
   );

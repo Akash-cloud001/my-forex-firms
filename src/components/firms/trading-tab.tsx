@@ -59,6 +59,19 @@ interface TradingTabProps {
 }
 
 export function TradingTab({ firm }: TradingTabProps) {
+  function renderBadgesFromArray(arr?: string[], variant: "secondary" | "outline" = "secondary") {
+  if (!arr || arr.length === 0) return <p className="text-muted-foreground">N/A</p>;
+  return arr.flatMap((item, i) =>
+    item
+      .split(',')
+      .map((x, j) => (
+        <Badge key={`${i}-${j}`} variant={variant}>
+          {x.trim()}
+        </Badge>
+      ))
+  );
+}
+
   return (
     <div className="space-y-6">
       {/* Trading Infrastructure */}
@@ -73,12 +86,12 @@ export function TradingTab({ firm }: TradingTabProps) {
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Trading Platforms</label>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {/* {firm.tradingInfrastructure.tradingPlatforms?.map((platform, index) => (
-                    <Badge key={index} variant="secondary">{platform}</Badge>
-                  ))} */}
-                  {firm.tradingInfrastructure?.tradingPlatforms[0].split(',').map((platform, index) => (
+                  {firm.tradingInfrastructure.tradingPlatforms?.map((platform, index) => (
                     <Badge key={index} variant="secondary">{platform}</Badge>
                   ))}
+                  {/* {firm.tradingInfrastructure?.tradingPlatforms[0].split(',').map((platform, index) => (
+                    <Badge key={index} variant="secondary">{platform}</Badge>
+                  ))} */}
                 </div>
               </div>
               <div>
@@ -249,13 +262,9 @@ export function TradingTab({ firm }: TradingTabProps) {
               <div className="col-span-2">
                 <label className="text-sm font-medium text-muted-foreground">Payout Proof Links</label>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {/* {firm.payoutFinancial.payoutProofLinks?.map((link, index) => (
-                    <Badge key={index} variant="outline">{link}</Badge>
-                  ))} */}
-                  {firm.payoutFinancial?.payoutProofLinks[0].split(',').map((link, index) => (
-                    <Badge key={index} variant="outline">{link}</Badge>
-                  ))}
-                </div>
+                      {renderBadgesFromArray(firm.payoutFinancial?.payoutProofLinks, "outline")}
+          </div>
+
               </div>
             </div>
           </CardContent>

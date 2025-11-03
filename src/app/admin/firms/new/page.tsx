@@ -1,97 +1,199 @@
 "use client";
-
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Check, AlertTriangle } from "lucide-react";
-import { useFirmFormStore } from "@/stores/firmFormStore";
 import { toast } from "sonner";
-import FirmInformationStep from "@/components/firms/steps/firm-information-step";
-import TradingPlatformsStep from "@/components/firms/steps/trading-platforms-step";
-import PayoutFinancialStep from "@/components/firms/steps/payout-financial-step";
-import ChallengeInformationStep from "@/components/firms/steps/challenge-information-step";
-import TradingEnvironmentStep from "@/components/firms/steps/trading-environment-step";
-import SupportOperationsStep from "@/components/firms/steps/support-operations-step";
-import TransparencyVerificationStep from "@/components/firms/steps/transparency-verification-step";
-import AdministrationAuditStep from "@/components/firms/steps/administration-audit-step";
-
-const steps = [
-  { id: 1, name: "Firm Information", component: FirmInformationStep },
-  { id: 2, name: "Trading Platforms", component: TradingPlatformsStep },
-  { id: 3, name: "Payout & Financial", component: PayoutFinancialStep },
-  { id: 4, name: "Challenge Information", component: ChallengeInformationStep },
-  { id: 5, name: "Trading Environment", component: TradingEnvironmentStep },
-  { id: 6, name: "Support & Operations", component: SupportOperationsStep },
-  { id: 7, name: "Transparency & Verification", component: TransparencyVerificationStep },
-  { id: 8, name: "Administration & Audit", component: AdministrationAuditStep },
-];
+import { steps, STORAGE_KEY } from "@/components/crm/firm-form/constants/constant";
+import { getDefaultValues } from "@/components/crm/firm-form/constants/default-value";
+import { FirmFormData, firmFormSchema, stepSchemas } from "@/components/crm/firm-form/schemas/schema";
 
 function NewFirmContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [loadingDraft, setLoadingDraft] = useState(false);
-  
-  const {
-    currentStep,
-    completedSteps,
-    formData,
-    isSubmitting,
-    setCurrentStep,
-    updateStepData,
-    markStepCompleted,
-    autoSaveDraft,
-    submitForm,
-    loadDraft,
-    loadFromLocalStorage
-  } = useFirmFormStore();
 
-  const CurrentStepComponent = steps.find((s) => s.id === currentStep)?.component;
+  const methods = useForm<FirmFormData>({
+    resolver: zodResolver(firmFormSchema),
+    defaultValues: getDefaultValues(),
+    mode: "onChange",
+  });
 
-  const handleStepComplete = async (stepData: Record<string, unknown>) => {
-    updateStepData(stepData);
-    markStepCompleted(currentStep);
-    setHasUnsavedChanges(true);
+  const { formState: { isDirty, errors }, watch, reset, trigger } = methods;
+
+  useEffect(() => {
+    console.log("Form State - isDirty:", isDirty, "Current Step:", currentStep);
+    console.log("Form Errors:", errors);
+  }, [isDirty, currentStep, errors]);
+
+  // Auto-save to localStorage
+  useEffect(() => {
+    if (isDirty) {
+      const subscription = watch((value) => {
+        try {
+          const draftData = {
+            formData: value,
+            currentStep,
+            completedSteps,
+            timestamp: Date.now(),
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(draftData));
+        } catch (error) {
+          console.error('Failed to save draft:', error);
+        }
+      });
+      return () => subscription.unsubscribe();
+    }
+  }, [watch, currentStep, completedSteps, isDirty]);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const { formData, currentStep: savedStep, completedSteps: savedCompleted } = JSON.parse(saved);
+        reset(formData);
+        setCurrentStep(savedStep);
+        setCompletedSteps(savedCompleted);
+        toast.info('Draft loaded from previous session');
+      }
+    } catch (error) {
+      console.error('Failed to load draft:', error);
+    }
+  }, [reset]);
+
+  const validateCurrentStep = async () => {
+    const currentSchema = stepSchemas[currentStep as keyof typeof stepSchemas];
+    if (!currentSchema) return true;
+
+    // Get field names for current step
+    const fieldNames = Object.keys(currentSchema.shape);
     
-    // Auto-save draft on each step completion
-    if (currentStep < steps.length) {
-      try {
-        await autoSaveDraft();
-        toast.success('Progress saved automatically');
-      } catch (error) {
-        console.warn('Auto-save failed:', error);
-      }
-      setCurrentStep(currentStep + 1);
-    } else {
-      // Form is complete, submit and clear draft
-      const result = await submitForm();
-      if (result.success) {
-        toast.success('Firm created successfully! Draft cleared.');
-        setHasUnsavedChanges(false);
-        router.push('/admin/firms');
+    // Trigger validation for current step fields
+    const isValid = await trigger(fieldNames as any);
+    
+    if (!isValid) {
+      // Show error toast with first error message
+      const firstError = Object.values(errors).find(e => e?.message);
+      if (firstError) {
+        toast.error(firstError.message as string);
       } else {
-        toast.error(result.error || 'Failed to create firm');
+        toast.error("Please fill in all required fields before proceeding");
       }
+    }
+    
+    return isValid;
+  };
+
+  const handleStepNext = async () => {
+    // Validate current step before proceeding
+    const isValid = await validateCurrentStep();
+    
+    if (!isValid) {
+      return;
+    }
+
+    // Mark current step as completed
+    if (!completedSteps.includes(currentStep)) {
+      setCompletedSteps(prev => [...prev, currentStep]);
+    }
+    
+    if (currentStep < steps.length) {
+      setCurrentStep(currentStep + 1);
+      toast.success('Progress saved');
     }
   };
 
-  const handleSaveDraft = async () => {
-    const result = await autoSaveDraft();
-    if (result.success) {
-      toast.success('Draft saved successfully');
-      setHasUnsavedChanges(false);
-    } else {
-      toast.error(result.error || 'Failed to save draft');
+  const handleStepPrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
     }
   };
+
+  const handleStepChange = async (stepId: number) => {
+    // If navigating to a future step, validate current step first
+    if (stepId > currentStep) {
+      const isValid = await validateCurrentStep();
+      if (!isValid) {
+        return;
+      }
+      
+      // Mark current step as completed
+      if (!completedSteps.includes(currentStep)) {
+        setCompletedSteps(prev => [...prev, currentStep]);
+      }
+    }
+    
+    setCurrentStep(stepId);
+  };
+
+  const handleSaveDraft = () => {
+    toast.success('Draft saved successfully');
+  };
+
+ const handleSubmit = methods.handleSubmit(async (data) => {
+  try {
+    setIsSubmitting(true);
+
+    console.log("Form Data:", data);
+
+    const formDataToSend = new FormData();
+
+    if (data.logoFile instanceof File) {
+      formDataToSend.append("logoFile", data.logoFile);
+    }
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === "logoFile") return;
+      if (value !== null && value !== undefined) {
+        const valueToSend =
+          typeof value === "object" ? JSON.stringify(value) : String(value);
+        formDataToSend.append(key, valueToSend);
+      }
+    });
+
+    formDataToSend.append("isDraft", "false");
+    formDataToSend.append("isPublished", "false");
+
+    const response = await fetch("/api/firms", {
+      method: "POST",
+      body: formDataToSend,
+    });
+
+    const dataResponse = await response.json();
+
+    if (!response.ok) {
+      throw new Error(dataResponse.error || "Failed to create firm");
+    }
+
+    toast.success("Firm created successfully!");
+    localStorage.removeItem(STORAGE_KEY);
+    router.push("/admin/firms");
+  } catch (error: unknown) {
+    console.error("Error creating firm:", error);
+
+    if (error instanceof Error) {
+      toast.error(error.message);
+    } else {
+      toast.error("Failed to create firm");
+    }
+  } finally {
+    setIsSubmitting(false);
+  }
+});
+
 
   const handleNavigation = (path: string) => {
-    if (hasUnsavedChanges) {
+    if (isDirty) {
       setPendingNavigation(path);
       setShowWarningModal(true);
     } else {
@@ -99,24 +201,10 @@ function NewFirmContent() {
     }
   };
 
-  const handleConfirmNavigation = () => {
-    if (pendingNavigation) {
-      setHasUnsavedChanges(false);
-      router.push(pendingNavigation);
-    }
-    setShowWarningModal(false);
-    setPendingNavigation(null);
-  };
-
-  const handleCancelNavigation = () => {
-    setShowWarningModal(false);
-    setPendingNavigation(null);
-  };
-
-  // Route change warning
+  // Before unload warning
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
+      if (isDirty) {
         e.preventDefault();
         e.returnValue = '';
       }
@@ -124,154 +212,140 @@ function NewFirmContent() {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges]);
+  }, [isDirty]);
 
-  // Load from local storage on mount
-  useEffect(() => {
-    const loaded = loadFromLocalStorage();
-    if (loaded) {
-      setHasUnsavedChanges(true);
-    }
-  }, [loadFromLocalStorage]);
-
-  // Load draft if specified in URL
-  useEffect(() => {
-    const draftId = searchParams.get('draft');
-    if (draftId) {
-      setLoadingDraft(true);
-      loadDraft(draftId).then((result) => {
-        if (result.success) {
-          toast.success('Draft loaded successfully');
-          setHasUnsavedChanges(true);
-        } else {
-          toast.error(result.error || 'Failed to load draft');
-        }
-        setLoadingDraft(false);
-      });
-    }
-    // Don't reset form automatically - let the form start fresh naturally
-  }, [searchParams, loadDraft]);
+  const CurrentStepComponent = steps[currentStep - 1]?.component;
 
   return (
-    <div className="p-6 space-y-6 ">
-      <PageHeader
-        title="Add New Firm"
-        description="Create a new forex firm profile with all required information."
-        actions={
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              onClick={handleSaveDraft}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Saving...' : 'Save Draft'}
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => handleNavigation('/admin/firms')}
-            >
-              Cancel
-            </Button>
-          </div>
-        }
-      />
-
-      <section className="grid grid-cols-12 gap-6">
-        {/* Form Step Content */}
-        <Card className="p-6 col-span-9">
-          {loadingDraft ? (
-            <div className="py-8 text-center text-muted-foreground">
-              Loading draft...
+    <FormProvider {...methods}>
+      <div className="p-6 space-y-6">
+        <PageHeader
+          title="Add New Firm"
+          description="Create a new forex firm profile with all required information."
+          actions={
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={handleSaveDraft}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Saving...' : 'Save Draft'}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => handleNavigation('/admin/firms')}
+              >
+                Cancel
+              </Button>
             </div>
-          ) : CurrentStepComponent ? (
-            <CurrentStepComponent
-              data={formData}
-              onNext={handleStepComplete}
-              onPrevious={() => setCurrentStep(Math.max(1, currentStep - 1))}
-              isFirstStep={currentStep === 1}
-              isLastStep={currentStep === steps.length}
-            />
-          ) : null}
-        </Card>
+          }
+        />
 
-        {/* Stepper Navigation */}
-        <nav aria-label="Progress" className="col-span-3">
-          <Card className="p-4">
-            <h3 className="text-lg font-semibold">Form Progress</h3>
-            <ol className="space-y-3">
-              {steps.map((step) => (
-                <li key={step.id}>
-                  <button
-                    onClick={() => setCurrentStep(step.id)}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${
-                      currentStep === step.id
-                        ? "bg-primary text-primary-foreground"
-                        : completedSteps.includes(step.id)
-                        ? "bg-primary/10 text-primary border border-primary/20"
-                        : "bg-muted hover:bg-muted/80"
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <span
-                        className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
-                          completedSteps.includes(step.id)
-                            ? "bg-primary text-primary-foreground"
-                            : currentStep === step.id
-                            ? "bg-primary-foreground text-primary"
-                            : "bg-muted-foreground text-muted"
-                        }`}
-                      >
-                        {completedSteps.includes(step.id) ? (
-                          <Check className="h-4 w-4" />
-                        ) : (
-                          step.id
-                        )}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className={`text-sm font-medium ${
-                            currentStep === step.id
-                              ? "text-primary-foreground"
-                              : completedSteps.includes(step.id)
-                              ? "text-primary"
-                              : "text-muted-foreground"
+        <section className="grid grid-cols-12 gap-6">
+          {/* Form Step Content */}
+          <Card className="p-6 col-span-9">
+            {loadingDraft ? (
+              <div className="py-8 text-center text-muted-foreground">
+                Loading draft...
+              </div>
+            ) : CurrentStepComponent ? (
+              <CurrentStepComponent
+                onNext={handleStepNext}
+                onPrevious={handleStepPrevious}
+                isFirstStep={currentStep === 1}
+                isLastStep={currentStep === steps.length}
+                onSubmit={handleSubmit}
+              />
+            ) : null}
+          </Card>
+
+          {/* Stepper Navigation */}
+          <nav aria-label="Progress" className="col-span-3">
+            <Card className="p-4">
+              <h3 className="text-lg font-semibold">Form Progress</h3>
+              <ol className="space-y-3">
+                {steps.map((step) => (
+                  <li key={step.id}>
+                    <button
+                      onClick={() => handleStepChange(step.id)}
+                      className={`w-full text-left p-3 rounded-lg transition-colors ${
+                        currentStep === step.id
+                          ? "bg-primary text-primary-foreground"
+                          : completedSteps.includes(step.id)
+                          ? "bg-primary/10 text-primary border border-primary/20"
+                          : "bg-muted hover:bg-muted/80"
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <span
+                          className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
+                            completedSteps.includes(step.id)
+                              ? "bg-primary text-primary-foreground"
+                              : currentStep === step.id
+                              ? "bg-primary-foreground text-primary"
+                              : "bg-muted-foreground text-muted"
                           }`}
                         >
-                          {step.name}
-                        </p>
+                          {completedSteps.includes(step.id) ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            step.id
+                          )}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className={`text-sm font-medium ${
+                              currentStep === step.id
+                                ? "text-primary-foreground"
+                                : completedSteps.includes(step.id)
+                                ? "text-primary"
+                                : "text-muted-foreground"
+                            }`}
+                          >
+                            {step.name}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                </li>
-              ))}
-            </ol>
-          </Card>
-        </nav>
-      </section>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </Card>
+          </nav>
+        </section>
 
-      {/* Warning Modal */}
-      <Dialog open={showWarningModal} onOpenChange={setShowWarningModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
-              Unsaved Changes
-            </DialogTitle>
-            <DialogDescription>
-              You have unsaved changes. If you leave now, your progress will be saved as a draft, but you may lose some recent changes.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleCancelNavigation}>
-              Stay on Page
-            </Button>
-            <Button variant="destructive" onClick={handleConfirmNavigation}>
-              Leave Anyway
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+        {/* Warning Modal */}
+        <Dialog open={showWarningModal} onOpenChange={setShowWarningModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-amber-500" />
+                Unsaved Changes
+              </DialogTitle>
+              <DialogDescription>
+                You have unsaved changes. Your progress is saved locally. Are you sure you want to leave?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowWarningModal(false)}>
+                Stay on Page
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={() => {
+                  if (pendingNavigation) {
+                    router.push(pendingNavigation);
+                  }
+                  setShowWarningModal(false);
+                }}
+              >
+                Leave Anyway
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </FormProvider>
   );
 }
 
