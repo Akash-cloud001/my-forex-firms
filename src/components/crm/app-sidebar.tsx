@@ -46,7 +46,7 @@ const navigationItems = [
   },
   {
     title: "Firm Management",
-    url: "/admin/firms",
+    url: "/admin/firm-management",
     icon: Building2,
     hasSubmenu: false,
   },
@@ -164,7 +164,7 @@ export default function AppSidebar() {
                   <SidebarMenuButton 
                     onClick={() => toggleSubmenu(item.url)}
                     isActive={isParentActive || hasActiveSubmenu}
-                    className={`hover:!bg-accent/50 ${(isParentActive || hasActiveSubmenu) ? "!bg-accent !text-primary" : ""}`}
+                    className={`hover:bg-accent/50! ${(isParentActive || hasActiveSubmenu) ? "bg-accent! text-primary!" : ""}`}
                   >
                     <Icon className="h-4 w-4 text-current" />
                     {state === "expanded" && (
@@ -182,7 +182,7 @@ export default function AppSidebar() {
                   <SidebarMenuButton 
                     asChild 
                     isActive={isActive}
-                    className={` hover:!bg-accent/50 ${isActive ? "!bg-accent !text-primary" : ""}`}
+                    className={` hover:bg-accent/50! ${isActive ? "bg-accent! text-primary!" : ""}`}
                   >
                     <Link href={item.url}>
                       <Icon className="h-4 w-4 text-current" />
