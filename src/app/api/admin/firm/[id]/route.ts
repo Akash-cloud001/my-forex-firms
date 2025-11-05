@@ -7,13 +7,12 @@ import { firmFormSchema } from '@/components/crm/firm-management/add-firm/schema
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
 
-    const { id } = params;
-
+  const { id } = await context.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, message: 'Invalid firm ID' },
@@ -52,13 +51,15 @@ export async function GET(
       message: 'Firm details with programs fetched successfully',
       data: firm,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching firm with programs:', error);
+      const err = error instanceof Error ? error : new Error(String(error));
+
     return NextResponse.json(
       {
         success: false,
         message: 'Failed to fetch firm details',
-        error: error.message,
+        error: err.message,
       },
       { status: 500 }
     );
@@ -69,13 +70,13 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Connect to database
     await connectDB();
 
-    const firmId = params.id;
+    const firmId = (await context.params).id;
     
     // Parse request body
     const body = await request.json();

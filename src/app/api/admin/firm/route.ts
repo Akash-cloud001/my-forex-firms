@@ -19,18 +19,20 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
-    console.error('Error creating firm:', error);
-    
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Failed to create funding firm',
-        error: error.message,
-      },
-      { status: 500 }
-    );
-  }
+ } catch (error) {
+  console.error('Error creating firm:', error);
+
+  const err = error instanceof Error ? error : new Error(String(error));
+
+  return NextResponse.json(
+    {
+      success: false,
+      message: 'Failed to create funding firm',
+      error: err.message,
+    },
+    { status: 500 }
+  );
+}
 }
 
 export async function GET(request: NextRequest) {
@@ -60,18 +62,21 @@ export async function GET(request: NextRequest) {
         totalPages: Math.ceil(total / limit),
       },
     });
-  } catch (error: any) {
-    console.error('Error fetching firms:', error);
-    
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Failed to fetch funding firms',
-        error: error.message,
-      },
-      { status: 500 }
-    );
-  }
+ } catch (error) {
+  console.error('Error Fetching firm:', error);
+
+  const err = error instanceof Error ? error : new Error(String(error));
+
+  return NextResponse.json(
+    {
+      success: false,
+      message: 'Failed to Fetch funding firm',
+      error: err.message,
+    },
+    { status: 500 }
+  );
+}
+
 }
 
 

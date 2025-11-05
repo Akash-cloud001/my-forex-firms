@@ -23,11 +23,13 @@ export async function uploadToCloudinary(
       url: result.secure_url,
       public_id: result.public_id,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Cloudinary upload error:", error);
+    const err = error instanceof Error ? error : new Error(String(error));
+
     return {
       success: false,
-      message: error.message || "Failed to upload image",
+      message: err.message || "Failed to upload image",
     };
   }
 }
@@ -39,11 +41,13 @@ export async function deleteFromCloudinary(publicId: string) {
       success: true,
       result,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Cloudinary delete error:", error);
+    const err = error instanceof Error ? error : new Error(String(error));
+
     return {
       success: false,
-      message: error.message || "Failed to delete image",
+      message: err.message || "Failed to delete image",
     };
   }
 }

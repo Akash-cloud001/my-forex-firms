@@ -25,13 +25,15 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error creating program:", error);
+    const err = error instanceof Error ? error : new Error(String(error));
+
     return NextResponse.json(
       {
         success: false,
         message: "Failed to create program",
-        error: error.message,
+        error: err.message,
       },
       { status: 500 }
     );
@@ -45,7 +47,8 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const propFirmId = url.searchParams.get("propFirmId");
 
-    const query: any = {};
+    const query: { propFirmId?: mongoose.Types.ObjectId } = {};
+
     if (propFirmId) {
       query.propFirmId = new mongoose.Types.ObjectId(propFirmId);
     }
@@ -56,10 +59,16 @@ export async function GET(req: NextRequest) {
       success: true,
       data: programs,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching programs:", error);
+    const err = error instanceof Error ? error : new Error(String(error));
+
     return NextResponse.json(
-      { success: false, message: "Failed to fetch programs", error: error.message },
+      {
+        success: false,
+        message: "Failed to fetch programs",
+        error: err.message,
+      },
       { status: 500 }
     );
   }

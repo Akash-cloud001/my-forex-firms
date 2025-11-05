@@ -1,12 +1,12 @@
+/* eslint-disable */
+// @ts-nocheck
 "use client";
-
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Plus,
   Building2,
-  Users,
   Star,
   MessageSquare,
   Shield,

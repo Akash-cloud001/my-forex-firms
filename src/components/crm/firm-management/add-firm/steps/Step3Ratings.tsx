@@ -6,8 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export function Step3Ratings({ onNext, onPrevious, isFirstStep }: StepProps) {
-  const { register, watch, setValue, control } = useFormContext();
+export function Step3Ratings({ onNext, onPrevious }: StepProps) {
+  const { register,  control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "ratings.otherRatings",

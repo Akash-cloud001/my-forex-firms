@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
 }
 
 // GET method to sync all users (admin only)
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     console.log('🔄 [ADMIN-SYNC] Starting bulk user sync...');
     

@@ -1,24 +1,13 @@
 "use client";
 
 import React, { useState } from 'react';
-import { SignedIn, useUser, useClerk } from '@clerk/nextjs';
+import { SignedIn, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { 
-  AlertDialog, 
-  AlertDialogAction, 
-  AlertDialogCancel, 
-  AlertDialogContent, 
-  AlertDialogDescription, 
-  AlertDialogFooter, 
-  AlertDialogHeader, 
-  AlertDialogTitle, 
-  AlertDialogTrigger 
-} from '@/components/ui/alert-dialog';
 import { 
   User as UserIcon, 
   Mail, 
@@ -33,23 +22,23 @@ import LogoutConfirmation from '@/components/profile/LogoutConfirmation';
 
 export default function ProfilePage() {
   const { user, isLoaded, isSignedIn } = useUser();
-  const { signOut } = useClerk();
+  // const { signOut } = useClerk();
   const router = useRouter();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [isSigningOut, setIsSigningOut] = useState(false);
+  // const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const handleSignOut = async () => {
-    setIsSigningOut(true);
-    try {
-      await signOut();
-      router.push('/');
-    } catch (error) {
-      console.error('Error signing out:', error);
-    } finally {
-      setIsSigningOut(false);
-      setShowLogoutModal(false);
-    }
-  };
+  // const handleSignOut = async () => {
+  //   setIsSigningOut(true);
+  //   try {
+  //     await signOut();
+  //     router.push('/');
+  //   } catch (error) {
+  //     console.error('Error signing out:', error);
+  //   } finally {
+  //     setIsSigningOut(false);
+  //     setShowLogoutModal(false);
+  //   }
+  // };
 
   if (!isLoaded) {
     return (
@@ -134,7 +123,7 @@ export default function ProfilePage() {
             <CardContent className="space-y-4 sm:space-y-6">
               {/* Profile Picture and Basic Info */}
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                   {user.imageUrl ? (
                     <Image
                       src={user.imageUrl}
@@ -175,7 +164,7 @@ export default function ProfilePage() {
                     </Badge>
                     </div>
                     <div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
-                      <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
                       <span className="text-muted-foreground text-sm sm:text-base break-all">
                         {user.emailAddresses[0]?.emailAddress}
                       </span>
@@ -183,7 +172,7 @@ export default function ProfilePage() {
                   </div>
                   
                     <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
-                      <Calendar className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                      <Calendar className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
                       <span className="text-center sm:text-left">
                         Member since {user.createdAt ? formatDate(user.createdAt) : 'Unknown'}
                       </span>

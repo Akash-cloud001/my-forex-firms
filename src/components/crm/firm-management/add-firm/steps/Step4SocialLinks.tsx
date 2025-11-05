@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { FirmFormData } from "../schema/schema";
 
 export function Step4SocialLinks({ onNext, onPrevious }:StepProps) {
- const { register, formState: { errors }, setValue, watch } = useFormContext<FirmFormData>();  
+ const {  setValue, watch } = useFormContext<FirmFormData>();  
  const [newPlatform, setNewPlatform] = useState('');
   const [newUrl, setNewUrl] = useState('');
   
@@ -25,7 +25,7 @@ export function Step4SocialLinks({ onNext, onPrevious }:StepProps) {
     }
   };
 
-  const removeSocialLink = (platform:any) => {
+  const removeSocialLink = (platform:string) => {
     const updated = { ...socialLinks };
     delete updated[platform];
     setValue('socialLinks.socialLinks', updated);

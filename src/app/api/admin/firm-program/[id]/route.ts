@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
 import Program from "@/models/FirmProgram";
+
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+ context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   try {
     await connectDB();
-    const program = await Program.findById(params.id);
+    const program = await Program.findById(id);
 
     if (!program) {
       return NextResponse.json(
@@ -18,10 +18,12 @@ export async function GET(
     }
 
     return NextResponse.json({ success: true, data: program });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching program:", error);
+    const err = error instanceof Error ? error : new Error(String(error));
+
     return NextResponse.json(
-      { success: false, message: "Failed to fetch program", error: error.message },
+      { success: false, message: "Failed to fetch program", error: err.message },
       { status: 500 }
     );
   }
@@ -29,13 +31,15 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await context.params;
+
   try {
     await connectDB();
     const updates = await req.json();
 
-    const program = await Program.findByIdAndUpdate(params.id, updates, {
+    const program = await Program.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,
     });
@@ -52,10 +56,12 @@ export async function PUT(
       message: "Program updated successfully",
       data: program,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error updating program:", error);
+    const err = error instanceof Error ? error : new Error(String(error));
+
     return NextResponse.json(
-      { success: false, message: "Failed to update program", error: error.message },
+      { success: false, message: "Failed to update program", error: err.message },
       { status: 500 }
     );
   }
@@ -63,12 +69,14 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+      const { id } = await context.params;
+
   try {
     await connectDB();
 
-    const deleted = await Program.findByIdAndDelete(params.id);
+    const deleted = await Program.findByIdAndDelete(id);
 
     if (!deleted) {
       return NextResponse.json(
@@ -81,10 +89,12 @@ export async function DELETE(
       success: true,
       message: "Program deleted successfully",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error deleting program:", error);
+    const err = error instanceof Error ? error : new Error(String(error));
+
     return NextResponse.json(
-      { success: false, message: "Failed to delete program", error: error.message },
+      { success: false, message: "Failed to delete program", error: err.message },
       { status: 500 }
     );
   }

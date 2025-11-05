@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,6 @@ export interface StepProps {
 }
 export function Step2Leadership({
   onNext,
-  onPrevious,
   isFirstStep,
 }: StepProps) {
   const {

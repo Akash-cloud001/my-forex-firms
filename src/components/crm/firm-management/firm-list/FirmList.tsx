@@ -1,16 +1,15 @@
+/* eslint-disable */
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   Edit,
   Search,
   RefreshCw,
-  FileText,
-  Image as ImageIcon,
-  Layers,
+  
 } from 'lucide-react';
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, useFieldArray, Controller, FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Plus, Trash2, Save, ArrowLeft, Info, X } from "lucide-react";
@@ -177,7 +177,7 @@ const router = useRouter()
     };
 
     fetchProgramData();
-  }, [programId, setValue]);
+  }, [programId, setValue,params.id,reset]);
 
 
 
@@ -291,7 +291,7 @@ const onSubmit = async (data: ProgramFormData) => {
 };
 
 
-  const onError = (errors: any) => {
+const onError = (errors: FieldErrors<ProgramFormData>) => {
     console.error(" Validation Errors:", errors);
     setSubmitStatus("error");
     setTimeout(() => setSubmitStatus(""), 5000);
@@ -473,7 +473,7 @@ const onSubmit = async (data: ProgramFormData) => {
               <CardContent className="space-y-4">
                 {stepFields.length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
-                    No evaluation steps added yet. Click "Add Step" to get started.
+                    No evaluation steps added yet. Click  &quot;Add Step &quot; to get started.
                   </div>
                 )}
                 {stepFields.map((field, index) => (
@@ -786,7 +786,7 @@ const onSubmit = async (data: ProgramFormData) => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[
+                {([
                   { name: "stopLossRequired", label: "Stop Loss Required" },
                   { name: "eaAllowed", label: "Expert Advisors (EA) Allowed" },
                   { name: "weekendHolding", label: "Weekend Position Holding" },
@@ -794,13 +794,13 @@ const onSubmit = async (data: ProgramFormData) => {
                   { name: "newsTrading", label: "News Trading Allowed" },
                   { name: "copyTrading", label: "Copy Trading Allowed" },
                   { name: "refundFee", label: "Refundable Fee" },
-                ].map((rule) => (
+                ]as const).map((rule) => (
                   <div
                     key={rule.name}
                     className="flex items-start space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors"
                   >
                     <Controller
-                      name={rule.name as any}
+                      name={rule.name }
                       control={control}
                       render={({ field }) => (
                         <Checkbox
