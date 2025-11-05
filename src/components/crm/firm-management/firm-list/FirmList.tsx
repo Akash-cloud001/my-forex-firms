@@ -83,10 +83,10 @@ export default function FirmsList() {
         description={`Search, filter, and manage all forex firms on the platform. ${firms.length} firms found.`}
         actions={
           <div className="flex gap-2">
-            <Button variant="outline">
+            {/* <Button variant="outline">
               <FileText className="h-4 w-4 mr-2" />
               View Drafts
-            </Button>
+            </Button> */}
             <Button variant="outline" onClick={fetchFirms}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
@@ -180,21 +180,21 @@ export default function FirmsList() {
                             )}
                           </div> */}
                           <div>
-                            <div className="font-medium">{firm.firmDetails.name}</div>
+                            <div className="font-medium capitalize">{firm.firmDetails.name}</div>
                             <div className="text-xs text-muted-foreground">
                               Reg: {firm.firmDetails.registrationNumber}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="p-3">{firm.firmDetails.jurisdiction}</td>
-                      <td className="p-3">{firm.firmDetails.yearFounded}</td>
+                      <td className="p-3">{firm.firmDetails.jurisdiction ? firm.firmDetails.jurisdiction : 'N/A'}</td>
+                      <td className="p-3">{firm.firmDetails.yearFounded ? firm.firmDetails.yearFounded : 'N/A'}</td>
                       <td className="p-3">
-                        <Badge variant="outline">
+                        {firm.firmDetails.status ? <Badge variant="outline">
                           {firm.firmDetails.status.charAt(0).toUpperCase() + firm.firmDetails.status.slice(1)}
-                        </Badge>
+                        </Badge> : 'N/A'}
                       </td>
-                      <td className="p-3">{firm.firmDetails.yearFounded}</td>
+                      <td className="p-3">{firm.firmDetails.yearFounded ? firm.firmDetails.yearFounded : 'N/A'}</td>
                       <td className="p-3 text-muted-foreground">
                         {firm.firmDetails.challenges?.length || 0}
                       </td>
