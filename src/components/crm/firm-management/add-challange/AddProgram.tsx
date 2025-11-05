@@ -415,7 +415,7 @@ const onSubmit = async (data: ProgramFormData) => {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor="name">Program Name *</Label>
                 <Input
                   id="name"
