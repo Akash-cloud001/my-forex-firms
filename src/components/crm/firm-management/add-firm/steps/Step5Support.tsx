@@ -10,12 +10,11 @@ import { StepProps } from "./Step2Leadership";
 import { FirmFormData } from "../schema/schema";
 
 export function Step5Support({ onNext, onPrevious }:StepProps) {
-  const { register, control, watch, setValue } = useFormContext<FirmFormData>();
+  const { register, control, watch, setValue, formState: { errors } } = useFormContext<FirmFormData>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'support.channels',
   });
-
   return (
     <div className="space-y-6">
       <div className="text-primary-foreground">
@@ -63,10 +62,20 @@ export function Step5Support({ onNext, onPrevious }:StepProps) {
                         <SelectItem value="discord">Discord</SelectItem>
                       </SelectContent>
                     </Select>
+                    {errors.support?.channels?.[index]?.type && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {errors.support.channels[index]?.type?.message}
+                      </p>
+                    )}
                   </div>
                   <div className="flex-1">
                     <Label className="text-xs">Link/Contact</Label>
                     <Input {...register(`support.channels.${index}.link`)} />
+                    {errors.support?.channels?.[index]?.link && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {errors.support.channels[index]?.link?.message}
+                      </p>
+                    )}
                   </div>
                   <Button
                     type="button"
@@ -85,6 +94,11 @@ export function Step5Support({ onNext, onPrevious }:StepProps) {
                       {...register(`support.channels.${index}.responseTime`)}
                       placeholder="e.g., 2 hours"
                     />
+                    {errors.support?.channels?.[index]?.responseTime && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {errors.support.channels[index]?.responseTime?.message}
+                      </p>
+                    )}
                   </div>
                   <div className="flex-1">
                     <Label className="text-xs">Status</Label>

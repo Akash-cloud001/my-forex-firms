@@ -59,7 +59,7 @@ export function Step7Transparency({ onNext, onPrevious }:StepProps) {
         </div>
       </div>
 
-      <div>
+      <div className="space-y-2">
         <Label>Notes</Label>
         <Textarea
           {...register('transparency.notes')}

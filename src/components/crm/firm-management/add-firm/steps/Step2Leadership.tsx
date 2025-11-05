@@ -79,8 +79,8 @@ export function Step2Leadership({
               </Button>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
+            <div className="grid grid-cols-2 gap-4 mb-2">
+              <div className="space-y-2">
                 <Label>Name *</Label>
                 <Input
                   {...register(`leadership.leadership.${index}.name`)}
@@ -98,7 +98,7 @@ export function Step2Leadership({
                 )}
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label>Role *</Label>
                 <Input
                   {...register(`leadership.leadership.${index}.role`)}
@@ -117,7 +117,7 @@ export function Step2Leadership({
               </div>
             </div>
 
-            <div className="flex items-center justify-between mb-4 p-3  rounded">
+            <div className="flex items-center justify-between mb-2 w-fit gap-4">
               <Label>Verified Identity</Label>
               <Switch
                 checked={
