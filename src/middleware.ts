@@ -20,6 +20,9 @@ const isAdminRoute = createRouteMatcher([
 
 
 export default clerkMiddleware(async (auth, req) => {
+  if (req.nextUrl.pathname === '/api/users/webhook') {
+    return NextResponse.next();
+  }
   if (!isPublicRoute(req)) {
     await auth.protect()
     
