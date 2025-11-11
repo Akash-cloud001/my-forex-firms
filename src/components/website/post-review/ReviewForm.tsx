@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle } from "lucide-react";
@@ -18,7 +18,11 @@ import { cn } from "@/lib/utils";
 import { createReview } from "@/lib/reviewApi";
 import { ReviewFormData } from "../types/types";
 import { reviewFormSchema } from "../schema/schema";
-import { MOCK_FIRMS, ISSUE_TYPES, DESCRIPTION_CONFIG } from "../constant/constants";
+import {
+  MOCK_FIRMS,
+  ISSUE_TYPES,
+  DESCRIPTION_CONFIG,
+} from "../constant/constants";
 import { StarRating } from "./StarRating";
 import { FileUpload } from "./FileUpload";
 import { FirmSelector } from "./FirmSelector";
@@ -31,6 +35,21 @@ export const ReviewForm: React.FC = () => {
   const [showThankYouModal, setShowThankYouModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  // const [firms, setFirms] = useState<{ id: string; name: string }[]>([]);
+
+//  useEffect(() => {
+//     const fetchFirms = async () => {
+//       try {
+//         const res = await fetch("/api/website/prop-firm-list");
+//         const data = await res.json();
+//         console.log("🚀 ~ fetchFirms ~ data:", data)
+//         setFirms(data.data || []);
+//       } catch (err) {
+//         console.error("Failed to fetch firms:", err);
+//       }
+//     };
+//     fetchFirms();
+//   }, []);
 
   const {
     register,

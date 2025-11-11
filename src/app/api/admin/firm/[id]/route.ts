@@ -1,9 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server';
-import mongoose from 'mongoose';
-import connectDB from '@/lib/mongodb';
-import FundingFirm from '@/models/FirmDetails';
-import { firmFormSchema } from '@/components/crm/firm-management/add-firm/schema/schema';
+import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
+import connectDB from "@/lib/mongodb";
+import FundingFirm from "@/models/FirmDetails";
+import { firmFormSchema } from "@/components/crm/firm-management/add-firm/schema/schema";
+import { currentUser } from "@clerk/nextjs/server";
+import AuditLog from "@/models/AuditLog";
+import {
+  deleteFromCloudinary,
+  uploadToCloudinary,
+} from "@/services/cloudinary";
+type ChangeEntry = {
+  field: string;
+  oldValue: unknown;
+  newValue: unknown;
+};
 
+interface Change {
+  field: string;
+  oldValue: string | number | boolean | object | null;
+  newValue: string | number | boolean | object | null;
+}
+
+interface ChangeLog {
+  [section: string]: Change[];
+}
 
 export async function GET(
   request: NextRequest,
@@ -12,10 +32,10 @@ export async function GET(
   try {
     await connectDB();
 
-  const { id } = await context.params;
+    const { id } = await context.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
-        { success: false, message: 'Invalid firm ID' },
+        { success: false, message: "Invalid firm ID" },
         { status: 400 }
       );
     }
@@ -24,22 +44,22 @@ export async function GET(
       { $match: { _id: new mongoose.Types.ObjectId(id) } },
       {
         $lookup: {
-          from: 'programs', 
-          localField: '_id',
-          foreignField: 'propFirmId',
-          as: 'programs',
+          from: "programs",
+          localField: "_id",
+          foreignField: "propFirmId",
+          as: "programs",
         },
       },
       {
         $addFields: {
-          totalPrograms: { $size: '$programs' },
+          totalPrograms: { $size: "$programs" },
         },
       },
     ]);
 
     if (!result || result.length === 0) {
       return NextResponse.json(
-        { success: false, message: 'Firm not found' },
+        { success: false, message: "Firm not found" },
         { status: 404 }
       );
     }
@@ -48,17 +68,17 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      message: 'Firm details with programs fetched successfully',
+      message: "Firm details with programs fetched successfully",
       data: firm,
     });
   } catch (error) {
-    console.error('Error fetching firm with programs:', error);
-      const err = error instanceof Error ? error : new Error(String(error));
+    console.error("Error fetching firm with programs:", error);
+    const err = error instanceof Error ? error : new Error(String(error));
 
     return NextResponse.json(
       {
         success: false,
-        message: 'Failed to fetch firm details',
+        message: "Failed to fetch firm details",
         error: err.message,
       },
       { status: 500 }
@@ -66,138 +86,216 @@ export async function GET(
   }
 }
 
-
-
 export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  try {
-    // Connect to database
-    await connectDB();
+  await connectDB();
+  const firmId = (await context.params).id;
 
-    const firmId = (await context.params).id;
-    
-    // Parse request body
-    const body = await request.json();
-    
-    // Validate data with Zod schema
-    const validationResult = firmFormSchema.safeParse(body);
-    
-    if (!validationResult.success) {
+  try {
+    const user = await currentUser();
+    if (!user) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Validation failed",
-          errors: validationResult.error.flatten().fieldErrors,
-        },
-        { status: 400 }
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
       );
     }
 
-    const validatedData = validationResult.data;
+    const userId = user.id;
+    const userName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+    const userRole = user.publicMetadata?.role || "User";
 
-    // Check if firm exists
+    // ---------- 1. Parse multipart/form-data ----------
+    const formData = await request.formData();
+
+    const parseJSON = (key: string) => {
+      const raw = formData.get(key);
+      if (typeof raw === "string") {
+        try {
+          return JSON.parse(raw);
+        } catch {
+          return {};
+        }
+      }
+      return {};
+    };
+
+    const firmDetailsRaw = parseJSON("firmDetails");
+    const imageFile = formData.get("firmDetails.imageFile") as File | null;
+    const keepExistingImage = formData.get("firmDetails.image"); // JSON string or null
+
+    // ---------- 2. Find existing firm ----------
     const existingFirm = await FundingFirm.findById(firmId);
-    
     if (!existingFirm) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Firm not found",
-        },
+        { success: false, message: "Firm not found" },
         { status: 404 }
       );
     }
 
-    // Prepare update data
-    const updateData = {
-      // Firm Details
-      "firmDetails.name": validatedData.firmDetails.name,
-      "firmDetails.legalEntityName": validatedData.firmDetails.legalEntityName,
-      "firmDetails.registrationNumber": validatedData.firmDetails.registrationNumber,
-      "firmDetails.licenseNumber": validatedData.firmDetails.licenseNumber,
-      "firmDetails.regulator": validatedData.firmDetails.regulator,
-      "firmDetails.jurisdiction": validatedData.firmDetails.jurisdiction,
-      "firmDetails.yearFounded": validatedData.firmDetails.yearFounded,
-      "firmDetails.status": validatedData.firmDetails.status,
-      "firmDetails.hqAddress": validatedData.firmDetails.hqAddress,
-      "firmDetails.languagesSupported": validatedData.firmDetails.languagesSupported,
-      "firmDetails.companyDescription": validatedData.firmDetails.companyDescription,
-      "firmDetails.officialWebsite": validatedData.firmDetails.officialWebsite,
-      "firmDetails.brokers": validatedData.firmDetails.brokers,
-      "firmDetails.liquidityProviders": validatedData.firmDetails.liquidityProviders,
+    // ---------- 3. Handle image ----------
+    let imageMeta = null;
+    // const existingImage = existingFirm.firmDetails?.image;
+    // CASE A: user removed the image completely (no file, no keepExisting)
+    const shouldDeleteOld =
+      existingFirm.firmDetails?.image?.publicId &&
+      !imageFile &&
+      !keepExistingImage;
 
-      // Leadership
-      "leadership.leadership": validatedData.leadership.leadership,
+    // CASE B: user uploaded a new image
+    if (imageFile && imageFile.size > 0) {
+      if (imageFile.size > 5 * 1024 * 1024) {
+        return NextResponse.json(
+          { success: false, message: "Image must be ≤ 5 MB" },
+          { status: 400 }
+        );
+      }
 
-      // Ratings
-      "ratings.trustPilotRating": validatedData.ratings.trustPilotRating,
-      "ratings.otherRatings": validatedData.ratings.otherRatings,
+      const upload = await uploadToCloudinary(imageFile, "funding-firms/logos");
+      if (!upload.success) {
+        return NextResponse.json(
+          { success: false, message: upload.message ?? "Upload failed" },
+          { status: 400 }
+        );
+      }
 
-      // Social Links
-      "socialLinks.socialLinks": validatedData.socialLinks.socialLinks,
+      imageMeta = {
+        url: upload.url,
+        publicId: upload.public_id,
+        thumbnail: upload.thumbnail_url,
+      };
 
-      // Support
-      "support.channels": validatedData.support.channels,
-      "support.avgResolutionTime": validatedData.support.avgResolutionTime,
-      "support.supportHours": validatedData.support.supportHours,
+      // Delete old image if a new one is uploaded
+      if (existingFirm.firmDetails?.image?.publicId) {
+        await deleteFromCloudinary(existingFirm?.firmDetails.image.publicId);
+      }
+    }
+    // CASE C: keep existing image
+    else if (keepExistingImage) {
+      try {
+        imageMeta = JSON.parse(keepExistingImage as string);
+      } catch {
+        // fallback to DB value
+        imageMeta = existingFirm.firmDetails?.image ?? null;
+      }
+    }
+    // CASE D: no image at all → imageMeta stays null
 
-      // Compliance
-      "compliance.kycRequirements": validatedData.compliance.kycRequirements,
-      "compliance.kycProvider": validatedData.compliance.kycProvider,
-      "compliance.restrictedCountries": validatedData.compliance.restrictedCountries,
-      "compliance.regulationsComplied": validatedData.compliance.regulationsComplied,
-      "compliance.amlLink": validatedData.compliance.amlLink,
-
-      // Transparency
-      "transparency.ceoPublic": validatedData.transparency.ceoPublic,
-      "transparency.officeVerified": validatedData.transparency.officeVerified,
-      "transparency.termsPublicUpdated": validatedData.transparency.termsPublicUpdated,
-      "transparency.payoutProofPublic": validatedData.transparency.payoutProofPublic,
-      "transparency.thirdPartyAudit": validatedData.transparency.thirdPartyAudit,
-      "transparency.notes": validatedData.transparency.notes,
-      "transparency.transparencyScore": validatedData.transparency.transparencyScore,
-
-      // Trading
-      "trading.leverageMatrix": validatedData.trading.leverageMatrix,
-      "trading.commissions": validatedData.trading.commissions,
-
-      // Payments
-      "payments.methods": validatedData.payments.methods,
-      "payments.payoutMethods": validatedData.payments.payoutMethods,
-      "payments.baseCurrency": validatedData.payments.baseCurrency,
-      "payments.minWithdrawal": validatedData.payments.minWithdrawal,
-      "payments.processingTime": validatedData.payments.processingTime,
-      "payments.payoutSchedule": validatedData.payments.payoutSchedule,
-      "payments.refundPolicy": validatedData.payments.refundPolicy,
-
-      // Metadata
-      updatedAt: new Date(),
+    // ---------- 4. Build final payload ----------
+    const payload = {
+      firmDetails: {
+        ...firmDetailsRaw,
+        image: imageMeta, // null or object
+      },
+      leadership: parseJSON("leadership"),
+      ratings: parseJSON("ratings"),
+      socialLinks: parseJSON("socialLinks"),
+      support: parseJSON("support"),
+      compliance: parseJSON("compliance"),
+      transparency: parseJSON("transparency"),
+      trading: parseJSON("trading"),
+      payments: parseJSON("payments"),
     };
 
-    // Update firm in database
+    // ---------- 5. Zod validation ----------
+    const validation = firmFormSchema.safeParse(payload);
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Validation failed",
+          errors: validation.error.flatten().fieldErrors,
+        },
+        { status: 400 }
+      );
+    }
+    const validatedData = validation.data;
+
+    // ---------- 6. Delete old image if needed ----------
+    if (shouldDeleteOld) {
+  const oldPublicId = existingFirm?.firmDetails?.image?.publicId;
+  if (typeof oldPublicId === "string" && oldPublicId.trim().length > 0) {
+    await deleteFromCloudinary(oldPublicId);
+  }
+}
+
+
+    // ---------- 7. Update DB ----------
+    const nestedPaths = [
+      "firmDetails",
+      "leadership",
+      "ratings",
+      "socialLinks",
+      "support",
+      "compliance",
+      "transparency",
+      "trading",
+      "payments",
+    ];
+
+    const updateData: Record<string, unknown> = { updatedAt: new Date() };
+    nestedPaths.forEach((section) => {
+      const sectionData = validatedData[section as keyof typeof validatedData];
+      if (sectionData && typeof sectionData === "object") {
+        Object.entries(sectionData).forEach(([field, value]) => {
+          updateData[`${section}.${field}`] = value;
+        });
+      }
+    });
+
     const updatedFirm = await FundingFirm.findByIdAndUpdate(
       firmId,
       { $set: updateData },
-      {
-        new: true, // Return updated document
-        runValidators: true, // Run mongoose validators
-      }
+      { new: true, runValidators: true }
     );
 
     if (!updatedFirm) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Failed to update firm",
-        },
+        { success: false, message: "Failed to update firm" },
         { status: 500 }
       );
     }
 
-    // Log the update (optional)
-    console.log(`Firm updated successfully: ${firmId}`);
+    // ---------- 8. Audit log ----------
+    const changes: ChangeLog  = {};
+    for (const key in updateData) {
+      if (key === "updatedAt") continue;
+      const [section, field] = key.split(".");
+
+      const getNestedValue = <T extends object>(
+        obj: T | null,
+        path: string
+      ): string | number | boolean | object | null => {
+        return path.split(".").reduce<string | number | boolean | object | null>(
+          (acc, curr) =>
+            acc && typeof acc === "object" && curr in acc
+              ? (acc as Record<string, string | number | boolean | object | null>)[curr]
+              : null,
+          obj
+        );
+      };
+
+      const oldValue = getNestedValue(existingFirm, key);
+      const newValue = getNestedValue(updatedFirm, key);
+
+      if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+        if (!changes[section]) changes[section] = [];
+        changes[section].push({ field, oldValue, newValue });
+      }
+    }
+
+    if (Object.keys(changes).length > 0) {
+      await AuditLog.create({
+        userId,
+        userName,
+        userRole,
+        entity: "Firm",
+        entityId: firmId,
+        action: "UPDATE",
+        changes,
+      });
+    }
 
     return NextResponse.json(
       {
@@ -207,26 +305,13 @@ export async function PUT(
       },
       { status: 200 }
     );
-
   } catch (error) {
-    console.error("Error updating firm:", error);
-    
-    // Handle specific error types
-    if (error instanceof Error) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Internal server error",
-          error: error.message,
-        },
-        { status: 500 }
-      );
-    }
-
+    console.error("PUT /api/admin/firm/[id] error:", error);
     return NextResponse.json(
       {
         success: false,
-        message: "An unexpected error occurred",
+        message: "Internal server error",
+        error: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     );

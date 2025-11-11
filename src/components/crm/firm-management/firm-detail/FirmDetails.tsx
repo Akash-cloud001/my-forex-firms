@@ -36,6 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Image from "next/image";
 
 interface FirmData {
   _id: string;
@@ -670,6 +671,14 @@ function FirmDetails({ id }: { id: string }) {
                                 {leverage["2-Step"]}
                               </p>
                             </div>
+                            <div>
+                              <label className="text-xs text-muted-foreground">
+                                3-Step
+                              </label>
+                              <p className="font-medium">
+                                {leverage["3-Step"]}
+                              </p>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -833,11 +842,13 @@ function FirmDetails({ id }: { id: string }) {
                 <TableBody>
                   {firmData?.programs.map((program:any) => (
                     <TableRow key={program._id}>
+                     
                       <TableCell>{program.type}</TableCell>
                       <TableCell className="font-medium">
                         {program.name}
                       </TableCell>
                       <TableCell>{program.evaluationPhases}</TableCell>
+                    
                       <TableCell>
                         {program.accountSizes.map((a: any) => (
                           <div key={a._id}>
