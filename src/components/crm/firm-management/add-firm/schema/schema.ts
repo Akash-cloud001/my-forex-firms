@@ -2,7 +2,14 @@ import { z } from "zod";
 
 export const firmDetailsSchema = z.object({
   name: z.string().min(1, "Firm name is required"),
-  // image:z.any(),
+  imageFile: z.instanceof(File).optional(),
+  image: z
+    .object({
+      url: z.string().url(),
+      publicId: z.string(),
+      thumbnail: z.string().url(),
+    })
+    .optional().nullable(),
   legalEntityName: z.string().optional(),
   registrationNumber: z.string().optional(),
   licenseNumber: z.string().optional(),

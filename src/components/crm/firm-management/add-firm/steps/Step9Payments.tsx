@@ -249,8 +249,8 @@ export function Step9Payments({ onPrevious, onSubmit, onNext, isLastStep }: Step
           Previous
         </Button>
         {isLastStep ? (
-          <Button type="submit" onClick={onSubmit}>
-            Submit Form
+          <Button type="submit" onClick={onSubmit} disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit"}
           </Button>
         ) : (
           <Button type="button" onClick={onNext}>

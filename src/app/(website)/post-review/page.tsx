@@ -17,7 +17,7 @@ const ReviewPage: React.FC = () => {
           />
           <h1 className="text-4xl font-geist-sans opacity-50 font-bold text-foreground">
             Submit Your Review
-          </h1>
+          </h1> 
         </div>
       </div>
       

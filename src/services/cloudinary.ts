@@ -18,10 +18,18 @@ export async function uploadToCloudinary(
     const result = await cloudinary.uploader.upload(base64Data, {
       folder,
     });
+
+    const thumbUrl = cloudinary.url(`${result.public_id}.jpg`, {
+      transformation: [
+        { width: 300, height: 300, crop: "fill", gravity: "auto" },
+        { quality: "auto", fetch_format: "auto" },
+      ],
+    });
     return {
       success: true,
       url: result.secure_url,
       public_id: result.public_id,
+      thumbnail_url:thumbUrl,
     };
   } catch (error) {
     console.error("Cloudinary upload error:", error);
@@ -51,5 +59,3 @@ export async function deleteFromCloudinary(publicId: string) {
     };
   }
 }
-
-

@@ -19,7 +19,7 @@ export interface ISupportChannel {
   link: string;
   preferred?: boolean;
   responseTime?: string;
-  status?: 'active' | 'inactive';
+  status?: "active" | "inactive";
 }
 
 export interface IRating {
@@ -30,7 +30,11 @@ export interface IRating {
 export interface IFundingFirm extends Document {
   firmDetails: {
     name: string;
-    // image:string;
+    image?: {
+      url: string;
+      publicId: string;
+      thumbnail: string;
+    };
     legalEntityName?: string;
     registrationNumber?: string;
     licenseNumber?: string;
@@ -84,11 +88,15 @@ export interface IFundingFirm extends Document {
   };
 
   trading: {
-    leverageMatrix?: Record<string, {
-      Instant?: string;
-      '1-Step'?: string;
-      '2-Step'?: string;
-    }>;
+    leverageMatrix?: Record<
+      string,
+      {
+        Instant?: string;
+        "1-Step"?: string;
+        "2-Step"?: string;
+        "3-step"?:string
+      }
+    >;
     commissions?: Record<string, string>;
   };
 
@@ -110,7 +118,11 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
   {
     firmDetails: {
       name: { type: String, required: true, trim: true },
-      // image:{type:String},
+      image: {
+        url: { type: String },
+        publicId: { type: String },
+        thumbnail: { type: String },
+      },
       legalEntityName: { type: String, trim: true },
       registrationNumber: { type: String, trim: true },
       licenseNumber: { type: String, trim: true },
@@ -165,7 +177,7 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
           link: { type: String, required: true },
           preferred: { type: Boolean, default: false },
           responseTime: String,
-          status: { type: String, enum: ['active', 'inactive'] },
+          status: { type: String, enum: ["active", "inactive"] },
         },
       ],
       avgResolutionTime: String,
@@ -195,8 +207,9 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
         type: Map,
         of: {
           Instant: String,
-          '1-Step': String,
-          '2-Step': String,
+          "1-Step": String,
+          "2-Step": String,
+          "3-step":String
         },
       },
       commissions: { type: Map, of: String },
@@ -214,15 +227,16 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
   },
   {
     timestamps: true,
-    collection: 'funding_firms',
+    collection: "funding_firms",
   }
 );
 
-FundingFirmSchema.index({ 'firmDetails.name': 1 });
-FundingFirmSchema.index({ 'firmDetails.status': 1 });
+FundingFirmSchema.index({ "firmDetails.name": 1 });
+FundingFirmSchema.index({ "firmDetails.status": 1 });
 FundingFirmSchema.index({ createdAt: -1 });
 
 const FundingFirm: Model<IFundingFirm> =
-  mongoose.models.FundingFirm || mongoose.model<IFundingFirm>('FundingFirm', FundingFirmSchema);
+  mongoose.models.FundingFirm ||
+  mongoose.model<IFundingFirm>("FundingFirm", FundingFirmSchema);
 
 export default FundingFirm;
