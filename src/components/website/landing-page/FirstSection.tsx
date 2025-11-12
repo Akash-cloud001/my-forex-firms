@@ -25,33 +25,27 @@ function FirstSection() {
     { value: "1M+", label: "Monthly Views", src: "/website/monthly-views.png" },
   ];
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen">
+    <div className="flex flex-col justify-start items-center min-h-screen pt-32">
       <div
-        className="flex flex-col items-center bg-cover bg-center px-6"
-        style={{
-          backgroundImage: `url(/website/hero-bg.png)`,
-          height: "539px",
-          width: "950px",
-        }}
+        className="flex flex-col items-center bg-cover bg-center px-6 relative"
       >
+        <div className="absolute -top-10 left-0 h-[539px] w-[950px] bg-[url('/website/hero-bg.png')] bg-no-repeat bg-center bg-cover z-0" />
         {/* Hero Text */}
-        <div className="text-center mt-12">
+        <div className="text-center relative z-10">
           <h1
-            className="text-[60px] font-semibold leading-none"
-            style={gradientTextStyle}
+            className="text-6xl 2xl:text-7xl font-semibold leading-none gradient-text"
           >
             Transparency, Verified Ratings,
           </h1>
           <h1
-            className="text-[60px] font-semibold leading-none"
-            style={gradientTextStyle}
+            className="text-6xl 2xl:text-7xl font-semibold leading-none gradient-text mt-2"
           >
             Traders Trust.
           </h1>
         </div>
 
         {/* Stats Section */}
-        <div className="flex justify-between w-full mt-16 text-white">
+        <div className="flex justify-between w-full mt-14 text-white relative z-10">
           {stats.map((item, index) => (
             <div
               key={index}
@@ -62,17 +56,13 @@ function FirstSection() {
                 <p className="font-bold text-[20px] leading-[100%]">
                   {item.value}
                 </p>
-                <p className="text-[20px] font-light leading-[100%] tracking-[-0.05em]">
+                <p className="text-[20px] font-light tracking-[-0.05em]">
                   {item.label}
                 </p>
               </div>
             </div>
           ))}
         </div>
-      </div>
-      <div className="flex flex-col items-center bg-cover bg-center px-6">
-        <TrustedFirmSlider />
-        <FirmListSection />
       </div>
     </div>
   );

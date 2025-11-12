@@ -213,3 +213,10 @@
   font-size: 8px !important;
 }
 
+.gradient-text{
+    background: linear-gradient(180deg, #FFFFFF 0%, #999999 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0px 4px 4px rgba(255, 255, 255, 0.25);
+}
