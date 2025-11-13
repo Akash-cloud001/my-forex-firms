@@ -22,7 +22,7 @@ function FirmListSection() {
         { name: "FundingPips", reviews: 10 },
         { name: "FundingPips", reviews: 10 },
         { name: "FundingPips", reviews: 10 },
-        { name: "FundingPips", reviews: 10 },
+        // { name: "FundingPips", reviews: 10 },
       ],
       stamp: "approved",
     },
@@ -35,7 +35,7 @@ function FirmListSection() {
         { name: "FundingPips", reviews: 10 },
         { name: "FundingPips", reviews: 10 },
         { name: "FundingPips", reviews: 10 },
-        { name: "FundingPips", reviews: 10 },
+        // { name: "FundingPips", reviews: 10 },
       ],
       stamp: "verified",
     },
@@ -48,28 +48,29 @@ function FirmListSection() {
         { name: "FundingPips", reviews: 10 },
         { name: "FundingPips", reviews: 10 },
         { name: "FundingPips", reviews: 10 },
-        { name: "FundingPips", reviews: 10 },
+        // { name: "FundingPips", reviews: 10 },
       ],
       stamp: "classic",
     },
   ];
 
   return (
-    <div className="min-h-screen text-white p-8">
-      <div className="max-w-9xl mx-auto ">
+    <div className="min-h-screen text-white px-0 md:px-8 py-8 relative max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-start justify-between w-full px-4 md:px-0">
           <div>
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
-                <h1 className="font-[Geist] font-semibold text-[24px] leading-[100%] tracking-[-0.05em] bg-linear-to-b from-[#FFFFFF] to-[#999999] bg-clip-text text-transparent drop-shadow-[0_4px_4px_#FFFFFF26]">
+                <h1 className="font-geist-sans font-semibold text-[24px] leading-[100%] tracking-[-0.05em] bg-linear-to-b from-[#FFFFFF] to-[#999999] bg-clip-text text-transparent drop-shadow-[0_4px_4px_#FFFFFF26]">
                   Firms <span className="text-primary font-bold">100</span>
                 </h1>
               </div>
             </div>
 
             {/* Filter Buttons */}
-            <div className="flex gap-3 mb-8">
+          </div>
+        <div className="flex items-center justify-between gap-8 w-full mb-8">
+            <div className="flex gap-3 ">
               <Button className=" text-white bg-blend-darken rounded-full px-6 ">
                 <Flame className="w-4 h-4 mr-2 " />
                 Popular
@@ -82,7 +83,6 @@ function FirmListSection() {
                 New
               </Button>
             </div>
-          </div>
 
           <div className="relative w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
@@ -96,11 +96,12 @@ function FirmListSection() {
             />
           </div>
         </div>
+        </div>
 
-        <div className="bg-[#121313] px-15 rounded-2xl ">
+        <div className="bg-[#121313] px-4 xl:px-8 2xl:px-15 rounded-2xl ">
           {/* Firms Table Header */}
           <div className="flex items-center mb-6 pt-6 ">
-            <div className="w-24 text-sm  text-gray-500 uppercase">
+            <div className="w-20 lg:w-24 text-sm  text-gray-500 uppercase">
               PT Index
             </div>
             <span className="border h-6 text-white/20"></span>
@@ -116,67 +117,68 @@ function FirmListSection() {
               <div key={rowIndex} className="flex items-center gap-4">
                 {/* PT Index */}
                 <div className="justify-between flex items-center">
-                  <div className="w-24 flex items-center gap-2 ">
-                    <span className="text-5xl font-light">{row.ptIndex}</span>
+                  <div className="w-20 lg:w-24 flex items-center justify-center ">
+                    <span className="text-4xl font-bold gradient-text">{row.ptIndex}</span>
                     {rowIndex < 2 && (
-                      <ChevronLeft className="w-5 h-5 text-primary" />
+                      <ChevronLeft className="w-8 h-8 text-primary" />
                     )}
                     {rowIndex === 2 && (
-                      <ChevronRight className="w-5 h-5 text-primary" />
+                      <ChevronRight className="w-8 h-8 text-primary" />
                     )}
                   </div>
                   <span className="border h-6 text-white/20"></span>
                 </div>
 
                 {/* Firms Grid */}
-                <div className="flex-1 flex items-center gap-3">
-                  {row.firms.map((firm, firmIndex) => (
-                    <Card
-                      key={firmIndex}
-                      className="bg-zinc-900 duration-100  border-zinc-800 p-4 flex-1 hover:bg-zinc-800 transition-colors cursor-pointer "
-                    >
-                      {/* Content in a row */}
-                      <div className=" w-[115px] h-auto flex flex-col items-left gap-3  rounded-2xl">
-                        {/* Badge Icons */}
-                        <div className="flex gap-10 ">
-                          <div className="w-12 h-12 rounded flex flex-col">
-                            <Image
-                              src={"/website/firm/imagePlac.png"}
-                              alt="placeholder"
-                              height={48}
-                              width={48}
-                            />
+                <div className="flex-1 flex items-center gap-0 md:gap-3 min-w-0">
+                  <div className="flex items-center gap-3 min-w-0 overflow-x-auto flex-1">
+                    {row.firms.map((firm, firmIndex) => (
+                      <Card
+                        key={firmIndex}
+                        className="min-w-[140px] w-[140px] bg-zinc-900 duration-100  border-zinc-800 p-4 shrink-0 hover:bg-zinc-800 transition-colors cursor-pointer "
+                      >
+                        {/* Content in a row */}
+                        <div className=" h-auto flex flex-col items-left gap-3  rounded-2xl  ">
+                          {/* Badge Icons */}
+                          <div className="flex gap-10 ">
+                            <div className="w-8 h-8 rounded flex flex-col relative">
+                              <Image
+                                src={"/website/firm/imagePlac.png"}
+                                alt="placeholder"
+                                fill
+                              />
+                            </div>
+                            {firm.rank === 1 && (
+                              <div className="w-7 h-7  rounded-full flex  items-center justify-center">
+                               <Image src={"/website/badge/badge1.png"} alt="badge1" height={20} width={20}/>
+                              </div>
+                            )}
+                            {firm.rank === 2 && (
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center">
+                                 <Image src={"/website/badge/badge2.png"} alt="badge1" height={20} width={20}/>
+                              </div>
+                            )}
+                              {firm.rank === 3 && (
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center">
+                                 <Image src={"/website/badge/badge3.png"} alt="badge1" height={20} width={20}/>
+                              </div>
+                            )}
                           </div>
-                          {firm.rank === 1 && (
-                            <div className="w-7 h-7  rounded-full flex  items-center justify-center">
-                             <Image src={"/website/badge/badge1.png"} alt="badge1" height={20} width={20}/>
-                            </div>
-                          )}
-                          {firm.rank === 2 && (
-                            <div className="w-7 h-7 rounded-full flex items-center justify-center">
-                               <Image src={"/website/badge/badge2.png"} alt="badge1" height={20} width={20}/>
-                            </div>
-                          )}
-                            {firm.rank === 3 && (
-                            <div className="w-7 h-7 rounded-full flex items-center justify-center">
-                               <Image src={"/website/badge/badge3.png"} alt="badge1" height={20} width={20}/>
-                            </div>
-                          )}
-                        </div>
 
-                        {/* Text Content */}
-                        <div className="flex flex-col text-left">
-                          <div className="text-sm font-medium">{firm.name}</div>
-                          <div className="text-xs text-gray-500">
-                            {firm.reviews} Reviews
+                          {/* Text Content */}
+                          <div className="flex flex-col text-left">
+                            <div className="text-sm font-medium">{firm.name}</div>
+                            <div className="text-xs text-gray-500">
+                              {firm.reviews} Reviews
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </Card>
-                  ))}
+                      </Card>
+                    ))}
+                  </div>
 
-                  {/* View More Button */}
-                  <div className="flex flex-col items-center justify-center gap-2 px-4">
+                  {/* View More Button - Outside scroll */}
+                  <div className="flex flex-col items-center justify-center gap-2 pl-4 shrink-0">
                     <div className="relative">
                       {row.stamp === "approved" && (
                         <Image
@@ -215,7 +217,6 @@ function FirmListSection() {
             ))}
           </div>
         </div>
-      </div>
     </div>
   );
 }
