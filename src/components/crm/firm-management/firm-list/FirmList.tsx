@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Edit, Search, RefreshCw } from "lucide-react";
@@ -54,6 +54,7 @@ export default function FirmsList() {
   const [firms, setFirms] = useState<Firm[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
     limit: 10,
@@ -61,43 +62,60 @@ export default function FirmsList() {
     totalPages: 1,
   });
 
-  const fetchFirms = async (page: number = 1) => {
+  const fetchFirms = useCallback(async (page: number, searchTerm: string) => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `/api/admin/firm?page=${page}&limit=${pagination.limit}`,
-        {
-          cache: "no-store",
-        }
-      );
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: "10",
+      });
+      if (searchTerm.trim()) params.append("search", searchTerm.trim());
+
+      const res = await fetch(`/api/admin/firm?${params.toString()}`, {
+        cache: "no-store",
+      });
+      
       if (!res.ok) throw new Error("Failed to fetch firms");
+
       const data = await res.json();
-      console.log("🚀 ~ fetchFirms ~ data:", data);
       setFirms(data?.data || []);
-      setPagination(data?.pagination || pagination);
+      setPagination(data?.pagination || {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 1,
+      });
     } catch (error) {
       console.error("Error fetching firms:", error);
+      setFirms([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchFirms(pagination.page);
-  }, [pagination.page]);
+    const timeout = setTimeout(() => {
+      setCurrentPage(1);
+      fetchFirms(1, search);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [search, fetchFirms]);
+
+  useEffect(() => {
+    if (currentPage !== 1 || search === "") {
+      fetchFirms(currentPage, search);
+    }
+  }, [currentPage]);
 
   const handlePageChange = (newPage: number) => {
-    setPagination((prev) => ({ ...prev, page: newPage }));
+    setCurrentPage(newPage);
   };
 
-  // Optional search filter (client side)
-  const filteredFirms = firms.filter((firm) =>
-    [
-      firm.firmDetails.name,
-      firm.firmDetails.jurisdiction,
-      firm.firmDetails.registrationNumber,
-    ].some((field) => field?.toLowerCase().includes(search.toLowerCase()))
-  );
+  const handleRefresh = () => {
+    setCurrentPage(1);
+    fetchFirms(1, search);
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -108,9 +126,10 @@ export default function FirmsList() {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={() => fetchFirms(pagination.page)}
+              onClick={handleRefresh}
+              disabled={loading}
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
             <Button asChild>
@@ -137,8 +156,9 @@ export default function FirmsList() {
                 className="max-w-sm"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                disabled={loading}
               />
-              <Button>
+              <Button disabled={loading}>
                 <Search className="h-4 w-4 mr-1" />
                 Search
               </Button>
@@ -161,7 +181,7 @@ export default function FirmsList() {
             <div className="text-center py-10 text-muted-foreground">
               Loading firms...
             </div>
-          ) : filteredFirms.length === 0 ? (
+          ) : firms.length === 0 ? (
             <div className="text-center py-10 text-muted-foreground">
               No firms found.
             </div>
@@ -182,7 +202,7 @@ export default function FirmsList() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {filteredFirms.map((firm) => (
+                    {firms.map((firm) => (
                       <tr
                         key={firm._id}
                         className="hover:bg-primary/10 cursor-pointer transition-all duration-100"
@@ -197,10 +217,11 @@ export default function FirmsList() {
                             src={
                               firm?.firmDetails?.image?.url ||
                               "/default-firm.png"
-                            } 
+                            }
                             alt={firm?.firmDetails?.name || "Firm logo"}
                             height={25}
                             width={25}
+                            className="rounded"
                           />
                         </td>
                         <td className="p-3">
@@ -263,7 +284,7 @@ export default function FirmsList() {
 
               {/* Pagination Component */}
               <Pagination
-                currentPage={pagination.page}
+                currentPage={currentPage}
                 totalPages={pagination.totalPages}
                 totalItems={pagination.total}
                 itemsPerPage={pagination.limit}

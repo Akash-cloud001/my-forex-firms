@@ -12,6 +12,7 @@ export interface IssueType {
 
 export interface ReviewFormData {
   firmName: string
+  firmId?:string
   customFirmName?: string
   issueType: string
   customIssueType?: string
@@ -33,11 +34,11 @@ export interface StarRatingProps {
 }
 
 export interface FirmSelectorProps {
-  value: string
-  onChange: (value: string) => void
-  error?: string
-  firms: Firm[]
+  value: string;
+  onChange: (name: string, id?: string) => void; 
+  error?: string;
 }
+
 
 export interface IssueTypeSelectorProps {
   value: string

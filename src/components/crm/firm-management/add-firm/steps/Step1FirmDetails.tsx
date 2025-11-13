@@ -48,7 +48,7 @@ export default function Step1FirmDetails({
   const [newImageFile, setNewImageFile] = useState<File | null>(null);
   const [newImagePreview, setNewImagePreview] = useState<string | null>(null);
   const existingImage = watch("firmDetails.image"); // {url, publicId, thumbnail} | undefined
-  const imageFile = watch("firmDetails.imageFile"); // File | undefined
+  // const imageFile = watch("firmDetails.imageFile"); // File | undefined
 
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,7 +155,7 @@ export default function Step1FirmDetails({
   const showExisting = existingImage && !newImageFile;
   // console.log("🚀 ~ Step1FirmDetails ~ showExisting:", showExisting)
   const showNew = newImageFile;
-  const showPlaceholder = !existingImage && !newImageFile;
+  // const showPlaceholder = !existingImage && !newImageFile;
 
   return (
     <div className="space-y-6">

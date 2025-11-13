@@ -18,11 +18,7 @@ import { cn } from "@/lib/utils";
 import { createReview } from "@/lib/reviewApi";
 import { ReviewFormData } from "../types/types";
 import { reviewFormSchema } from "../schema/schema";
-import {
-  MOCK_FIRMS,
-  ISSUE_TYPES,
-  DESCRIPTION_CONFIG,
-} from "../constant/constants";
+import { ISSUE_TYPES, DESCRIPTION_CONFIG } from "../constant/constants";
 import { StarRating } from "./StarRating";
 import { FileUpload } from "./FileUpload";
 import { FirmSelector } from "./FirmSelector";
@@ -35,21 +31,9 @@ export const ReviewForm: React.FC = () => {
   const [showThankYouModal, setShowThankYouModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  // const [firms, setFirms] = useState<{ id: string; name: string }[]>([]);
+  type FirmInfo = { name: string; id?: string };
 
-//  useEffect(() => {
-//     const fetchFirms = async () => {
-//       try {
-//         const res = await fetch("/api/website/prop-firm-list");
-//         const data = await res.json();
-//         console.log("🚀 ~ fetchFirms ~ data:", data)
-//         setFirms(data.data || []);
-//       } catch (err) {
-//         console.error("Failed to fetch firms:", err);
-//       }
-//     };
-//     fetchFirms();
-//   }, []);
+  const [selectedFirm, setSelectedFirm] = useState<FirmInfo>({ name: "" });
 
   const {
     register,
@@ -64,6 +48,7 @@ export const ReviewForm: React.FC = () => {
     reValidateMode: "onChange",
     defaultValues: {
       firmName: "",
+      firmId: "",
       customFirmName: "",
       issueType: "",
       customIssueType: "",
@@ -120,10 +105,13 @@ export const ReviewForm: React.FC = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Firm Selection */}
             <FirmSelector
-              value={watchedFirmName}
-              onChange={(value) => setValue("firmName", value)}
+              value={selectedFirm.name}
+              onChange={(name, id) => {
+                setSelectedFirm({ name, id });
+                setValue("firmName", name);
+                setValue("firmId", id ?? "");
+              }}
               error={errors.firmName?.message}
-              firms={MOCK_FIRMS}
             />
 
             {/* Custom Firm Name Input */}

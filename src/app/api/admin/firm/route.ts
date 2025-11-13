@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
 
-    const firmData = Object.fromEntries(formData.entries());
+    // const firmData = Object.fromEntries(formData.entries());
 
     // Extract image file
     const imageFile = formData.get("firmDetails.imageFile") as File | null;
@@ -163,15 +163,26 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
+    const search = searchParams.get("search")?.trim() || "";
+
     const skip = (page - 1) * limit;
 
-    const firms = await FundingFirm.find()
+    const query: Record<string, unknown> = {};
+    if (search) {
+      query.$or = [
+        { "firmDetails.name": { $regex: search, $options: "i" } },
+        { "firmDetails.jurisdiction": { $regex: search, $options: "i" } },
+        { "firmDetails.registrationNumber": { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const firms = await FundingFirm.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean();
 
-    const total = await FundingFirm.countDocuments();
+    const total = await FundingFirm.countDocuments(query);
 
     return NextResponse.json({
       success: true,
@@ -185,9 +196,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error Fetching firm:", error);
-
     const err = error instanceof Error ? error : new Error(String(error));
-
     return NextResponse.json(
       {
         success: false,
