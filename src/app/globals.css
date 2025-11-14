@@ -220,3 +220,58 @@
     -webkit-text-fill-color: transparent;
     text-shadow: 0px 4px 4px rgba(255, 255, 255, 0.25);
 }
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* FAQ Accordion Icon Toggle */
+.faq-accordion-item[data-state="open"] .faq-icon-plus,
+[data-state="open"] .faq-icon-plus,
+.group[data-state="open"] .faq-icon-plus {
+  display: none !important;
+}
+
+.faq-accordion-item[data-state="open"] .faq-icon-minus,
+[data-state="open"] .faq-icon-minus,
+.group[data-state="open"] .faq-icon-minus {
+  display: block !important;
+}
+
+.faq-accordion-item[data-state="closed"] .faq-icon-plus,
+[data-state="closed"] .faq-icon-plus,
+.group[data-state="closed"] .faq-icon-plus {
+  display: block !important;
+}
+
+.faq-accordion-item[data-state="closed"] .faq-icon-minus,
+[data-state="closed"] .faq-icon-minus,
+.group[data-state="closed"] .faq-icon-minus {
+  display: none !important;
+}

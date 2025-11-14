@@ -4,6 +4,8 @@ import ComingSoon from "@/components/website/coming-soon/ComingSoon";
 import FirmListSection from "@/components/website/landing-page/FirmListSection";
 import FirstSection from "@/components/website/landing-page/FirstSection";
 import TrustedFirmSlider from "@/components/website/landing-page/TrustedFirmSlider";
+import Reviews from "@/components/website/Reviews";
+import Faq from "@/components/website/Faq";
 // import TrustedFirmSlider from "@/components/website/landing-page/TrustedFirmSlider";
 
 export default function Page() {
@@ -13,6 +15,8 @@ export default function Page() {
     <FirstSection/>
     <TrustedFirmSlider/>
     <FirmListSection/>
+    <Reviews/>
+    <Faq/>
   </main>
   
   </>

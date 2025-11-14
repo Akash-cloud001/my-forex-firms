@@ -26,6 +26,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@sendgrid/mail": "^8.1.6",
     "@types/mongoose": "^5.11.96",
+    "@use-gesture/react": "^10.3.1",
     "axios": "^1.12.2",
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.8.0",
