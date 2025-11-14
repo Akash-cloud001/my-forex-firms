@@ -9,11 +9,11 @@ import {
   deleteFromCloudinary,
   uploadToCloudinary,
 } from "@/services/cloudinary";
-type ChangeEntry = {
-  field: string;
-  oldValue: unknown;
-  newValue: unknown;
-};
+// type ChangeEntry = {
+//   field: string;
+//   oldValue: unknown;
+//   newValue: unknown;
+// };
 
 interface Change {
   field: string;
