@@ -38,12 +38,12 @@ const FAQ_DATA: FaqItem[] = [
 const Faq = () => {
   return (
     <section className="w-full bg-background py-16 sm:py-24">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-8">
-        <div className="flex w-full flex-col gap-10 btn-grad rounded-[32px] py-16 px-6 sm:px-10">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl text-center">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-8">
+        <div className="flex w-full flex-col gap-10 btn-grad rounded-[32px] py-10 sm:py-16 px-6 sm:px-10">
+          <h2 className="text-2xl font-semibold tracking-tight sm:text-4xl text-center text-wrap">
             Frequently Asked Questions
           </h2>
-          <div className="relative font-geist-sans w-full max-w-4xl mx-auto">
+          <div className="relative font-geist-sans w-full  md:max-w-4xl mx-auto">
             <CustomAccordion
               items={FAQ_DATA}
               defaultOpenIndex={1}
