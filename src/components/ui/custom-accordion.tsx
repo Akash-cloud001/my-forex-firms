@@ -35,7 +35,7 @@ export function CustomAccordionItem({
     <div className={cn("mb-3 sm:mb-4 md:mb-6 lg:mb-8 last:mb-0", className)}>
       <button
         className={cn(
-          "w-full text-left cursor-pointer transition-all duration-300 flex items-center justify-between gap-1.5 sm:gap-2 md:gap-3 lg:gap-4 rounded-xl sm:rounded-2xl md:rounded-3xl px-2.5 sm:px-3 md:px-4 lg:px-5 pt-2 sm:pt-2.5 md:pt-3 lg:pt-4 hover:no-underline text-sm sm:text-base md:text-xl lg:text-2xl tracking-tight font-semibold text-white",
+          "w-full text-left cursor-pointer transition-all duration-300 flex items-center justify-between gap-1.5 sm:gap-2 md:gap-3 lg:gap-4 rounded-xl sm:rounded-2xl md:rounded-3xl  sm:px-3 md:px-4 lg:px-5 pt-2 sm:pt-2.5 md:pt-3 lg:pt-4 hover:no-underline text-base md:text-xl lg:text-2xl tracking-tight font-semibold text-white",
           isOpen && "rounded-b-none"
         )}
         onClick={onToggle}
@@ -54,7 +54,7 @@ export function CustomAccordionItem({
         className="overflow-hidden transition-[max-height] duration-300 ease-out rounded-b-xl sm:rounded-b-2xl md:rounded-b-3xl"
         style={{ maxHeight: "0" }}
       >
-        <div className="px-2.5 sm:px-3 md:px-4 lg:px-6 pt-1.5 sm:pt-2 md:pt-3 lg:pt-4 font-geist-sans first-letter:uppercase leading-relaxed text-white/90 text-xs sm:text-sm md:text-base lg:text-lg whitespace-normal break-words font-light tracking-tight">
+        <div className="sm:px-3 md:px-4 lg:px-6 pt-1.5 sm:pt-2 md:pt-3 lg:pt-4 font-geist-sans first-letter:uppercase leading-relaxed text-white/90 text-sm md:text-base lg:text-lg whitespace-normal break-words font-light tracking-tight">
           {answer}
         </div>
       </div>

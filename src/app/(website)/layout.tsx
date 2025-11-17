@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "@/components/website/navbar";
 import BottomBar from "@/components/website/bottombar";
+import Footer from "@/components/website/footer";
 const WebsiteLayout = ({
   children,
 }: Readonly<{
@@ -11,6 +12,7 @@ const WebsiteLayout = ({
       <Navbar />
       {children}
       <BottomBar />
+      <Footer />
     </section>
   );
 };

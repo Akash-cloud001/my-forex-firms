@@ -7,6 +7,7 @@ import TrustedFirmSlider from "@/components/website/landing-page/TrustedFirmSlid
 import Reviews from "@/components/website/Reviews";
 import Faq from "@/components/website/Faq";
 import Blogs from "@/components/website/Blogs";
+import Subscribe from "@/components/website/Subscribe";
 // import TrustedFirmSlider from "@/components/website/landing-page/TrustedFirmSlider";
 
 export default function Page() {
@@ -19,6 +20,8 @@ export default function Page() {
     <Reviews/>
     <Faq/>
     <Blogs/>
+    <Subscribe/>
+    
   </main>
   
   </>
