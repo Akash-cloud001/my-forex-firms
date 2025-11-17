@@ -34,6 +34,7 @@ import {
   Mail,
   Users,
   Shield,
+  MessageCircleQuestionMark,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -66,6 +67,12 @@ const navigationItems = [
     title: "Affiliate Links",
     url: "/admin/affiliates",
     icon: Link2,
+    hasSubmenu: false,
+  },
+  {
+    title: "FAQ",
+    url: "/admin/faq-management",
+    icon: MessageCircleQuestionMark,
     hasSubmenu: false,
   },
   {

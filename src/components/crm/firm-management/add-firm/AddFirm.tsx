@@ -229,6 +229,7 @@ export default function FundingFirmForm({
       }
     });
 
+    console.log("🚀 ~ FundingFirmForm ~ formData:", formData)
     try {
       const url = isEditMode ? `/api/admin/firm/${firmId}` : "/api/admin/firm";
       const method = isEditMode ? "PUT" : "POST";

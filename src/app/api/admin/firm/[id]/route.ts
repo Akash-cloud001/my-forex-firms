@@ -51,8 +51,23 @@ export async function GET(
         },
       },
       {
+        $lookup: {
+          from: "firmrules", // <-- collection name
+          localField: "_id",
+          foreignField: "firmId",
+          as: "firmRules",
+        },
+      },
+      {
         $addFields: {
           totalPrograms: { $size: "$programs" },
+          totalCategories: {
+            $cond: [
+              { $gt: [{ $size: "$firmRules" }, 0] },
+              { $size: { $first: "$firmRules.categories" } }, // first document categories count
+              0,
+            ],
+          },
         },
       },
     ]);
@@ -108,6 +123,7 @@ export async function PUT(
 
     // ---------- 1. Parse multipart/form-data ----------
     const formData = await request.formData();
+    // console.log("🚀 ~ PUT ~ formData:", formData);
 
     const parseJSON = (key: string) => {
       const raw = formData.get(key);
@@ -123,8 +139,7 @@ export async function PUT(
 
     const firmDetailsRaw = parseJSON("firmDetails");
     const imageFile = formData.get("firmDetails.imageFile") as File | null;
-    const keepExistingImage = formData.get("firmDetails.image"); // JSON string or null
-
+    const keepExistingImage = firmDetailsRaw.image;
     // ---------- 2. Find existing firm ----------
     const existingFirm = await FundingFirm.findById(firmId);
     if (!existingFirm) {
@@ -214,12 +229,11 @@ export async function PUT(
 
     // ---------- 6. Delete old image if needed ----------
     if (shouldDeleteOld) {
-  const oldPublicId = existingFirm?.firmDetails?.image?.publicId;
-  if (typeof oldPublicId === "string" && oldPublicId.trim().length > 0) {
-    await deleteFromCloudinary(oldPublicId);
-  }
-}
-
+      const oldPublicId = existingFirm?.firmDetails?.image?.publicId;
+      if (typeof oldPublicId === "string" && oldPublicId.trim().length > 0) {
+        await deleteFromCloudinary(oldPublicId);
+      }
+    }
 
     // ---------- 7. Update DB ----------
     const nestedPaths = [
@@ -258,7 +272,7 @@ export async function PUT(
     }
 
     // ---------- 8. Audit log ----------
-    const changes: ChangeLog  = {};
+    const changes: ChangeLog = {};
     for (const key in updateData) {
       if (key === "updatedAt") continue;
       const [section, field] = key.split(".");
@@ -267,13 +281,20 @@ export async function PUT(
         obj: T | null,
         path: string
       ): string | number | boolean | object | null => {
-        return path.split(".").reduce<string | number | boolean | object | null>(
-          (acc, curr) =>
-            acc && typeof acc === "object" && curr in acc
-              ? (acc as Record<string, string | number | boolean | object | null>)[curr]
-              : null,
-          obj
-        );
+        return path
+          .split(".")
+          .reduce<string | number | boolean | object | null>(
+            (acc, curr) =>
+              acc && typeof acc === "object" && curr in acc
+                ? (
+                    acc as Record<
+                      string,
+                      string | number | boolean | object | null
+                    >
+                  )[curr]
+                : null,
+            obj
+          );
       };
 
       const oldValue = getNestedValue(existingFirm, key);
