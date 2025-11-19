@@ -21,7 +21,7 @@ interface Step9PaymentsProps {
 }
 
 export function Step9Payments({ onPrevious, onSubmit, onNext, isLastStep }: Step9PaymentsProps) {
-  const { register, watch, setValue, formState: { errors } } = useFormContext<FirmFormData>();
+  const { register, watch, setValue, formState: { errors,isSubmitting } } = useFormContext<FirmFormData>();
 
   // Local input states
   const [methodInput, setMethodInput] = useState('');
@@ -249,8 +249,8 @@ export function Step9Payments({ onPrevious, onSubmit, onNext, isLastStep }: Step
           Previous
         </Button>
         {isLastStep ? (
-          <Button type="submit" onClick={onSubmit}>
-            Submit Form
+          <Button type="submit" onClick={onSubmit} disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit"}
           </Button>
         ) : (
           <Button type="button" onClick={onNext}>

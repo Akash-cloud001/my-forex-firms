@@ -38,7 +38,6 @@ const getArray = <T extends keyof FirmFormData['compliance']>(
   const restrictedCountries = getArray('restrictedCountries');
   const regulations = getArray('regulationsComplied');
 
-  // Generic add function — accepts the compliance key (like 'kycRequirements')
   const addItem = (
     field: keyof FirmFormData['compliance'],
     value: string,
@@ -53,6 +52,35 @@ const getArray = <T extends keyof FirmFormData['compliance']>(
       shouldValidate: true,
       shouldDirty: true,
     });
+    setInput('');
+  };
+
+  const addMultipleItems = (
+    field: keyof FirmFormData['compliance'],
+    value: string,
+    setInput: (val: string) => void
+  ) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+
+    const items = trimmed
+      .split(',')
+      .map(item => item.trim())
+      .filter(item => item !== '');
+
+    if (items.length === 0) return;
+
+    const current = getArray(field);
+    const newItems = items.filter(item => !current.includes(item));
+    
+    setValue(
+      `compliance.${String(field)}` as any,
+      [...current, ...newItems] as any,
+      {
+        shouldValidate: true,
+        shouldDirty: true,
+      }
+    );
     setInput('');
   };
 
@@ -137,17 +165,17 @@ const getArray = <T extends keyof FirmFormData['compliance']>(
           <Input
             value={countryInput}
             onChange={(e) => setCountryInput(e.target.value)}
-            placeholder="Add country (e.g., United States)"
+            placeholder="Add countries (e.g., United States, Canada, UK)"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
-                addItem('restrictedCountries', countryInput, setCountryInput);
+                addMultipleItems('restrictedCountries', countryInput, setCountryInput);
               }
             }}
           />
           <Button
             type="button"
-            onClick={() => addItem('restrictedCountries', countryInput, setCountryInput)}
+            onClick={() => addMultipleItems('restrictedCountries', countryInput, setCountryInput)}
             size="icon"
             variant="outline"
           >
@@ -169,6 +197,7 @@ const getArray = <T extends keyof FirmFormData['compliance']>(
           ))}
         </div>
         {restrictedCountries.length === 0 && <p className="text-xs text-gray-500">No restricted countries</p>}
+        <p className="text-xs text-gray-500">Separate multiple countries with commas</p>
       </div>
 
       {/* Regulations Complied */}

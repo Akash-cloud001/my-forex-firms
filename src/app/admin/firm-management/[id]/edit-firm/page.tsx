@@ -23,7 +23,6 @@ export default function EditFirmPage() {
         setIsLoading(false);
       }
     };
-
     if (firmId) {
       fetchFirmData();
     }

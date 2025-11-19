@@ -51,7 +51,7 @@ export default function RootLayout({
         </Script>
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${inter.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${inter.variable} antialiased bg-background`}
         >
           <main className="w-full min-h-screen">
             {children}

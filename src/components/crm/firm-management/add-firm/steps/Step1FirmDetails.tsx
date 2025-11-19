@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Building2, Globe, Calendar, MapPin } from "lucide-react";
+import {
+  X,
+  Plus,
+  Building2,
+  Globe,
+  Calendar,
+  MapPin,
+  Trash2,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -32,11 +40,48 @@ export default function Step1FirmDetails({
     formState: { errors },
     setValue,
     watch,
+    clearErrors,
   } = useFormContext<FirmFormData>();
   const [languageInput, setLanguageInput] = useState("");
   const [brokerInput, setBrokerInput] = useState("");
   const [liquidityInput, setLiquidityInput] = useState("");
+  const [newImageFile, setNewImageFile] = useState<File | null>(null);
+  const [newImagePreview, setNewImagePreview] = useState<string | null>(null);
+  const existingImage = watch("firmDetails.image"); // {url, publicId, thumbnail} | undefined
+  // const imageFile = watch("firmDetails.imageFile"); // File | undefined
 
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image must be ≤ 5 MB");
+        return;
+      }
+
+      setNewImageFile(file);
+      setNewImagePreview(URL.createObjectURL(file));
+      setValue("firmDetails.imageFile", file, { shouldValidate: true });
+      clearErrors("firmDetails.imageFile");
+    },
+    [setValue, clearErrors]
+  );
+
+  // Remove new file
+  const handleRemoveNew = () => {
+    setNewImageFile(null);
+    setNewImagePreview(null);
+    setValue("firmDetails.imageFile", undefined);
+  };
+
+  // Remove existing image (will be deleted on save)
+  const handleRemoveExisting = () => {
+    setValue("firmDetails.image", undefined);
+    setValue("firmDetails.imageFile", undefined); // ensure no file
+    setNewImageFile(null);
+    setNewImagePreview(null);
+  };
   const languages = watch("firmDetails.languagesSupported") || [];
   const brokers = watch("firmDetails.brokers") || [];
   const liquidityProviders = watch("firmDetails.liquidityProviders") || [];
@@ -106,6 +151,12 @@ export default function Step1FirmDetails({
     (_, i) => currentYear - i
   );
 
+  // === DETERMINE WHAT TO SHOW ===
+  const showExisting = existingImage && !newImageFile;
+  // console.log("🚀 ~ Step1FirmDetails ~ showExisting:", showExisting)
+  const showNew = newImageFile;
+  // const showPlaceholder = !existingImage && !newImageFile;
+
   return (
     <div className="space-y-6">
       <div>
@@ -120,7 +171,119 @@ export default function Step1FirmDetails({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Firm Logo Upload */}
-       
+        <div className="space-y-3">
+          <Label className="text-sm font-medium">Firm Logo</Label>
+          <div className="flex items-start gap-6">
+            {/* PREVIEW */}
+            <div className="relative">
+              {showExisting && existingImage ? (
+                <div className="relative group">
+                  <img
+                    src={existingImage.thumbnail || existingImage.url}
+                    alt="Current logo"
+                    className="w-24 h-24 rounded-lg object-cover border-2 border-border shadow-sm"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                    <span className="text-white text-xs font-medium">
+                      Current
+                    </span>
+                  </div>
+                </div>
+              ) : showNew && newImagePreview ? (
+                <div className="relative group">
+                  <img
+                    src={newImagePreview}
+                    alt="New logo preview"
+                    className="w-24 h-24 rounded-lg object-cover border-2 border-primary shadow-sm"
+                  />
+                  <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-full shadow-md">
+                    New
+                  </div>
+                </div>
+              ) : (
+                <div className="w-24 h-24 rounded-lg border-2 border-dashed border-muted-foreground/25 flex flex-col items-center justify-center text-muted-foreground bg-muted/30">
+                  <svg
+                    className="w-8 h-8 mb-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <span className="text-xs font-medium">No Logo</span>
+                </div>
+              )}
+            </div>
+
+            {/* UPLOAD INPUT & ACTIONS */}
+            <div className="flex-1 space-y-3">
+              <div className="relative">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 file:cursor-pointer"
+                />
+                <p className="text-xs text-muted-foreground mt-1.5">
+                  PNG, JPG, or WebP (max 5 MB)
+                </p>
+              </div>
+
+              {/* REMOVE BUTTONS */}
+              <div className="flex gap-2">
+                {showExisting && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRemoveExisting}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
+                  >
+                    <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                    Remove Logo
+                  </Button>
+                )}
+                {showNew && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRemoveNew}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
+                  >
+                    <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                    Cancel Upload
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* ERROR MESSAGE */}
+          {errors.firmDetails?.imageFile && (
+            <div className="flex items-center gap-2 text-destructive bg-destructive/10 px-3 py-2 rounded-md border border-destructive/20">
+              <svg
+                className="w-4 h-4 shrink-0"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="text-sm font-medium">
+                {errors.firmDetails.imageFile.message}
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Firm Name */}
         <div className="space-y-2">
@@ -444,7 +607,6 @@ export default function Step1FirmDetails({
     </div>
   );
 }
-
 
 //  <div className="space-y-2">
 //           <Label htmlFor="image" className="text-sm font-medium">

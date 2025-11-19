@@ -1,7 +1,7 @@
 /* eslint-disable */
 // @ts-nocheck
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -14,6 +14,7 @@ import {
   TrendingUp,
   CreditCard,
   Edit,
+  Trash2,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -28,6 +29,14 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
   Table,
   TableBody,
   TableCaption,
@@ -36,6 +45,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Image from "next/image";
+import FirmDetailsTab from "./FirmDetailsTab";
+import RatingTab from "./RatingTab";
+import ComplianceTab from "./ComplianceTab";
+import ProgramTab from "./ProgramTab";
+import PaymentTab from "./PaymentTab";
+import TransparencyTab from "./TransparencyTab";
+import SupportTab from "./SupportTab";
 
 interface FirmData {
   _id: string;
@@ -49,12 +66,46 @@ interface FirmData {
   trading: any;
   payments: any;
   programs: any;
+  firmRules: any;
 }
 
 function FirmDetails({ id }: { id: string }) {
   const router = useRouter();
   const [firmData, setFirmData] = useState<FirmData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [openDrawerId, setOpenDrawerId] = useState<string | null>(null);
+
+  const groupedCategories = useMemo(() => {
+    const grouped = new Map<string, any>();
+
+    firmData?.firmRules?.forEach((rule) => {
+      rule.categories?.forEach((cat) => {
+        const key = cat.name.trim();
+        if (!key) return;
+
+        if (!grouped.has(key)) {
+          grouped.set(key, {
+            _id: cat._id,
+            name: cat.name,
+            createdAt: cat.createdAt,
+            questions: [...cat.questions],
+          });
+        } else {
+          const existing = grouped.get(key);
+          existing.questions.push(...cat.questions);
+          if (new Date(cat.createdAt) < new Date(existing.createdAt)) {
+            existing.createdAt = cat.createdAt;
+            existing._id = cat._id;
+          }
+        }
+      });
+    });
+
+    return Array.from(grouped.values()).sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+  }, [firmData?.firmRules]);
 
   useEffect(() => {
     const fetchFirmData = async () => {
@@ -93,7 +144,7 @@ function FirmDetails({ id }: { id: string }) {
   const handleEdit = (program: any) => {
     console.log("Edit program:", program);
     // Open edit modal or navigate to edit page
-     router.push(`/admin/firm-management/${id}/edit-program/${program._id}`);
+    router.push(`/admin/firm-management/${id}/edit-program/${program._id}`);
   };
 
   return (
@@ -113,20 +164,31 @@ function FirmDetails({ id }: { id: string }) {
             </p>
           </div>
         </div>
-        <Button
-          className="gap-2"
-          onClick={() =>
-            router.push(`/admin/firm-management/${id}/add-program`)
-          }
-        >
-          <Plus className="h-4 w-4" />
-          Add Challenge
-        </Button>
+        <div className="gap-3 flex">
+          <Button
+            className="gap-2"
+            onClick={() =>
+              router.push(`/admin/firm-management/${id}/firm-rule`)
+            }
+          >
+            <Plus className="h-4 w-4" />
+            Add Rules
+          </Button>
+          <Button
+            className="gap-2"
+            onClick={() =>
+              router.push(`/admin/firm-management/${id}/add-program`)
+            }
+          >
+            <Plus className="h-4 w-4" />
+            Add Challenge
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
       <Tabs defaultValue="firm" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-9 gap-2">
+        <TabsList className="grid grid-cols-4 lg:grid-cols-9 gap-2">
           <TabsTrigger value="firm">Firm Details</TabsTrigger>
           {/* <TabsTrigger value="leadership">Leadership</TabsTrigger> */}
           <TabsTrigger value="ratings">Ratings</TabsTrigger>
@@ -136,494 +198,23 @@ function FirmDetails({ id }: { id: string }) {
           <TabsTrigger value="trading">Trading</TabsTrigger>
           <TabsTrigger value="payments">Payments & Social</TabsTrigger>
           <TabsTrigger value="program">Program</TabsTrigger>
+          <TabsTrigger value="firmRule">Firm rule</TabsTrigger>
         </TabsList>
 
         {/* Firm Details Tab */}
-        <TabsContent value="firm">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
-                Firm Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Legal Entity Name
-                  </label>
-                  <p className="text-base">
-                    {firmData.firmDetails.legalEntityName}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Registration Number
-                  </label>
-                  <p className="text-base">
-                    {firmData.firmDetails.registrationNumber}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    License Number
-                  </label>
-                  <p className="text-base">
-                    {firmData.firmDetails.licenseNumber}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Regulator
-                  </label>
-                  <p className="text-base">{firmData.firmDetails.regulator}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Jurisdiction
-                  </label>
-                  <p className="text-base">
-                    {firmData.firmDetails.jurisdiction}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Year Founded
-                  </label>
-                  <p className="text-base">
-                    {firmData.firmDetails.yearFounded}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Status
-                  </label>
-                  <Badge
-                    variant={
-                      firmData.firmDetails.status === "Active"
-                        ? "default"
-                        : "secondary"
-                    }
-                  >
-                    {firmData.firmDetails.status}
-                  </Badge>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    HQ Address
-                  </label>
-                  <p className="text-base">{firmData.firmDetails.hqAddress}</p>
-                </div>
-              </div>
-              <Separator />
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Languages Supported
-                </label>
-                <div className="flex gap-2 mt-2">
-                  {firmData.firmDetails.languagesSupported.map(
-                    (lang: string, index: number) => (
-                      <Badge key={index} variant="outline">
-                        {lang}
-                      </Badge>
-                    )
-                  )}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Brokers
-                </label>
-                <div className="flex gap-2 mt-2">
-                  {firmData.firmDetails.brokers.map(
-                    (broker: string, index: number) => (
-                      <Badge key={index} variant="secondary">
-                        {broker}
-                      </Badge>
-                    )
-                  )}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Liquidity Providers
-                </label>
-                <div className="flex gap-2 mt-2">
-                  {firmData.firmDetails.liquidityProviders.map(
-                    (provider: string, index: number) => (
-                      <Badge key={index} variant="secondary">
-                        {provider}
-                      </Badge>
-                    )
-                  )}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <Label>Company Description</Label>
-                <p className="text-base text-muted-foreground">
-                  {firmData.firmDetails.companyDescription}
-                </p>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Official Website
-                </label>
-                <a
-                  href={firmData.firmDetails.officialWebsite}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline block mt-1"
-                >
-                  {firmData.firmDetails.officialWebsite}
-                </a>
-              </div>
-              <Separator />
-              <Label className="text-2xl">Leadership</Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {firmData.leadership.leadership.map((leader: any) => (
-                  <Card key={leader._id}>
-                    <CardHeader>
-                      <CardTitle className="text-lg">{leader.name}</CardTitle>
-                      <CardDescription>{leader.role}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">
-                          Verified:
-                        </span>
-                        <Badge
-                          variant={leader.verified ? "default" : "secondary"}
-                        >
-                          {leader.verified ? "Yes" : "No"}
-                        </Badge>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium mb-2">
-                          Social Links:
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {Object.entries(leader.links).map(
-                            ([platform, link]: [string, any]) => (
-                              <a
-                                key={platform}
-                                href={link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <Badge
-                                  variant="outline"
-                                  className="cursor-pointer hover:bg-accent"
-                                >
-                                  {platform}
-                                </Badge>
-                              </a>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        <FirmDetailsTab firmData={firmData} />
 
         {/* Ratings Tab */}
-        <TabsContent value="ratings">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="h-5 w-5" />
-                Ratings & Reviews
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 bg-accent rounded-lg">
-                <label className="text-sm font-medium text-muted-foreground">
-                  TrustPilot Rating
-                </label>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-3xl font-bold">
-                    {firmData.ratings.trustPilotRating}
-                  </span>
-                  <span className="text-muted-foreground">/ 5.0</span>
-                </div>
-              </div>
-              <Separator />
-              <div>
-                <label className="text-sm font-medium text-muted-foreground mb-3 block">
-                  Other Ratings
-                </label>
-                <div className="space-y-3">
-                  {firmData.ratings.otherRatings.map((rating: any) => (
-                    <div
-                      key={rating._id}
-                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                    >
-                      <span className="font-medium">{rating.platform}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl font-bold">
-                          {rating.rating}
-                        </span>
-                        <span className="text-muted-foreground">/ 5</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        <RatingTab firmData={firmData} />
 
         {/* Support Tab */}
-        <TabsContent value="support">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5" />
-                Customer Support
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Average Resolution Time
-                  </label>
-                  <p className="text-2xl font-bold">
-                    {firmData.support.avgResolutionTime} hours
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Support Hours
-                  </label>
-                  <p className="text-2xl font-bold">
-                    {firmData.support.supportHours}
-                  </p>
-                </div>
-              </div>
-              <Separator />
-              <div>
-                <label className="text-sm font-medium text-muted-foreground mb-3 block">
-                  Support Channels
-                </label>
-                <div className="space-y-3">
-                  {firmData.support.channels.map((channel: any) => (
-                    <Card key={channel._id}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium capitalize">
-                            {channel.type}
-                          </span>
-                          <div className="flex gap-2">
-                            {channel.preferred && <Badge>Preferred</Badge>}
-                            <Badge
-                              variant={
-                                channel.status === "active"
-                                  ? "default"
-                                  : "secondary"
-                              }
-                            >
-                              {channel.status}
-                            </Badge>
-                          </div>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Response Time: {channel.responseTime} hours
-                        </p>
-                        <a
-                          href={channel.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline text-sm"
-                        >
-                          {channel.link}
-                        </a>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
+        <SupportTab firmData={firmData} />
         {/* Compliance Tab */}
-        <TabsContent value="compliance">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Compliance & Regulations
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  KYC Provider
-                </label>
-                <p className="text-base mt-1">
-                  {firmData.compliance.kycProvider}
-                </p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  KYC Requirements
-                </label>
-                <div className="flex gap-2 mt-2">
-                  {firmData.compliance.kycRequirements.map(
-                    (req: string, index: number) => (
-                      <Badge key={index} variant="outline">
-                        {req}
-                      </Badge>
-                    )
-                  )}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Restricted Countries
-                </label>
-                <div className="flex gap-2 mt-2">
-                  {firmData.compliance.restrictedCountries.map(
-                    (country: string, index: number) => (
-                      <Badge key={index} variant="destructive">
-                        {country}
-                      </Badge>
-                    )
-                  )}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Regulations Complied
-                </label>
-                <div className="flex gap-2 mt-2">
-                  {firmData.compliance.regulationsComplied.map(
-                    (reg: string, index: number) => (
-                      <Badge key={index} variant="secondary">
-                        {reg}
-                      </Badge>
-                    )
-                  )}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  AML Policy
-                </label>
-                <a
-                  href={firmData.compliance.amlLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline block mt-1"
-                >
-                  {firmData.compliance.amlLink}
-                </a>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        <ComplianceTab firmData={firmData} />
 
         {/* Transparency Tab */}
-        <TabsContent value="transparency">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Eye className="h-5 w-5" />
-                Transparency Metrics
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 bg-accent rounded-lg">
-                <label className="text-sm font-medium text-muted-foreground">
-                  Transparency Score
-                </label>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-3xl font-bold">
-                    {firmData.transparency.transparencyScore}
-                  </span>
-                  <span className="text-muted-foreground">/ 5</span>
-                </div>
-              </div>
-              <Separator />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <span className="font-medium">CEO Public</span>
-                  <Badge
-                    variant={
-                      firmData.transparency.ceoPublic ? "default" : "secondary"
-                    }
-                  >
-                    {firmData.transparency.ceoPublic ? "Yes" : "No"}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <span className="font-medium">Office Verified</span>
-                  <Badge
-                    variant={
-                      firmData.transparency.officeVerified
-                        ? "default"
-                        : "secondary"
-                    }
-                  >
-                    {firmData.transparency.officeVerified ? "Yes" : "No"}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <span className="font-medium">Terms Public & Updated</span>
-                  <Badge
-                    variant={
-                      firmData.transparency.termsPublicUpdated
-                        ? "default"
-                        : "secondary"
-                    }
-                  >
-                    {firmData.transparency.termsPublicUpdated ? "Yes" : "No"}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <span className="font-medium">Payout Proof Public</span>
-                  <Badge
-                    variant={
-                      firmData.transparency.payoutProofPublic
-                        ? "default"
-                        : "secondary"
-                    }
-                  >
-                    {firmData.transparency.payoutProofPublic ? "Yes" : "No"}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <span className="font-medium">Third Party Audit</span>
-                  <Badge
-                    variant={
-                      firmData.transparency.thirdPartyAudit
-                        ? "default"
-                        : "secondary"
-                    }
-                  >
-                    {firmData.transparency.thirdPartyAudit ? "Yes" : "No"}
-                  </Badge>
-                </div>
-              </div>
-              {firmData.transparency.notes && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Notes
-                  </label>
-                  <p className="text-base mt-2">
-                    {firmData.transparency.notes}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+        <TransparencyTab firmData={firmData} />
 
         {/* Trading Tab */}
         <TabsContent value="trading">
@@ -670,6 +261,14 @@ function FirmDetails({ id }: { id: string }) {
                                 {leverage["2-Step"]}
                               </p>
                             </div>
+                            <div>
+                              <label className="text-xs text-muted-foreground">
+                                3-Step
+                              </label>
+                              <p className="font-medium">
+                                {leverage["3-Step"]}
+                              </p>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -698,192 +297,119 @@ function FirmDetails({ id }: { id: string }) {
         </TabsContent>
 
         {/* Payments Tab */}
-        <TabsContent value="payments">
+        <PaymentTab firmData={firmData} />
+
+        {/* Program Tab */}
+        <ProgramTab firmData={firmData} handleEdit={handleEdit} />
+
+        {/* Firm Rule  */}
+        <TabsContent value="firmRule">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="h-5 w-5" />
-                Payment Information
+                Firm Rules
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Base Currency
-                  </label>
-                  <p className="text-2xl font-bold">
-                    {firmData.payments.baseCurrency}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Min Withdrawal
-                  </label>
-                  <p className="text-2xl font-bold">
-                    ${firmData.payments.minWithdrawal}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Processing Time
-                  </label>
-                  <p className="text-2xl font-bold">
-                    {firmData.payments.processingTime} days
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Payout Schedule
-                  </label>
-                  <p className="text-2xl font-bold capitalize">
-                    {firmData.payments.payoutSchedule}
-                  </p>
-                </div>
-              </div>
-              <Separator />
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Payment Methods
-                </label>
-                <div className="flex gap-2 mt-2">
-                  {firmData.payments.methods.map(
-                    (method: string, index: number) => (
-                      <Badge key={index} variant="outline">
-                        {method}
-                      </Badge>
-                    )
-                  )}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Payout Methods
-                </label>
-                <div className="flex gap-2 mt-2">
-                  {firmData.payments.payoutMethods.map(
-                    (method: string, index: number) => (
-                      <Badge key={index} variant="secondary">
-                        {method}
-                      </Badge>
-                    )
-                  )}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Refund Policy
-                </label>
-                <p className="text-base mt-2">
-                  {firmData.payments.refundPolicy}
-                </p>
-              </div>
-              <Separator />
-              <p className="text-xl">Social Media Links</p>
-              <div className="space-y-3">
-                {Object.entries(firmData.socialLinks.socialLinks).map(
-                  ([platform, link]: [string, any]) => (
-                    <div
-                      key={platform}
-                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                    >
-                      <span className="font-medium capitalize">{platform}</span>
-                      <a
-                        href={link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        Visit
-                      </a>
-                    </div>
-                  )
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="program">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
-                Program{" "}
-              </CardTitle>
-            </CardHeader>
-
             <CardContent>
-              <Table>
-                <TableCaption>List of all challenge programs.</TableCaption>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Evaluation Phases</TableHead>
-                    <TableHead>Account Sizes</TableHead>
-                    <TableHead>Profit Split</TableHead>
-                    <TableHead>Leverage</TableHead>
-                    <TableHead>Features</TableHead>
-                    <TableHead>Payout</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {firmData?.programs.map((program:any) => (
-                    <TableRow key={program._id}>
-                      <TableCell>{program.type}</TableCell>
-                      <TableCell className="font-medium">
-                        {program.name}
-                      </TableCell>
-                      <TableCell>{program.evaluationPhases}</TableCell>
-                      <TableCell>
-                        {program.accountSizes.map((a: any) => (
-                          <div key={a._id}>
-                            ${a.size.toLocaleString()} – ${a.price}
+              <div className="space-y-5 mx-auto">
+                {groupedCategories.map((category,idx:number) => (
+                  <Sheet
+                    key={category._id}
+                    open={openDrawerId === category._id}
+                    onOpenChange={(open) =>
+                      setOpenDrawerId(open ? category._id : null)
+                    }
+                  >
+                    <SheetTrigger asChild>
+                      <div className={`cursor-pointer border-muted-foreground/40  ${idx !== groupedCategories.length - 1 ? "border-b pb-4" : ""}`}>
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex-1 ">
+                            <h3 className="font-semibold text-base text-foreground capitalize">
+                              {category.name}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mt-0.5 capitalize">
+                              {category.questions.length}{" "}
+                              {category.questions.length === 1
+                                ? "question"
+                                : "questions"}
+                              {" • "}
+                              Created{" "}
+                              {new Date(
+                                category.createdAt
+                              ).toLocaleDateString()}
+                            </p>
                           </div>
-                        ))}
-                      </TableCell>
-                      <TableCell>{program.profitSplit}%</TableCell>
-                      <TableCell>{program.leverage}</TableCell>
-                      <TableCell className="max-w-[180px]">
-                        <div className="flex flex-wrap gap-1">
-                          {program.stopLossRequired && <Badge>Stop Loss</Badge>}
-                          {program.eaAllowed && <Badge>EA</Badge>}
-                          {program.weekendHolding && <Badge>Weekend</Badge>}
-                          {program.overnightHolding && <Badge>Overnight</Badge>}
-                          {program.newsTrading && (
-                            <Badge variant="destructive">No News</Badge>
-                          )}
-                          {program.copyTrading && <Badge>Copy</Badge>}
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Handle edit action
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        {program.payoutFrequency.map((p: any) => (
-                          <div key={p._id}>
-                            {p.label} ({p.percentage})
-                          </div>
-                        ))}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(program.createdAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => handleEdit(program)}
+                      </div>
+                    </SheetTrigger>
+                    <SheetContent side="right" className="w-full max-w-4xl overflow-x-hidden overflow-y-auto">
+                      <SheetHeader>
+                        <SheetTitle className="text-2xl font-bold text-foreground capitalize">{category.name}</SheetTitle>
+                        <SheetDescription>
+                          {category.questions.length}{" "}
+                          {category.questions.length === 1
+                            ? "question"
+                            : "questions"}
+                          {" • "}
+                          Created{" "}
+                          {new Date(category.createdAt).toLocaleDateString()}
+                        </SheetDescription>
+                      </SheetHeader>
+                      <div className="space-y-4 w-full">
+                        {category.questions.map((q, idx) => (
+                          <div
+                            key={q._id}
+                            className={`pb-4 pl-4 ${
+                              idx !== category.questions.length - 1
+                                ? "mb-4"
+                                : ""
+                            }`}
                           >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                            <div className="flex justify-between items-start gap-4">
+                              <div className="flex-1 space-y-2 min-w-0">
+                                <div>
+                                  <p className="text-sm font-medium mt-1 text-foreground whitespace-normal wrap-break-word">
+                                  Q{idx + 1}: {q.question}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-muted-foreground mt-1 whitespace-normal wrap-break-word">
+                                  {q.answer}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex gap-2 shrink-0">
+                                <Button variant="ghost" size="sm">
+                                  <Edit className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                ))}
+              </div>
+
+              {groupedCategories.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  No firm rules found
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
