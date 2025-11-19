@@ -37,7 +37,7 @@ const Navbar = () => {
             height={44}
           />
         </figure>
-        <h1 className="text-primary font-semibold text-2xl tracking-tight">
+        <h1 className="hidden md:block text-primary font-semibold text-2xl tracking-tight">
           My Forex Firms
         </h1>
       </Link>

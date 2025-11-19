@@ -3,6 +3,7 @@ import { DESCRIPTION_CONFIG } from '../constant/constants'
 
 export const reviewFormSchema = z.object({
   firmName: z.string().min(1, 'Please select a firm'),
+  firmId: z.string().optional(),
   customFirmName: z.string().optional(),
   issueType: z.string().min(1, 'Please select an issue type'),
   customIssueType: z.string().optional(),

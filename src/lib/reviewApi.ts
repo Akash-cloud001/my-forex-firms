@@ -8,6 +8,7 @@ export interface ReviewData {
   description: string;
   rating: number;
   files?: File[];
+  firmId?:string;
 }
 
 export interface ReviewResponse {
@@ -46,6 +47,8 @@ export async function createReview(reviewData: ReviewData): Promise<{ review: Re
   
   // Add text fields
   formData.append('firmName', reviewData.firmName);
+    if (reviewData.firmId) formData.append("firmId", reviewData.firmId);
+
   if (reviewData.customFirmName) {
     formData.append('customFirmName', reviewData.customFirmName);
   }

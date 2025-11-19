@@ -29,7 +29,7 @@ const ReviewDeleteModal = ({
             variant="destructive" 
             onClick={onConfirm} 
             disabled={loading}
-            className="min-w-[80px]"
+            className="min-w-20"
           >
             {loading ? 'Deleting...' : 'Confirm'}
           </Button>

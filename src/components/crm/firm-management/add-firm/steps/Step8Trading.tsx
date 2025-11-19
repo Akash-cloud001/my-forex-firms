@@ -30,7 +30,7 @@ export function Step8Trading({ onNext, onPrevious }: StepProps) {
     if (assetClass.trim()) {
       setValue('trading.leverageMatrix', {
         ...leverageMatrix,
-        [assetClass.trim()]: { Instant: '', '1-Step': '', '2-Step': '' },
+        [assetClass.trim()]: { Instant: '', '1-Step': '', '2-Step': '','3-step':'' },
       });
       setAssetClass('');
     }
@@ -135,7 +135,7 @@ export function Step8Trading({ onNext, onPrevious }: StepProps) {
                   </Button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {['Instant', '1-Step', '2-Step'].map((type) => (
+                  {['Instant', '1-Step', '2-Step','3-step'].map((type) => (
                     <div key={type}>
                       <Label className="text-xs text-gray-600">{type}</Label>
                       <Input
