@@ -5,8 +5,8 @@ import { ChevronDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CustomAccordionItemProps {
-  question: string;
-  answer: string;
+  question: string | React.ReactNode;
+  answer: string | React.ReactNode;
   isOpen: boolean;
   onToggle: () => void;
   className?: string;
@@ -35,16 +35,18 @@ export function CustomAccordionItem({
     <div className={cn("mb-3 sm:mb-4 md:mb-6 lg:mb-8 last:mb-0", className)}>
       <button
         className={cn(
-          "w-full text-left cursor-pointer transition-all duration-300 flex items-center justify-between gap-1.5 sm:gap-2 md:gap-3 lg:gap-4   sm:px-3 md:px-4 lg:px-5 pt-2 sm:pt-2.5 md:pt-3 lg:pt-4 hover:no-underline text-base md:text-xl lg:text-2xl tracking-tight font-semibold text-white",
+          "w-full text-left cursor-pointer transition-all duration-300 flex items-center justify-between gap-1.5 sm:gap-2 md:gap-3 lg:gap-4 sm:px-3 md:px-4 lg:px-5 pt-2 sm:pt-2.5 md:pt-3 lg:pt-4 hover:no-underline text-base md:text-xl lg:text-2xl tracking-tight font-semibold text-foreground",
           isOpen && "rounded-b-none"
         )}
         onClick={onToggle}
         type="button"
       >
-        <span className="w-[90%] text-wrap pr-1 sm:pr-1.5 md:pr-2 wrap-break-word min-w-0">{question}</span>
+        <div className="w-[90%] text-wrap pr-1 sm:pr-1.5 md:pr-2 wrap-break-word min-w-0">
+          {question}
+        </div>
         <ChevronDownIcon
           className={cn(
-            "size-3.5 sm:size-4 md:size-5 shrink-0 transition-transform duration-300 text-white",
+            "size-3.5 sm:size-4 md:size-5 shrink-0 transition-transform duration-300 text-foreground",
             isOpen && "rotate-180"
           )}
         />
@@ -54,7 +56,7 @@ export function CustomAccordionItem({
         className="overflow-hidden transition-[max-height] duration-300 ease-out"
         style={{ maxHeight: "0" }}
       >
-        <div className="sm:px-3 md:px-4 lg:px-6 pt-1.5 sm:pt-2 md:pt-3 lg:pt-4 font-geist-sans first-letter:uppercase leading-relaxed text-white/90 text-sm md:text-base lg:text-lg whitespace-normal break-words font-light tracking-tight">
+        <div className="sm:px-3 md:px-4 lg:px-6 pt-1.5 sm:pt-2 md:pt-3 lg:pt-4 font-geist-sans leading-relaxed text-foreground/90 text-sm md:text-base lg:text-lg whitespace-normal break-words font-light tracking-tight">
           {answer}
         </div>
       </div>

@@ -5,7 +5,13 @@ const isPublicRoute = createRouteMatcher([
   '/',
   '/sign-in(.*)',
   '/sign-up(.*)',
-  '/api/users/webhook'
+  '/api/users/webhook',
+  '/blogs(.*)',
+  '/firms(.*)',
+  '/privacy-policy(.*)',
+  '/terms-conditions(.*)',
+  '/about(.*)',
+  '/reviews(.*)',
 ])
 
 const isDashboardRoute = createRouteMatcher([

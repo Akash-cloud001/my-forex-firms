@@ -15,8 +15,6 @@ import {
   CreditCard,
   Edit,
   Trash2,
-  ChevronDown,
-  ChevronRight,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -30,6 +28,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -67,19 +73,7 @@ function FirmDetails({ id }: { id: string }) {
   const router = useRouter();
   const [firmData, setFirmData] = useState<FirmData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    new Set()
-  );
-
-  const toggleCategory = (categoryId: string) => {
-    const newExpanded = new Set(expandedCategories);
-    if (newExpanded.has(categoryId)) {
-      newExpanded.delete(categoryId);
-    } else {
-      newExpanded.add(categoryId);
-    }
-    setExpandedCategories(newExpanded);
-  };
+  const [openDrawerId, setOpenDrawerId] = useState<string | null>(null);
 
   const groupedCategories = useMemo(() => {
     const grouped = new Map<string, any>();
@@ -318,108 +312,96 @@ function FirmDetails({ id }: { id: string }) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {groupedCategories.map((category) => (
-                  <div
+              <div className="space-y-5 mx-auto">
+                {groupedCategories.map((category,idx:number) => (
+                  <Sheet
                     key={category._id}
-                    className="border rounded-lg overflow-hidden"
+                    open={openDrawerId === category._id}
+                    onOpenChange={(open) =>
+                      setOpenDrawerId(open ? category._id : null)
+                    }
                   >
-                    {/* Category Header */}
-                    <div
-                      className="flex items-center justify-between p-4 bg-muted/50 hover:bg-muted/70 transition-colors cursor-pointer"
-                      onClick={() => toggleCategory(category._id)}
-                    >
-                      <div className="flex items-center gap-3 flex-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleCategory(category._id);
-                          }}
-                          className="h-8 w-8 p-0"
-                        >
-                          {expandedCategories.has(category._id) ? (
-                            <ChevronDown className="h-4 w-4" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4" />
-                          )}
-                        </Button>
-
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-base">
-                            {category.name}
-                          </h3>
-                          <p className="text-sm text-muted-foreground mt-0.5">
-                            {category.questions.length}{" "}
-                            {category.questions.length === 1
-                              ? "question"
-                              : "questions"}
-                            {" • "}
-                            Created{" "}
-                            {new Date(category.createdAt).toLocaleDateString()}
-                          </p>
+                    <SheetTrigger asChild>
+                      <div className={`cursor-pointer border-muted-foreground/40  ${idx !== groupedCategories.length - 1 ? "border-b pb-4" : ""}`}>
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex-1 ">
+                            <h3 className="font-semibold text-base text-foreground capitalize">
+                              {category.name}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mt-0.5 capitalize">
+                              {category.questions.length}{" "}
+                              {category.questions.length === 1
+                                ? "question"
+                                : "questions"}
+                              {" • "}
+                              Created{" "}
+                              {new Date(
+                                category.createdAt
+                              ).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Handle edit action
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
-
-                      <div
-                        className="flex gap-2"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Button variant="outline" size="icon">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        {/* <Button variant="destructive" size="icon">
-                          <Trash2 className="h-4 w-4" />
-                        </Button> */}
-                      </div>
-                    </div>
-
-                    {/* Expanded Questions */}
-                    {expandedCategories.has(category._id) && (
-                      <div className="border-t bg-background">
+                    </SheetTrigger>
+                    <SheetContent side="right" className="w-full max-w-4xl overflow-x-hidden overflow-y-auto">
+                      <SheetHeader>
+                        <SheetTitle className="text-2xl font-bold text-foreground capitalize">{category.name}</SheetTitle>
+                        <SheetDescription>
+                          {category.questions.length}{" "}
+                          {category.questions.length === 1
+                            ? "question"
+                            : "questions"}
+                          {" • "}
+                          Created{" "}
+                          {new Date(category.createdAt).toLocaleDateString()}
+                        </SheetDescription>
+                      </SheetHeader>
+                      <div className="space-y-4 w-full">
                         {category.questions.map((q, idx) => (
                           <div
                             key={q._id}
-                            className={`p-4 ${
+                            className={`pb-4 pl-4 ${
                               idx !== category.questions.length - 1
-                                ? "border-b"
+                                ? "mb-4"
                                 : ""
                             }`}
                           >
                             <div className="flex justify-between items-start gap-4">
-                              <div className="flex-1 space-y-2">
+                              <div className="flex-1 space-y-2 min-w-0">
                                 <div>
-                                  <span className="text-xs font-medium text-muted-foreground">
-                                    Q{idx + 1}:
-                                  </span>
-                                  <p className="text-sm font-medium mt-1">
-                                    {q.question}
+                                  <p className="text-sm font-medium mt-1 text-foreground whitespace-normal wrap-break-word">
+                                  Q{idx + 1}: {q.question}
                                   </p>
                                 </div>
                                 <div>
-                                  <span className="text-xs font-medium text-muted-foreground">
-                                    Answer:
-                                  </span>
-                                  <p className="text-sm text-muted-foreground mt-1">
-                                    {q.answer}
+                                  <p className="text-sm text-muted-foreground mt-1 whitespace-normal wrap-break-word">
+                                  {q.answer}
                                   </p>
                                 </div>
                               </div>
-                              <div className="flex gap-2">
+                              <div className="flex gap-2 shrink-0">
                                 <Button variant="ghost" size="sm">
                                   <Edit className="h-3 w-3" />
                                 </Button>
-                                {/* <Button variant="ghost" size="sm">
-                                  <Trash2 className="h-3 w-3" />
-                                </Button> */}
                               </div>
                             </div>
                           </div>
                         ))}
                       </div>
-                    )}
-                  </div>
+                    </SheetContent>
+                  </Sheet>
                 ))}
               </div>
 
