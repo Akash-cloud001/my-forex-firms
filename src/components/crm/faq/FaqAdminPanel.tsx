@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Edit2, FolderPlus, Loader2, Plus, Search } from "lucide-react";
 import { CategoryListItem } from "./CategoryListItem";
 import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FaqCard } from "./FaqCard";
 import { FaqModal } from "./FaqModal";
 import { CategoryModal } from "./CategoryModal";
@@ -154,14 +153,14 @@ const currentCategory = categories.find((cat) => cat._id === selectedCategoryId)
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Top Header */}
-      <div className="bg-card border-b border-border sticky top-0 z-40">
+      <div className="">
         <div className="max-w-[1600px] mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold bg-linear-to-r from-white to-gray-400 bg-clip-text text-transparent">
                 FAQ Management
               </h1>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-2">
                 Create and organize your help center
               </p>
             </div>
@@ -169,7 +168,8 @@ const currentCategory = categories.find((cat) => cat._id === selectedCategoryId)
               onClick={() =>
                 setCategoryModal({ isOpen: true, mode: 'create' })
               }
-              className="bg-linear-to-r from-[#F66435] to-[#672611]"
+              className="bg-linear-to-r from-[#F66435] to-[#672611] hover:opacity-90 transition-opacity shadow-lg shadow-primary/20"
+              size="lg"
             >
               <FolderPlus className="w-5 h-5 mr-2" />
               New Category
@@ -178,24 +178,30 @@ const currentCategory = categories.find((cat) => cat._id === selectedCategoryId)
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-6 py-6">
-        <div className="grid grid-cols-12 gap-6">
+      <div className="max-w-[1600px] mx-auto px-6 py-8">
+        <div className="grid grid-cols-12 gap-8">
           {/* Categories Sidebar */}
           <div className="col-span-3">
-            <div className="bg-card border border-border rounded-2xl p-4 sticky top-24">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
+            <div className="bg-card border border-border rounded-sm p-5 sticky top-24 shadow-sm">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4 px-1">
                 Categories
               </h3>
-              <div className="space-y-1">
-                {categories.map((category) => (
-                  <CategoryListItem
-                    key={category._id}
-                    category={category}
-                    isSelected={selectedCategoryId === category._id}
-                    faqCount={category.faqs.length}
-                    onClick={() => setSelectedCategoryId(category._id)}
-                  />
-                ))}
+              <div className="space-y-1.5">
+                {categories.length === 0 ? (
+                  <div className="text-center py-8 text-sm text-muted-foreground">
+                    No categories yet
+                  </div>
+                ) : (
+                  categories.map((category) => (
+                    <CategoryListItem
+                      key={category._id}
+                      category={category}
+                      isSelected={selectedCategoryId === category._id}
+                      faqCount={category.faqs.length}
+                      onClick={() => setSelectedCategoryId(category._id)}
+                    />
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -205,64 +211,55 @@ const currentCategory = categories.find((cat) => cat._id === selectedCategoryId)
             {currentCategory ? (
               <>
                 {/* Category Header */}
-                <div className="bg-card border border-border rounded-2xl p-6 mb-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h2 className="text-2xl font-bold mb-1">
+                <div className="bg-card border border-border rounded-sm px-6 py-4 mb-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <h2 className="text-2xl font-bold text-foreground capitalize">
                         {currentCategory.name}
                       </h2>
                       {currentCategory.description && (
-                        <p className="text-muted-foreground">
+                        <p className="text-muted-foreground capitalize">
                           {currentCategory.description}
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() =>
-                          setCategoryModal({
-                            isOpen: true,
-                            mode: 'edit',
-                            data: {
-                              name: currentCategory.name,
-                              description: currentCategory.description,
-                            },
-                          })
-                        }
-                        title="Edit Category"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      {/* <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteCategory(currentCategory._id)}
-                        className="text-destructive hover:bg-destructive/20"
-                        title="Delete Category"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button> */}
-                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() =>
+                        setCategoryModal({
+                          isOpen: true,
+                          mode: 'edit',
+                          data: {
+                            name: currentCategory.name,
+                            description: currentCategory.description,
+                          },
+                        })
+                      }
+                      className="shrink-0 hover:bg-accent transition-colors"
+                      title="Edit Category"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
 
                 {/* Search and Add */}
                 <div className="flex gap-4 mb-6">
                   <div className="relative flex-1">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
                     <Input
                       type="text"
                       placeholder="Search FAQs in this category..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-12"
+                      className="pl-12 h-11 bg-background border-border focus:border-primary/50 transition-colors"
                     />
                   </div>
                   <Button
                     onClick={() => setFaqModal({ isOpen: true, mode: 'create' })}
-                    className="bg-linear-to-r from-[#F66435] to-[#672611] whitespace-nowrap"
+                    className="bg-linear-to-r from-[#F66435] to-[#672611] rounded-full hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 whitespace-nowrap h-11"
+                    size="lg"
                   >
                     <Plus className="w-5 h-5 mr-2" />
                     Add FAQ
@@ -271,15 +268,20 @@ const currentCategory = categories.find((cat) => cat._id === selectedCategoryId)
 
                 {/* FAQs List */}
                 {displayFaqs.length === 0 ? (
-                  <Alert className="bg-card border-border">
-                    <AlertDescription className="text-muted-foreground text-center py-8">
-                      {searchTerm
-                        ? 'No FAQs found matching your search.'
-                        : 'No FAQs in this category yet. Click "Add FAQ" to create one.'}
-                    </AlertDescription>
-                  </Alert>
+                  <div className="bg-card border border-border rounded-sm p-12 text-center">
+                    <div className="max-w-md mx-auto">
+                      <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                        <Search className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                      <p className="text-muted-foreground text-base">
+                        {searchTerm
+                          ? 'No FAQs found matching your search.'
+                          : 'No FAQs in this category yet. Click "Add FAQ" to create one.'}
+                      </p>
+                    </div>
+                  </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-4 bg-card rounded-sm p-4 border border-border">
                     {displayFaqs.map((faq, index) => (
                       <FaqCard
                         key={faq._id}
@@ -303,11 +305,16 @@ const currentCategory = categories.find((cat) => cat._id === selectedCategoryId)
                 )}
               </>
             ) : (
-              <Alert className="bg-card border-border">
-                <AlertDescription className="text-muted-foreground text-center py-12">
-                  Select a category to start managing FAQs
-                </AlertDescription>
-              </Alert>
+              <div className="bg-card border border-border rounded-sm p-12 text-center">
+                <div className="max-w-md mx-auto">
+                  <div className="w-16 h-16 rounded-sm bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                    <FolderPlus className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-muted-foreground text-base">
+                    Select a category to start managing FAQs
+                  </p>
+                </div>
+              </div>
             )}
           </div>
         </div>
