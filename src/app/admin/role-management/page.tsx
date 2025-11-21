@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,7 +27,10 @@ interface User {
 }
 
 export default function EmailManagementPage() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
+  
+  // All hooks must be called before any conditional returns
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('admins');
@@ -37,20 +42,8 @@ export default function EmailManagementPage() {
   const [isAssigning, setIsAssigning] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  
   const currentUserEmail = user?.emailAddresses[0]?.emailAddress;
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (searchTimeout) {
-        clearTimeout(searchTimeout);
-      }
-    };
-  }, [searchTimeout]);
 
   const fetchUsers = async () => {
     try {
@@ -199,8 +192,30 @@ export default function EmailManagementPage() {
     </div>
   );
 
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
 
+  // Show loading while user data is being fetched
+  if (!isLoaded) {
+    return <LoadingScreen title="Checking access..." subtitle="Verifying permissions..." />;
+  }
+
+  // Check role after user is loaded
+  const userRole = user?.publicMetadata?.role as string | undefined;
+  if (isLoaded && user && userRole !== 'admin') {
+    router.push('/admin/unauthorized');
+    return null; // Don't render anything during redirect
+  }
 
   if (loading) {
     return (
