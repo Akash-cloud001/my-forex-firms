@@ -171,7 +171,7 @@ const ChallengesContent = () => {
   ]
 
   return (
-    <div className="w-full border border-border p-8 rounded-lg bg-card">
+    <div className="w-full border border-border p-8 rounded-lg card-custom-grad">
       {/* Filter Section */}
       <div className="flex gap-4 mb-6">
         <Select value={selectedSteps} onValueChange={setSelectedSteps}>

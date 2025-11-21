@@ -1,21 +1,27 @@
 "use client"
 import React, { useState } from 'react'
+import Image from 'next/image'
 import { 
-  TrendingUp, 
   CreditCard, 
-  Coins, 
-  Building2, 
-  Globe
+  Globe,
+  ChartLine
 } from 'lucide-react'
 import { IFundingFirm } from '@/models/FirmDetails'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 
 interface FirmDashboardProps {
   firmData?: IFundingFirm | null
 }
 
 const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
-  const [showMoreCountries, setShowMoreCountries] = useState(false)
-  const [showMoreLanguages, setShowMoreLanguages] = useState(false)
+  const [isCountriesModalOpen, setIsCountriesModalOpen] = useState(false)
+  const [isLanguagesModalOpen, setIsLanguagesModalOpen] = useState(false)
 
   if (!firmData) {
     return <div className="text-foreground">Loading...</div>
@@ -23,25 +29,56 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
 
   const restrictedCountries = firmData.compliance?.restrictedCountries || []
   const languagesSupported = firmData.firmDetails?.languagesSupported || []
-  const displayCountries = showMoreCountries ? restrictedCountries : restrictedCountries.slice(0, 3)
-  const displayLanguages = showMoreLanguages ? languagesSupported : languagesSupported.slice(0, 4)
+  const displayCountries = restrictedCountries.slice(0, 3)
+  const displayLanguages = languagesSupported.slice(0, 4)
 
-  // Platform icons mapping
-  const platformIcons: Record<string, React.ReactNode> = {
-    'cTrader': <span className="text-red-500 font-bold text-sm">C</span>,
-    'Match Trader': <span className="text-yellow-500">★</span>,
-    'MT5': <span className="text-green-500">▲</span>,
-    'MT4': <span className="text-blue-500">▲</span>
+  // Map platform names to SVG file paths
+  const getPlatformSvgPath = (platformName: string): string | null => {
+    const normalized = platformName.toLowerCase().replace(/\s+/g, '')
+    
+    const platformMap: Record<string, string> = {
+      'ctrader': '/website/platforms/ctrader.svg',
+      'matchtrader': '/website/platforms/matchtrader.svg',
+      'mt5': '/website/platforms/mt5.svg',
+      'metatrader5': '/website/platforms/mt5.svg',
+      'metatrader 5': '/website/platforms/mt5.svg',
+      'dxtrade': '/website/platforms/dxtrade.svg',
+      'dxt': '/website/platforms/dxtrade.svg',
+      'dx trade': '/website/platforms/dxtrade.svg',
+      'traderlocker': '/website/platforms/traderlocker.svg',
+      'trader locker': '/website/platforms/traderlocker.svg',
+    }
+    
+    return platformMap[normalized] || null
   }
 
-  // Payment method icons
-  const paymentIcons: Record<string, React.ReactNode> = {
-    'Credit/Debit Card': <CreditCard className="w-4 h-4" />,
-    'Debit/credit card': <CreditCard className="w-4 h-4" />,
-    'Crypto': <Coins className="w-4 h-4" />,
-    'Cryptocurrencies': <Coins className="w-4 h-4" />,
-    'Korapay': <span className="text-blue-500 font-bold text-sm">K</span>,
-    'Skrill': <span className="text-purple-500 font-bold text-sm">S</span>
+  // Map payment method names to SVG file paths
+  const getPaymentSvgPath = (methodName: string): string | null => {
+    const normalized = methodName.toLowerCase().replace(/\s+/g, '')
+    
+    const paymentMap: Record<string, string> = {
+      'credit': '/website/payments/credit.svg',
+      'debit': '/website/payments/credit.svg',
+      'card': '/website/payments/credit.svg',
+      'creditcard': '/website/payments/credit.svg',
+      'debitcard': '/website/payments/credit.svg',
+      'credit/debitcard': '/website/payments/credit.svg',
+      'debit/creditcard': '/website/payments/credit.svg',
+      'crypto': '/website/payments/crypto.svg',
+      'cryptocurrency': '/website/payments/crypto.svg',
+      'cryptocurrencies': '/website/payments/crypto.svg',
+      'bank': '/website/payments/bank.svg',
+      'banktransfer': '/website/payments/bank.svg',
+      'bank transfer': '/website/payments/bank.svg',
+      'wire': '/website/payments/bank.svg',
+      'wiretransfer': '/website/payments/bank.svg',
+      'wire transfer': '/website/payments/bank.svg',
+      'korapay': '/website/payments/korapay.svg',
+      'riseworks': '/website/payments/riseworks.svg',
+      'rise works': '/website/payments/riseworks.svg',
+    }
+    
+    return paymentMap[normalized] || null
   }
 
   // Get platforms - check if tradingInfrastructure exists, otherwise use default
@@ -52,33 +89,28 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
   const paymentMethods = firmData.payments?.methods || []
   const payoutMethods = firmData.payments?.payoutMethods || []
   
-  // Map payment methods to display format and get icon
+  // Map payment methods to display format and get SVG path
   const getPaymentMethodDisplay = (method: string) => {
     const lowerMethod = method.toLowerCase()
+    let display = method
+    
+    // Normalize display names
     if (lowerMethod.includes('card') || lowerMethod.includes('debit') || lowerMethod.includes('credit')) {
-      return { display: 'Credit/Debit Card', icon: paymentIcons['Credit/Debit Card'] }
+      display = 'Credit/Debit Card'
+    } else if (lowerMethod.includes('crypto')) {
+      display = 'Crypto'
+    } else if (lowerMethod.includes('bank') || lowerMethod.includes('wire')) {
+      display = 'Bank Transfer'
     }
-    if (lowerMethod.includes('crypto')) {
-      return { display: 'Crypto', icon: paymentIcons['Crypto'] }
-    }
-    if (lowerMethod.includes('skrill')) {
-      return { display: 'Skrill', icon: paymentIcons['Skrill'] || <CreditCard className="w-4 h-4" /> }
-    }
-    if (lowerMethod.includes('bank') || lowerMethod.includes('wire')) {
-      return { display: method, icon: <Building2 className="w-4 h-4" /> }
-    }
-    return { display: method, icon: <CreditCard className="w-4 h-4" /> }
+    
+    const svgPath = getPaymentSvgPath(method)
+    return { display, svgPath }
   }
-
-  // Get broker/liquidity provider
-  const broker = firmData.firmDetails?.liquidityProviders?.[0] || 
-                 firmData.firmDetails?.brokers?.[0] || 
-                 'Datafeed Provider'
 
   return (
     <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
       {/* Left Panel - Company Information */}
-      <div className="border border-border rounded-lg p-6 bg-card space-y-4">
+      <div className="border border-border rounded-lg p-6 card-custom-grad space-y-4">
         <div>
           <p className="text-xs text-foreground/60 mb-1">Legal Name</p>
           <p className="text-foreground font-medium">{firmData.firmDetails?.legalEntityName || firmData.firmDetails?.name}</p>
@@ -125,15 +157,17 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
       </div>
 
       {/* Right Panel - Operational Information */}
-      <div className="border border-border rounded-lg p-6 bg-card space-y-6">
+      <div className="border border-border rounded-lg p-6 card-custom-grad space-y-6">
         {/* Broker */}
         <div>
           <p className="text-xs text-foreground/60 mb-2">Broker</p>
           <div className="flex items-center gap-2">
-            <span className="px-5 py-1.5 bg-foreground/5 rounded-full text-sm text-foreground flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-foreground/60" />
+            {firmData?.firmDetails?.brokers?.map((broker:string, idx:number)=>(
+              <span key={idx} className="px-5 py-1.5 bg-foreground/5 rounded-full text-sm text-foreground flex items-center gap-2">
+                <ChartLine className="w-4 h-4 text-primary" />
               {broker}
-            </span>
+              </span>
+            )) }
           </div>
         </div>
 
@@ -141,12 +175,26 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
         <div>
           <p className="text-xs text-foreground/60 mb-2">Platform</p>
           <div className="flex flex-wrap gap-2">
-            {platforms.map((platform: string) => (
-              <div key={platform} className="flex items-center gap-2 px-5 py-1.5 bg-foreground/5 rounded-full">
-                {platformIcons[platform] || <span className="text-foreground/60 text-sm">●</span>}
-                <span className="text-sm text-foreground">{platform}</span>
-              </div>
-            ))}
+            {platforms.map((platform: string) => {
+              const svgPath = getPlatformSvgPath(platform)
+              return (
+                <div key={platform} className="flex items-center gap-2 px-5 py-1.5 bg-foreground/5 rounded-full">
+                  {svgPath ? (
+                    <div className="relative w-4 h-4">
+                      <Image 
+                        src={svgPath} 
+                        alt={platform} 
+                        fill 
+                        className="object-contain" 
+                      />
+                    </div>
+                  ) : (
+                    <span className="text-foreground/60 text-sm">●</span>
+                  )}
+                  <span className="text-sm text-foreground">{platform}</span>
+                </div>
+              )
+            })}
           </div>
         </div>
 
@@ -155,10 +203,21 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
           <p className="text-xs text-foreground/60 mb-2">Payment Methods</p>
           <div className="flex flex-wrap gap-2">
             {paymentMethods.slice(0, 3).map((method, idx) => {
-              const { display, icon } = getPaymentMethodDisplay(method)
+              const { display, svgPath } = getPaymentMethodDisplay(method)
               return (
                 <div key={idx} className="flex items-center gap-2 px-5 py-1.5 bg-foreground/5 rounded-full">
-                  {icon}
+                  {svgPath ? (
+                    <div className="relative w-4 h-4">
+                      <Image 
+                        src={svgPath} 
+                        alt={display} 
+                        fill 
+                        className="object-contain" 
+                      />
+                    </div>
+                  ) : (
+                    <CreditCard className="w-4 h-4 text-foreground/60" />
+                  )}
                   <span className="text-sm text-foreground">{display}</span>
                 </div>
               )
@@ -171,14 +230,22 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
           <p className="text-xs text-foreground/60 mb-2">Payout Methods</p>
           <div className="flex flex-wrap gap-2">
             {payoutMethods.slice(0, 3).map((method, idx) => {
-              const { display, icon } = getPaymentMethodDisplay(method)
-              const isBank = method.toLowerCase().includes('bank') || method.toLowerCase().includes('wire')
+              const { display, svgPath } = getPaymentMethodDisplay(method)
               return (
                 <div key={idx} className="flex items-center gap-2 px-5 py-1.5 bg-foreground/5 rounded-full">
-                  {isBank ? <Building2 className="w-4 h-4" /> : icon}
-                  <span className="text-sm text-foreground">
-                    {isBank ? 'Bank Transfer' : display}
-                  </span>
+                  {svgPath ? (
+                    <div className="relative w-4 h-4">
+                      <Image 
+                        src={svgPath} 
+                        alt={display} 
+                        fill 
+                        className="object-contain" 
+                      />
+                    </div>
+                  ) : (
+                    <CreditCard className="w-4 h-4 text-foreground/60" />
+                  )}
+                  <span className="text-sm text-foreground">{display}</span>
                 </div>
               )
             })}
@@ -197,7 +264,7 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
             ))}
             {restrictedCountries.length > 3 && (
               <button
-                onClick={() => setShowMoreCountries(!showMoreCountries)}
+                onClick={() => setIsCountriesModalOpen(true)}
                 className="px-3 py-1.5 bg-foreground/5 rounded-full text-sm  hover:bg-foreground/20 transition-colors text-primary"
               >
                 View more...
@@ -205,6 +272,36 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
             )}
           </div>
         </div>
+
+        {/* Restricted Countries Modal */}
+        <Dialog open={isCountriesModalOpen} onOpenChange={setIsCountriesModalOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-foreground">Restricted Countries</DialogTitle>
+              <DialogDescription className="text-foreground/70">
+                The following countries are restricted from using this firm&apos;s services.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              <div className="flex flex-wrap gap-2">
+                {restrictedCountries.map((country, idx) => (
+                  <div 
+                    key={idx} 
+                    className="flex items-center gap-2 px-4 py-2 bg-foreground/5 rounded-full border border-border hover:bg-foreground/10 transition-colors"
+                  >
+                    <Globe className="w-4 h-4 text-foreground/60" />
+                    <span className="text-sm text-foreground font-medium">{country}</span>
+                  </div>
+                ))}
+              </div>
+              {restrictedCountries.length === 0 && (
+                <p className="text-sm text-foreground/60 text-center py-8">
+                  No restricted countries listed.
+                </p>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Language Supported */}
         <div>
@@ -220,7 +317,7 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
             ))}
             {languagesSupported.length > 4 && (
               <button
-                onClick={() => setShowMoreLanguages(!showMoreLanguages)}
+                onClick={() => setIsLanguagesModalOpen(true)}
                 className="px-3 py-1.5 bg-foreground/5 rounded-full text-sm hover:bg-foreground/20 transition-colors text-primary"
               >
                 View more...
@@ -228,6 +325,35 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
             )}
           </div>
         </div>
+
+        {/* Supported Languages Modal */}
+        <Dialog open={isLanguagesModalOpen} onOpenChange={setIsLanguagesModalOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-foreground">Supported Languages</DialogTitle>
+              <DialogDescription className="text-foreground/70">
+                The following languages are supported by this firm.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              <div className="flex flex-wrap gap-2">
+                {languagesSupported.map((language, idx) => (
+                  <span 
+                    key={idx} 
+                    className="px-4 py-2 bg-foreground/5 text-primary rounded-full border border-border hover:bg-foreground/10 transition-colors text-sm font-medium"
+                  >
+                    {language}
+                  </span>
+                ))}
+              </div>
+              {languagesSupported.length === 0 && (
+                <p className="text-sm text-foreground/60 text-center py-8">
+                  No supported languages listed.
+                </p>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )
