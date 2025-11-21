@@ -280,3 +280,33 @@
   background: linear-gradient(to bottom, rgb(255, 255, 255, 0.1) 0%, rgb(0, 0, 0, 0.1) 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+.border-gradient {
+  position: relative;
+  background: transparent;
+  border-radius: 9999px;
+}
+
+.border-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 1px;
+  background: linear-gradient(115deg, #F66435 0%, #672611 100%);
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.background-gradient{
+  background:
+      "radial-gradient(circle at top, rgba(255,255,255,0.12), transparent 60%), var(--background)";
+    backdrop-filter: blur(12px) !important;
+}

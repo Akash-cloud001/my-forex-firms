@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,6 +60,10 @@ interface ApiResponse {
 }
 
 export default function AdminNewsletter() {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
+  
+  // All hooks must be called before any conditional returns
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [stats, setStats] = useState<Stats>({
     total: 0,
@@ -111,6 +118,18 @@ export default function AdminNewsletter() {
     fetchSubscriptions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, pagination.limit, sortBy, sortOrder]);
+
+  // Show loading while user data is being fetched
+  if (!isLoaded) {
+    return <LoadingScreen title="Checking access..." subtitle="Verifying permissions..." />;
+  }
+
+  // Check role after user is loaded
+  const userRole = user?.publicMetadata?.role as string | undefined;
+  if (isLoaded && user && userRole !== 'admin') {
+    router.push('/admin/unauthorized');
+    return null; // Don't render anything during redirect
+  }
 
   const handleSearch = () => {
     setPagination((prev) => ({ ...prev, page: 1 }));

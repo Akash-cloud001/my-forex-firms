@@ -6,6 +6,7 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/api/users/webhook',
+  '/api/public(.*)',
   '/blogs(.*)',
   '/firms(.*)',
   '/privacy-policy(.*)',
@@ -21,6 +22,12 @@ const isDashboardRoute = createRouteMatcher([
 const isAdminRoute = createRouteMatcher([
   '/admin/users(.*)',
   '/api/admin(.*)'
+])
+
+const isEditorRestrictedRoute = createRouteMatcher([
+  '/admin/role-management(.*)',
+  '/admin/newsletter(.*)',
+  '/admin/affiliates(.*)'
 ])
 
 
@@ -59,6 +66,11 @@ export default clerkMiddleware(async (auth, req) => {
         if (!userRole || !allowedRoles.includes(userRole)) {
           // Redirect users without proper roles to home page
           return NextResponse.redirect(new URL('/', req.url))
+        }
+
+        // Check if editor is trying to access restricted routes
+        if (isEditorRestrictedRoute(req) && userRole === 'editor') {
+          return NextResponse.redirect(new URL('/admin/unauthorized', req.url))
         }
 
         // Allow admin to proceed

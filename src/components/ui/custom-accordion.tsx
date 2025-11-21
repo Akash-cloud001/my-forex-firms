@@ -96,9 +96,12 @@ export function CustomAccordion({
     });
   };
 
+  // Limit to first 10 items
+  const limitedItems = items.slice(0, 10);
+
   return (
     <div className={cn("w-full", className)}>
-      {items.map((item, index) => (
+      {limitedItems.map((item, index) => (
         <CustomAccordionItem
           key={index}
           question={item.question}

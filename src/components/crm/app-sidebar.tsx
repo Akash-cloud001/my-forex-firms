@@ -35,10 +35,11 @@ import {
   Users,
   Shield,
   MessageCircleQuestionMark,
+  Loader2,
 } from "lucide-react";
 import Image from "next/image";
 
-const navigationItems = [
+const adminNavigationItems = [
   {
     title: "Dashboard",
     url: "/admin/dashboard",
@@ -100,13 +101,57 @@ const navigationItems = [
     hasSubmenu: false,
   },
 ];
-
+const editorNavigationItems = [
+  {
+    title: "Dashboard",
+    url: "/admin/dashboard",
+    icon: LayoutDashboard,
+    hasSubmenu: false,
+  },
+  {
+    title: "Firm Management",
+    url: "/admin/firm-management",
+    icon: Building2,
+    hasSubmenu: false,
+  },
+  {
+    title: "Reviews",
+    url: "/admin/reviews",
+    icon: AlertCircle,
+    hasSubmenu: false,
+  },
+  {
+    title: "Penalties",
+    url: "/admin/penalties",
+    icon: ShieldAlert,
+    hasSubmenu: false,
+  },
+  {
+    title: "FAQ",
+    url: "/admin/faq-management",
+    icon: MessageCircleQuestionMark,
+    hasSubmenu: false,
+  },
+];
 export default function AppSidebar() {
   const { state } = useSidebar()
   const pathname = usePathname();
   const router = useRouter(); 
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const [openSubmenus, setOpenSubmenus] = React.useState<Record<string, boolean>>({});
+  
+  // Get user role and select appropriate navigation array
+  const userRole = user?.publicMetadata?.role as string | undefined;
+  const navigationItems = React.useMemo(() => {
+    if (!isLoaded) return [];
+    if (userRole === 'admin') {
+      return adminNavigationItems;
+    } else if (userRole === 'editor') {
+      return editorNavigationItems;
+    }
+    // Default to admin navigation if role is not recognized
+    return adminNavigationItems;
+  }, [isLoaded, userRole]);
   
   const toggleSubmenu = (itemUrl: string) => {
     setOpenSubmenus(prev => ({
@@ -131,17 +176,18 @@ export default function AppSidebar() {
         }
       }
     });
-  }, [pathname, openSubmenus]);
+  }, [pathname, openSubmenus, navigationItems]);
   
   return (
     <Sidebar className="bg-background border-r border-sidebar-border" collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
-        <div className={`flex items-center gap-2 py-2 ${state === "expanded" ? "px-4" : "px-0"}`}>
-          {state !== "expanded" && <div className="flex items-center justify-center text-primary text-sm font-bold">
-            MFF
+        <div className={`flex items-center gap-2 py-2 ${state === "expanded" ? "pl-1" : "pl-1"}`}>
+          {state !== "expanded" && <div className="relative h-5 w-5  flex items-center justify-center text-primary text-sm font-bold">
+            <Image src="/logo.png" alt="My Forex Firms" fill className="object-contain" />
           </div>}
-          {state === "expanded" && <div className={`${state !== "expanded" ? "w-0" : "w-auto"} transition-all duration-200 flex items-center justify-center text-primary font-bold overflow-hidden text-sm`}>
-            My Forex Firms
+          {state === "expanded" && <div className={`${state !== "expanded" ? "w-0" : "w-full"} relative transition-all duration-200 flex items-start justify-start text-primary font-bold overflow-hidden text-sm h-5 `}>
+          <Image src="/my-forex-firms-full.png" alt="My Forex Firms" fill className="object-contain object-left" />
+
           </div>}
         </div>
       </SidebarHeader>
@@ -149,8 +195,13 @@ export default function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu className="mt-4">
-              {navigationItems.map((item) => {
+            {!isLoaded ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <SidebarMenu className="mt-4">
+                {navigationItems.map((item) => {
                 const Icon = item.icon;
                 const isSubmenuOpen = openSubmenus[item.url];
                 
@@ -299,7 +350,8 @@ export default function AppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
-            </SidebarMenu>
+              </SidebarMenu>
+            )}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
