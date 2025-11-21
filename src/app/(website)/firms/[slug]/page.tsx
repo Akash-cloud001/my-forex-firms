@@ -98,10 +98,10 @@ const factor3 = [
 
 const FirmPage = () => {
   const params = useParams();
-  const firmId = params.firm_id as string;
+  const slug = params.slug as string;
   const [activeTab, setActiveTab] = useState<'dashboard' | 'challenges' | 'reviews'>('dashboard');
 
-  const { data: firmData, isLoading, isError } = useFirmDetails(firmId);
+  const { data: firmData, isLoading, isError } = useFirmDetails(slug);
 
   if (isLoading) {
     return <LoadingScreen title="Getting things ready..." subtitle="This will only take a moment." />
@@ -115,7 +115,7 @@ const FirmPage = () => {
     <section className='w-full min-h-screen py-12 px-4 lg:px-0 text-foreground background-gradient'>
       <FirmHeader
         firmData={firmData || null}
-        firmId={firmId}
+        firmId={"4242"}
         factor1={factor1}
         factor2={factor2}
         factor3={factor3}

@@ -48,6 +48,8 @@ export interface IFundingFirm extends Document {
     officialWebsite?: string;
     brokers?: string[];
     liquidityProviders?: string[];
+    totalPayout?: string;
+    slug?: string;
   };
 
   leadership: {
@@ -94,7 +96,7 @@ export interface IFundingFirm extends Document {
         Instant?: string;
         "1-Step"?: string;
         "2-Step"?: string;
-        "3-step"?:string
+        "3-step"?: string
       }
     >;
     commissions?: Record<string, string>;
@@ -136,6 +138,8 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
       officialWebsite: { type: String, trim: true },
       brokers: [{ type: String }],
       liquidityProviders: [{ type: String }],
+      totalPayout: { type: String, trim: true },
+      slug: { type: String, trim: true },
     },
 
     leadership: {
@@ -209,7 +213,7 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
           Instant: String,
           "1-Step": String,
           "2-Step": String,
-          "3-step":String
+          "3-step": String
         },
       },
       commissions: { type: Map, of: String },

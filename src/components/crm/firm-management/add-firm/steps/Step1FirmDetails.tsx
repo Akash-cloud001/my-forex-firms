@@ -590,12 +590,34 @@ export default function Step1FirmDetails({
         </div>
       </div>
 
+      <div className="flex flex-row justify-between gap-2">
+
+        {/* Total Payout */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Total Payout</Label>
+          <Input
+            type="number"
+            {...register("firmDetails.totalPayout")}
+            placeholder="Enter total payout"
+          />
+        </div>
+        {/* slug */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Slug</Label>
+          <Input
+            type="text"
+            {...register("firmDetails.slug")}
+            placeholder="Enter slug"
+          />
+        </div>
+      </div>
+
       {/* Navigation Buttons */}
       <div className="flex justify-between pt-6">
         <Button
           type="button"
           variant="outline"
-          onClick={() => {}}
+          onClick={() => { }}
           disabled={isFirstStep}
         >
           Previous
@@ -607,44 +629,3 @@ export default function Step1FirmDetails({
     </div>
   );
 }
-
-//  <div className="space-y-2">
-//           <Label htmlFor="image" className="text-sm font-medium">
-//             Firm Logo
-//           </Label>
-//           <div className="flex items-center gap-4">
-//             {/* Preview */}
-//             {watch("firmDetails.image") instanceof File ? (
-//               <img
-//                 src={URL.createObjectURL(watch("firmDetails.image"))}
-//                 alt="Firm Logo Preview"
-//                 className="w-16 h-16 rounded-md object-cover border"
-//               />
-//             ) : watch("firmDetails.image") ? (
-//               <img
-//                 src={watch("firmDetails.image")}
-//                 alt="Existing Logo"
-//                 className="w-16 h-16 rounded-md object-cover border"
-//               />
-//             ) : (
-//               <div className="w-16 h-16 rounded-md border flex items-center justify-center text-xs text-muted-foreground">
-//                 No Logo
-//               </div>
-//             )}
-
-//             {/* Upload Button */}
-//             <Input
-//               id="logoFile"
-//               type="file"
-//               accept="image/*"
-//               className="max-w-xs"
-//               onChange={(e) => {
-//                 const file = e.target.files?.[0];
-//                 if (file)
-//                   setValue("firmDetails.image", file, {
-//                     shouldValidate: true,
-//                   });
-//               }}
-//             />
-//           </div>
-//         </div>

@@ -73,26 +73,18 @@ const programSchema = z.object({
   timeLimit: z.string().optional(),
   drawdownResetType: z.string().optional(),
   minTradingDays: z.number().optional(),
-}).refine(
-  (data) =>
-    data.type === "Instant" || (data.evaluationPhases && data.evaluationPhases > 0),
-  {
-    message: "Evaluation Phases is required for non-Instant programs",
-    path: ["evaluationPhases"],
-  }
-);
-
+})
 type ProgramFormData = z.infer<typeof programSchema>;
 
 const ProgramForm = ({ programId }: { programId?: string }) => {
   const [submitStatus, setSubmitStatus] = useState("");
   const [payoutMethodInput, setPayoutMethodInput] = useState('');
-   const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [isLoadingProgram, setIsLoadingProgram] = useState(false);
 
 
-const params = useParams<{ id: string }>();
-const router = useRouter()
+  const params = useParams<{ id: string }>();
+  const router = useRouter()
 
   const {
     register,
@@ -105,15 +97,15 @@ const router = useRouter()
   } = useForm<ProgramFormData>({
     resolver: zodResolver(programSchema),
     defaultValues: {
-  propFirmId: params.id || "",
+      propFirmId: params.id || "",
       type: "",
       name: "",
       evaluationPhases: 0,
       evaluationSteps: [],
       accountSizes: [],
       profitSplit: "",
-      payoutFrequency: [{ label: "Bi-weekly", percentage: "80%" }],
-      leverage: "1:50",
+      payoutFrequency: [],
+      leverage: "",
       stopLossRequired: false,
       eaAllowed: true,
       weekendHolding: true,
@@ -122,22 +114,23 @@ const router = useRouter()
       copyTrading: true,
       refundFee: false,
       payoutMethods: [],
+      minTradingDays: 0,
     },
   });
   useEffect(() => {
     const fetchProgramData = async () => {
       if (!programId) return;
-      
+
       setIsLoadingProgram(true);
       setIsEditing(true);
-      
+
       try {
         const response = await fetch(`/api/admin/firm-program/${programId}`);
         const result = await response.json();
-        
+
         if (result.success && result.data) {
           const program = result.data;
-          
+
           // Reset form with fetched data
           reset({
             propFirmId: program.propFirmId || params.id,
@@ -177,7 +170,7 @@ const router = useRouter()
     };
 
     fetchProgramData();
-  }, [programId, setValue,params.id,reset]);
+  }, [programId, setValue, params.id, reset]);
 
 
 
@@ -236,62 +229,62 @@ const router = useRouter()
     });
   };
 
-const onSubmit = async (data: ProgramFormData) => {
-  try {
-    if (data.type === "Instant") {
-      delete data.evaluationPhases;
-      delete data.evaluationSteps;
-    }
-    
-    const url = isEditing 
-      ? `/api/admin/firm-program/${programId}` 
-      : "/api/admin/firm-program";
-    
-    const method = isEditing ? "PUT" : "POST";
-    
-    const res = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+  const onSubmit = async (data: ProgramFormData) => {
+    try {
+      if (data.type === "Instant") {
+        delete data.evaluationPhases;
+        delete data.evaluationSteps;
+      }
 
-    // Check if response has content before parsing JSON
-    const contentType = res.headers.get("content-type");
-    let result;
-    
-    if (contentType && contentType.includes("application/json")) {
-      const text = await res.text();
-      result = text ? JSON.parse(text) : {};
-    } else {
-      result = { success: res.ok };
-    }
+      const url = isEditing
+        ? `/api/admin/firm-program/${programId}`
+        : "/api/admin/firm-program";
 
-    if (!res.ok) {
-      console.error(`Failed to ${isEditing ? 'update' : 'create'} program:`, result.message || 'Unknown error');
+      const method = isEditing ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      // Check if response has content before parsing JSON
+      const contentType = res.headers.get("content-type");
+      let result;
+
+      if (contentType && contentType.includes("application/json")) {
+        const text = await res.text();
+        result = text ? JSON.parse(text) : {};
+      } else {
+        result = { success: res.ok };
+      }
+
+      if (!res.ok) {
+        console.error(`Failed to ${isEditing ? 'update' : 'create'} program:`, result.message || 'Unknown error');
+        setSubmitStatus("error");
+        return;
+      }
+
+      console.log(`Program ${isEditing ? 'updated' : 'created'} successfully:`, result.data);
+      setSubmitStatus("success");
+
+      // Navigate after a short delay to show success message
+      setTimeout(() => {
+        router.push(`/admin/firm-management/${params.id}/firm-detail`);
+      }, 1000);
+
+    } catch (error) {
+      console.error("Error submitting form:", error);
       setSubmitStatus("error");
-      return;
+    } finally {
+      setTimeout(() => setSubmitStatus(""), 5000);
     }
-
-    console.log(`Program ${isEditing ? 'updated' : 'created'} successfully:`, result.data);
-    setSubmitStatus("success");
-
-    // Navigate after a short delay to show success message
-    setTimeout(() => {
-      router.push(`/admin/firm-management/${params.id}/firm-detail`);
-    }, 1000);
-
-  } catch (error) {
-    console.error("Error submitting form:", error);
-    setSubmitStatus("error");
-  } finally {
-    setTimeout(() => setSubmitStatus(""), 5000);
-  }
-};
+  };
 
 
-const onError = (errors: FieldErrors<ProgramFormData>) => {
+  const onError = (errors: FieldErrors<ProgramFormData>) => {
     console.error(" Validation Errors:", errors);
     setSubmitStatus("error");
     setTimeout(() => setSubmitStatus(""), 5000);
@@ -301,7 +294,7 @@ const onError = (errors: FieldErrors<ProgramFormData>) => {
     handleSubmit(onSubmit, onError)();
   };
 
-    if (isLoadingProgram) {
+  if (isLoadingProgram) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-lg text-muted-foreground">Loading program...</div>
@@ -319,7 +312,7 @@ const onError = (errors: FieldErrors<ProgramFormData>) => {
                 variant="ghost"
                 size="icon"
                 className="text-white"
-                onClick={()=>router.back()}
+                onClick={() => router.back()}
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
@@ -332,7 +325,7 @@ const onError = (errors: FieldErrors<ProgramFormData>) => {
                 </p>
               </div>
             </div>
-             <Button
+            <Button
               onClick={handleFormSubmit}
               className="bg-primary hover:bg-primary/90"
             >
@@ -348,7 +341,7 @@ const onError = (errors: FieldErrors<ProgramFormData>) => {
           <Alert className="mb-6 bg-green-500/10 border-green-500">
             <Info className="h-4 w-4 text-green-500" />
             <AlertDescription className="text-green-500 font-medium">
-               Program saved successfully! Check console for details.
+              Program saved successfully! Check console for details.
             </AlertDescription>
           </Alert>
         )}
@@ -357,7 +350,7 @@ const onError = (errors: FieldErrors<ProgramFormData>) => {
           <Alert className="mb-6 bg-red-500/10 border-red-500">
             <Info className="h-4 w-4 text-red-500" />
             <AlertDescription className="text-red-500 font-medium">
-               Please fix the errors below before submitting. Check console for details.
+              Please fix the errors below before submitting. Check console for details.
             </AlertDescription>
           </Alert>
         )}
@@ -717,7 +710,7 @@ const onError = (errors: FieldErrors<ProgramFormData>) => {
                     Add payment methods available for traders (e.g., PayPal, Wise, Cryptocurrency)
                   </p>
                 </div>
-                
+
                 <div className="flex gap-2">
                   <Input
                     value={payoutMethodInput}
@@ -741,7 +734,7 @@ const onError = (errors: FieldErrors<ProgramFormData>) => {
                     Add
                   </Button>
                 </div>
-                
+
                 {payoutMethods.length > 0 ? (
                   <div className="flex flex-wrap gap-2 p-4 bg-accent/30 rounded-lg border border-border">
                     {payoutMethods.map((method: string) => (
@@ -766,7 +759,7 @@ const onError = (errors: FieldErrors<ProgramFormData>) => {
                     No payout methods added yet
                   </div>
                 )}
-                
+
                 {errors.payoutMethods && (
                   <p className="text-sm text-destructive">
                     {errors.payoutMethods.message}
@@ -794,13 +787,13 @@ const onError = (errors: FieldErrors<ProgramFormData>) => {
                   { name: "newsTrading", label: "News Trading Allowed" },
                   { name: "copyTrading", label: "Copy Trading Allowed" },
                   { name: "refundFee", label: "Refundable Fee" },
-                ]as const).map((rule) => (
+                ] as const).map((rule) => (
                   <div
                     key={rule.name}
                     className="flex items-start space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors"
                   >
                     <Controller
-                      name={rule.name }
+                      name={rule.name}
                       control={control}
                       render={({ field }) => (
                         <Checkbox

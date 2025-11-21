@@ -26,6 +26,8 @@ export const firmDetailsSchema = z.object({
   officialWebsite: z.string().url("Invalid URL").optional().or(z.literal("")),
   brokers: z.array(z.string()).optional(),
   liquidityProviders: z.array(z.string()).optional(),
+  totalPayout: z.string().optional(),
+  slug: z.string().optional(),
 });
 
 export const leadershipMemberSchema = z.object({

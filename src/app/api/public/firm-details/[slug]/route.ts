@@ -6,20 +6,16 @@ import FundingFirm from "@/models/FirmDetails";
 
 export async function GET(
     request: NextRequest,
-    context: { params: Promise<{ id: string }> }
+    context: { params: Promise<{ slug: string }> }
 ) {
     try {
         await connectDB();
 
-        const { id } = await context.params;
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return NextResponse.json(
-                { success: false, message: "Invalid firm ID" },
-                { status: 400 }
-            );
-        }
-
-        const existingFirm = await FundingFirm.findById(id);
+        const { slug } = await context.params;
+        const existingFirm = await FundingFirm.findOne({
+            "firmDetails.slug": slug,
+        });
+        console.log("existingFirm", existingFirm)
         if (!existingFirm) {
             return NextResponse.json(
                 { success: false, message: "Firm not found" },
@@ -28,7 +24,7 @@ export async function GET(
         }
 
         const result = await FundingFirm.aggregate([
-            { $match: { _id: new mongoose.Types.ObjectId(id) } },
+            { $match: { _id: new mongoose.Types.ObjectId(existingFirm._id) } },
             {
                 $lookup: {
                     from: "programs",

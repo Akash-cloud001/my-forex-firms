@@ -79,6 +79,8 @@ export default function FundingFirmForm({
       officialWebsite: "",
       brokers: [],
       liquidityProviders: [],
+      totalPayout: "",
+      slug: "",
     },
     leadership: {
       leadership: [],
@@ -229,7 +231,7 @@ export default function FundingFirmForm({
       }
     });
 
-    console.log("🚀 ~ FundingFirmForm ~ formData:", formData)
+    // console.log("🚀 ~ FundingFirmForm ~ formData:", formData)
     try {
       const url = isEditMode ? `/api/admin/firm/${firmId}` : "/api/admin/firm";
       const method = isEditMode ? "PUT" : "POST";
@@ -295,11 +297,10 @@ export default function FundingFirmForm({
 
           {submitStatus && (
             <Alert
-              className={`mb-6 ${
-                submitStatus.type === "success"
-                  ? "bg-green-50 border-green-200"
-                  : "bg-red-50 border-red-200"
-              }`}
+              className={`mb-6 ${submitStatus.type === "success"
+                ? "bg-green-50 border-green-200"
+                : "bg-red-50 border-red-200"
+                }`}
             >
               <AlertDescription
                 className={
@@ -339,23 +340,21 @@ export default function FundingFirmForm({
                       <button
                         type="button"
                         onClick={() => handleStepChange(step.id)}
-                        className={`w-full text-left p-3 rounded-lg transition-colors ${
-                          currentStep === step.id
-                            ? "bg-sidebar-ring text-white"
-                            : completedSteps.includes(step.id)
+                        className={`w-full text-left p-3 rounded-lg transition-colors ${currentStep === step.id
+                          ? "bg-sidebar-ring text-white"
+                          : completedSteps.includes(step.id)
                             ? "bg-primary/10 text-primary"
                             : "bg-primary/10 hover:bg-primary/10 text-white"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center space-x-3">
                           <span
-                            className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
-                              completedSteps.includes(step.id)
-                                ? "bg-primary/30 text-white"
-                                : currentStep === step.id
+                            className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${completedSteps.includes(step.id)
+                              ? "bg-primary/30 text-white"
+                              : currentStep === step.id
                                 ? "bg-white text-blue-600"
                                 : "bg-gray-300 text-gray-600"
-                            }`}
+                              }`}
                           >
                             {completedSteps.includes(step.id) ? (
                               <Check className="h-4 w-4" />

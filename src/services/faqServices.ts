@@ -14,6 +14,7 @@ export interface IFaqCategory {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  totalFaq?: number;
 }
 
 export interface IFaq {
