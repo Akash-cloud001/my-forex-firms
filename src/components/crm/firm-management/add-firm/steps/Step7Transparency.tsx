@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
-export function Step7Transparency({ onNext, onPrevious }:StepProps) {
+export function Step7Transparency({ onNext, onPrevious }: StepProps) {
   const { register, watch, setValue } = useFormContext();
 
   const toggles = [
@@ -40,24 +40,7 @@ export function Step7Transparency({ onNext, onPrevious }:StepProps) {
         ))}
       </Card>
 
-      <div>
-        <Label>Transparency Score (0-10)</Label>
-        <div className="flex items-center gap-3 mt-2">
-          <input
-            type="range"
-            min="0"
-            max="10"
-            value={watch('transparency.transparencyScore') || 0}
-            onChange={(e) =>
-              setValue('transparency.transparencyScore', parseInt(e.target.value))
-            }
-            className="flex-1"
-          />
-          <span className="w-8 text-center font-semibold">
-            {watch('transparency.transparencyScore') || 0}
-          </span>
-        </div>
-      </div>
+
 
       <div className="space-y-2">
         <Label>Notes</Label>

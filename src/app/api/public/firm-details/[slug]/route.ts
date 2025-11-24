@@ -15,7 +15,6 @@ export async function GET(
         const existingFirm = await FundingFirm.findOne({
             "firmDetails.slug": slug,
         });
-        console.log("existingFirm", existingFirm)
         if (!existingFirm) {
             return NextResponse.json(
                 { success: false, message: "Firm not found" },
@@ -25,14 +24,14 @@ export async function GET(
 
         const result = await FundingFirm.aggregate([
             { $match: { _id: new mongoose.Types.ObjectId(existingFirm._id) } },
-            {
-                $lookup: {
-                    from: "programs",
-                    localField: "_id",
-                    foreignField: "propFirmId",
-                    as: "programs",
-                },
-            },
+            // {
+            //     $lookup: {
+            //         from: "programs",
+            //         localField: "_id",
+            //         foreignField: "propFirmId",
+            //         as: "programs",
+            //     },
+            // },
             {
                 $lookup: {
                     from: "firmrules",
@@ -43,7 +42,7 @@ export async function GET(
             },
             {
                 $addFields: {
-                    totalPrograms: { $size: "$programs" },
+                    // totalPrograms: { $size: "$programs" },
                     totalCategories: {
                         $cond: [
                             { $gt: [{ $size: "$firmRules" }, 0] },

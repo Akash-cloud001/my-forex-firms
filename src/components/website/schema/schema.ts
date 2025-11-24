@@ -5,15 +5,16 @@ export const reviewFormSchema = z.object({
   firmName: z.string().min(1, 'Please select a firm'),
   firmId: z.string().optional(),
   customFirmName: z.string().optional(),
-  issueType: z.string().min(1, 'Please select an issue type'),
+  issueCategory: z.string().min(1, 'Please select an issue category'),
+  issueSubCategory: z.string().min(1, 'Please select a specific issue'),
   customIssueType: z.string().optional(),
   description: z.string()
     .min(DESCRIPTION_CONFIG.minLength, `Description must be at least ${DESCRIPTION_CONFIG.minLength} characters`)
     .max(DESCRIPTION_CONFIG.maxLength, `Description must be less than ${DESCRIPTION_CONFIG.maxLength} characters`),
-  rating: z.number().min(1, 'Please provide a rating').max(5),
+  // rating: z.number().min(1, 'Please provide a rating').max(5),
   files: z.array(z.any()).optional()
 }).refine((data) => {
-  if (data.issueType === 'other' && (!data.customIssueType || data.customIssueType.trim().length === 0)) {
+  if (data.issueSubCategory.startsWith('other-') && (!data.customIssueType || data.customIssueType.trim().length === 0)) {
     return false
   }
   return true

@@ -96,7 +96,6 @@ export const transparencySchema = z.object({
   payoutProofPublic: z.boolean().default(false),
   thirdPartyAudit: z.boolean().default(false),
   notes: z.string().optional(),
-  transparencyScore: z.number().min(0).max(10).optional(),
 });
 
 export const leverageMatrixSchema = z.record(

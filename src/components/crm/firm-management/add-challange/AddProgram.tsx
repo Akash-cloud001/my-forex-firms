@@ -427,7 +427,6 @@ const ProgramForm = ({ programId }: { programId?: string }) => {
                   <Label htmlFor="evaluationPhases">Evaluation Phases *</Label>
                   <Input
                     id="evaluationPhases"
-                    type="number"
                     {...register("evaluationPhases", { valueAsNumber: true })}
                     placeholder="Number of phases"
                   />
@@ -877,7 +876,6 @@ const ProgramForm = ({ programId }: { programId?: string }) => {
                 <div className="space-y-2">
                   <Label>Min Trading Days (Legacy)</Label>
                   <Input
-                    type="number"
                     {...register("minTradingDays", { valueAsNumber: true })}
                     placeholder="e.g., 5"
                   />

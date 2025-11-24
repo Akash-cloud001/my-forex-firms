@@ -111,7 +111,6 @@ export default function FundingFirmForm({
       payoutProofPublic: false,
       thirdPartyAudit: false,
       notes: "",
-      transparencyScore: undefined,
     },
     trading: {
       leverageMatrix: {},

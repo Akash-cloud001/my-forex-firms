@@ -28,6 +28,7 @@ export interface IRating {
 }
 
 export interface IFundingFirm extends Document {
+  _id: string;
   firmDetails: {
     name: string;
     image?: {
@@ -86,7 +87,6 @@ export interface IFundingFirm extends Document {
     payoutProofPublic: boolean;
     thirdPartyAudit: boolean;
     notes?: string;
-    transparencyScore?: number;
   };
 
   trading: {
@@ -203,7 +203,6 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
       payoutProofPublic: { type: Boolean, default: false },
       thirdPartyAudit: { type: Boolean, default: false },
       notes: String,
-      transparencyScore: { type: Number, min: 0, max: 10 },
     },
 
     trading: {

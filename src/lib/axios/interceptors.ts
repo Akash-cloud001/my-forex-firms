@@ -5,6 +5,11 @@ export interface ApiError {
     status?: number;
 }
 
+interface ErrorResponseData {
+    message?: string;
+    error?: string;
+}
+
 export const setupInterceptors = (instance: AxiosInstance): void => {
     // REQUEST
     instance.interceptors.request.use(
@@ -22,10 +27,11 @@ export const setupInterceptors = (instance: AxiosInstance): void => {
     instance.interceptors.response.use(
         (response: AxiosResponse) => response.data,
         (error: AxiosError) => {
+            const data = error.response?.data as ErrorResponseData | undefined;
             const err: ApiError = {
                 message:
-                    (error.response?.data as any)?.message ||
-                    (error.response?.data as any)?.error ||
+                    data?.message ||
+                    data?.error ||
                     error.message ||
                     "Unknown error",
                 status: error.response?.status,
