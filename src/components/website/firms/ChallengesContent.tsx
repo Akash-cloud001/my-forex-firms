@@ -119,34 +119,34 @@ const ChallengesContent = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-foreground/20 ">
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground flex items-center relative">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground flex items-center relative">
                   CHALLENGE
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground ">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground ">
                   STEPS
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground ">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground ">
                   ACCOUNT SIZE
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground ">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground ">
                   FEE
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground ">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground ">
                   PROFIT TARGET
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground ">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground ">
                   PROFIT SPLIT
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground ">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground ">
                   LEVERAGE
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground ">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground ">
                   MAX LOSS
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground">
                   DAILY LOSS
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground w-10">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground w-10">
                   {/* Empty header for chevron */}
                 </th>
               </tr>
@@ -155,7 +155,7 @@ const ChallengesContent = () => {
               {isLoading ? (
                 // Skeleton rows
                 Array.from({ length: 5 }).map((_, index) => (
-                  <tr key={index} className="border-b border-foreground/20">
+                  <tr key={index} className={`border-b border-foreground/20 w-full ${index === 4 ? 'last:border-b-0' : ''}`}>
                     <td className="px-4 py-4">
                       <Skeleton className="h-4 w-32" />
                     </td>
