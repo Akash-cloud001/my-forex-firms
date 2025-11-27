@@ -287,11 +287,11 @@ export async function PUT(
             (acc, curr) =>
               acc && typeof acc === "object" && curr in acc
                 ? (
-                    acc as Record<
-                      string,
-                      string | number | boolean | object | null
-                    >
-                  )[curr]
+                  acc as Record<
+                    string,
+                    string | number | boolean | object | null
+                  >
+                )[curr]
                 : null,
             obj
           );

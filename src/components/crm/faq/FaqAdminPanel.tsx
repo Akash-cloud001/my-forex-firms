@@ -12,10 +12,10 @@ import { createCategory, createFaq, deleteCategory, deleteFaq, getAllCategories,
 
 export default function FAQAdminPanel() {
   const [categories, setCategories] = useState<(IFaqCategory & { faqs: IFaq[] })[]>([
-   
+
   ]);
-const [loading,setLoading] = useState(false)
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('1');
+  const [loading, setLoading] = useState(false)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryModal, setCategoryModal] = useState<{
     isOpen: boolean;
@@ -28,7 +28,7 @@ const [loading,setLoading] = useState(false)
     data?: Partial<FaqFormData>;
     faqId?: string;
   }>({ isOpen: false, mode: 'create' });
- useEffect(() => {
+  useEffect(() => {
     fetchCategories();
   }, []);
 
@@ -39,7 +39,7 @@ const [loading,setLoading] = useState(false)
     }
   }, [selectedCategoryId]);
 
-  
+
   const fetchCategories = async () => {
     try {
       setLoading(true);
@@ -67,9 +67,9 @@ const [loading,setLoading] = useState(false)
     }
   };
 
-  
 
- const handleCategorySubmit = async (data: CategoryFormData) => {
+
+  const handleCategorySubmit = async (data: CategoryFormData) => {
     if (categoryModal.mode === "create") {
       const newCategory = await createCategory(data);
       setCategories((prev) => [...prev, { ...newCategory, faqs: [] }]);
@@ -91,7 +91,7 @@ const [loading,setLoading] = useState(false)
       setCategories((prev) =>
         prev.map((cat) =>
           cat._id === selectedCategoryId
-            ? { ...cat, faqs: [...cat.faqs, newFaq] }
+            ? { ...cat, faqs: [...cat.faqs, newFaq], totalFaq: (cat.totalFaq || 0) + 1 }
             : cat
         )
       );
@@ -101,20 +101,20 @@ const [loading,setLoading] = useState(false)
         prev.map((cat) =>
           cat._id === selectedCategoryId
             ? {
-                ...cat,
-                faqs: cat.faqs.map((faq) =>
-                  faq._id === faqModal.faqId ? updated : faq
-                ),
-              }
+              ...cat,
+              faqs: cat.faqs.map((faq) =>
+                faq._id === faqModal.faqId ? updated : faq
+              ),
+            }
             : cat
         )
       );
     }
   };
 
- const handleDeleteCategory = async (categoryId: string) => {
+  const handleDeleteCategory = async (categoryId: string) => {
     if (!window.confirm("Are you sure you want to delete this category?")) return;
-    
+
     await deleteCategory(categoryId);
     setCategories((prev) => prev.filter((cat) => cat._id !== categoryId));
     if (selectedCategoryId === categoryId) {
@@ -124,17 +124,17 @@ const [loading,setLoading] = useState(false)
 
   const handleDeleteFaq = async (faqId: string) => {
     if (!window.confirm("Are you sure you want to delete this FAQ?")) return;
-    
+
     await deleteFaq(faqId);
     setCategories((prev) =>
       prev.map((cat) =>
         cat._id === selectedCategoryId
-          ? { ...cat, faqs: cat.faqs.filter((faq) => faq._id !== faqId) }
+          ? { ...cat, faqs: cat.faqs.filter((faq) => faq._id !== faqId), totalFaq: Math.max(0, (cat.totalFaq || 0) - 1) }
           : cat
       )
     );
   };
-const currentCategory = categories.find((cat) => cat._id === selectedCategoryId);
+  const currentCategory = categories.find((cat) => cat._id === selectedCategoryId);
   const displayFaqs =
     currentCategory?.faqs.filter(
       (faq) =>
@@ -197,7 +197,7 @@ const currentCategory = categories.find((cat) => cat._id === selectedCategoryId)
                       key={category._id}
                       category={category}
                       isSelected={selectedCategoryId === category._id}
-                      faqCount={category.faqs.length}
+                      faqCount={category.totalFaq ?? category.faqs.length}
                       onClick={() => setSelectedCategoryId(category._id)}
                     />
                   ))

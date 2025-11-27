@@ -1,5 +1,5 @@
 "use client";
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle } from "lucide-react";
@@ -15,15 +15,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { createReview } from "@/lib/reviewApi";
 import { ReviewFormData } from "../types/types";
 import { reviewFormSchema } from "../schema/schema";
-import { ISSUE_TYPES, DESCRIPTION_CONFIG } from "../constant/constants";
+import { ISSUE_CATEGORIES, DESCRIPTION_CONFIG } from "../constant/constants";
 import { StarRating } from "./StarRating";
 import { FileUpload } from "./FileUpload";
-import { FirmSelector } from "./FirmSelector";
 import { IssueTypeSelector } from "./IssueTypeSelector";
 import { SuccessModal, ErrorModal } from "./ReviewModals";
+import { FirmSelector } from "./FirmSelector";
 
 export const ReviewForm: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -50,40 +49,60 @@ export const ReviewForm: React.FC = () => {
       firmName: "",
       firmId: "",
       customFirmName: "",
-      issueType: "",
+      issueCategory: "",
+      issueSubCategory: "",
       customIssueType: "",
       description: "",
-      rating: 0,
+      // rating: 0,
       files: [],
     },
   });
 
-  const watchedRating = watch("rating");
+  // const watchedRating = watch("rating");
   const watchedDescription = watch("description");
-  const watchedIssueType = watch("issueType");
+  const watchedIssueCategory = watch("issueCategory");
+  const watchedIssueSubCategory = watch("issueSubCategory");
   const watchedFirmName = watch("firmName");
 
   const onSubmit = async (data: ReviewFormData) => {
     setIsSubmittingForm(true);
     try {
-      const reviewData = {
-        ...data,
-        files: selectedFiles,
-      };
+      const formData = new FormData();
 
-      const result = await createReview(reviewData);
-      console.log("Review created:", result);
+      // Append all form fields
+      formData.append('firmName', data.firmName);
+      if (data.firmId) formData.append('firmId', data.firmId);
+      if (data.customFirmName) formData.append('customFirmName', data.customFirmName);
+      formData.append('issueCategory', data.issueCategory);
+      // Map issueSubCategory to issueType for backend
+      formData.append('issueType', data.issueSubCategory);
+      if (data.customIssueType) formData.append('customIssueType', data.customIssueType);
+      formData.append('description', data.description);
+      // Default rating to 1 for now as it's commented out in schema
+      formData.append('rating', '1');
+
+      // Append files
+      selectedFiles.forEach((file) => {
+        formData.append('files', file);
+      });
+      console.log(formData, "formData")
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit review');
+      }
 
       setShowThankYouModal(true);
       reset();
       setSelectedFiles([]);
+      setSelectedFirm({ name: "" }); // Reset firm selector
     } catch (error) {
       console.error("Error submitting review:", error);
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "An unexpected error occurred. Please try again."
-      );
+      setErrorMessage(error instanceof Error ? error.message : "An unexpected error occurred.");
       setShowErrorModal(true);
     } finally {
       setIsSubmittingForm(false);
@@ -135,16 +154,22 @@ export const ReviewForm: React.FC = () => {
               </div>
             )}
 
+
             {/* Issue Type Selection */}
             <IssueTypeSelector
-              value={watchedIssueType}
-              onChange={(value) => setValue("issueType", value)}
-              error={errors.issueType?.message}
-              issueTypes={ISSUE_TYPES}
+              issueCategories={ISSUE_CATEGORIES}
+              selectedCategory={watchedIssueCategory}
+              selectedSubCategory={watchedIssueSubCategory}
+              onCategoryChange={(val) => {
+                setValue("issueCategory", val);
+                setValue("issueSubCategory", ""); // Reset sub-category when category changes
+              }}
+              onSubCategoryChange={(val) => setValue("issueSubCategory", val)}
+              error={errors.issueCategory?.message || errors.issueSubCategory?.message}
             />
 
             {/* Custom Issue Type Input */}
-            {watchedIssueType === "other" && (
+            {watchedIssueSubCategory.startsWith("other-") && (
               <div className="space-y-2">
                 <Label
                   htmlFor="customIssueType"
@@ -152,7 +177,7 @@ export const ReviewForm: React.FC = () => {
                 >
                   Please specify the issue type *
                 </Label>
-                <Input
+                <Textarea
                   id="customIssueType"
                   placeholder="Enter the specific issue type..."
                   className={cn(errors.customIssueType && "border-destructive")}
@@ -214,7 +239,7 @@ export const ReviewForm: React.FC = () => {
               )}
             </div>
 
-            {/* Rating */}
+            {/* Rating
             <div className="space-y-3">
               <Label className="text-base font-semibold">
                 Overall Rating *
@@ -224,7 +249,7 @@ export const ReviewForm: React.FC = () => {
                 onChange={(rating) => setValue("rating", rating)}
                 error={errors.rating?.message}
               />
-            </div>
+            </div> */}
 
             {/* File Upload */}
             <div className="space-y-3">

@@ -59,6 +59,12 @@ const adminNavigationItems = [
     hasSubmenu: false,
   },
   {
+    title: "Point Evaluation",
+    url: "/admin/point-evaluation",
+    icon: Mail,
+    hasSubmenu: false,
+  },
+  {
     title: "Penalties",
     url: "/admin/penalties",
     icon: ShieldAlert,
@@ -81,7 +87,7 @@ const adminNavigationItems = [
     url: "/admin/newsletter",
     icon: Mail,
     hasSubmenu: false,
-  },  
+  },
   {
     title: "Live Firms",
     url: "/admin/live-firms",
@@ -136,10 +142,10 @@ const editorNavigationItems = [
 export default function AppSidebar() {
   const { state } = useSidebar()
   const pathname = usePathname();
-  const router = useRouter(); 
+  const router = useRouter();
   const { user, isLoaded } = useUser();
   const [openSubmenus, setOpenSubmenus] = React.useState<Record<string, boolean>>({});
-  
+
   // Get user role and select appropriate navigation array
   const userRole = user?.publicMetadata?.role as string | undefined;
   const navigationItems = React.useMemo(() => {
@@ -152,7 +158,7 @@ export default function AppSidebar() {
     // Default to admin navigation if role is not recognized
     return adminNavigationItems;
   }, [isLoaded, userRole]);
-  
+
   const toggleSubmenu = (itemUrl: string) => {
     setOpenSubmenus(prev => ({
       ...prev,
@@ -165,7 +171,7 @@ export default function AppSidebar() {
     navigationItems.forEach(item => {
       const submenu = (item as unknown as { submenu?: Array<{ url: string }> }).submenu;
       if (item.hasSubmenu && submenu) {
-        const isOnSubmenuRoute = submenu.some(subItem => 
+        const isOnSubmenuRoute = submenu.some(subItem =>
           pathname === subItem.url || pathname.startsWith(subItem.url + '/')
         );
         if (isOnSubmenuRoute && !openSubmenus[item.url]) {
@@ -177,7 +183,7 @@ export default function AppSidebar() {
       }
     });
   }, [pathname, openSubmenus, navigationItems]);
-  
+
   return (
     <Sidebar className="bg-background border-r border-sidebar-border" collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
@@ -186,12 +192,12 @@ export default function AppSidebar() {
             <Image src="/logo.png" alt="My Forex Firms" fill className="object-contain" />
           </div>}
           {state === "expanded" && <div className={`${state !== "expanded" ? "w-0" : "w-full"} relative transition-all duration-200 flex items-start justify-start text-primary font-bold overflow-hidden text-sm h-5 `}>
-          <Image src="/my-forex-firms-full.png" alt="My Forex Firms" fill className="object-contain object-left" />
+            <Image src="/my-forex-firms-full.png" alt="My Forex Firms" fill className="object-contain object-left" />
 
           </div>}
         </div>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -202,173 +208,171 @@ export default function AppSidebar() {
             ) : (
               <SidebarMenu className="mt-4">
                 {navigationItems.map((item) => {
-                const Icon = item.icon;
-                const isSubmenuOpen = openSubmenus[item.url];
-                
-                // For items with submenus, only highlight if we're on the exact parent route
-                // or if we're on a submenu route (but don't highlight the parent if we're on a submenu)
-                const isParentActive = item.hasSubmenu ? pathname === item.url : false;
-                
-                // Check if any submenu item is active for parent highlighting
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const hasActiveSubmenu = item.hasSubmenu && (item as any).submenu?.some((subItem: { url: string }) => 
-                  pathname === subItem.url || pathname.startsWith(subItem.url + '/')
-                );
-                
-                // For items without submenus, use normal active detection
-                const isActive = !item.hasSubmenu && (pathname === item.url || pathname.startsWith(item.url + '/'));
-                
-                const menuButton = item.hasSubmenu ? (
-                  <SidebarMenuButton 
-                    onClick={() => toggleSubmenu(item.url)}
-                    isActive={isParentActive || hasActiveSubmenu}
-                    className={`hover:bg-accent/50! ${(isParentActive || hasActiveSubmenu) ? "bg-accent! text-primary!" : ""}`}
-                  >
-                    <Icon className="h-4 w-4 text-current" />
-                    {state === "expanded" && (
-                      <>
-                        <span>{item.title}</span>
-                        <ChevronDown 
-                          className={`h-4 w-4 ml-auto transition-transform duration-200 ${
-                            isSubmenuOpen ? "rotate-180" : ""
-                          }`} 
-                        />
-                      </>
-                    )}
-                  </SidebarMenuButton>
-                ) : (
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={isActive}
-                    className={` hover:bg-accent/50! ${isActive ? "bg-accent! text-primary!" : ""}`}
-                  >
-                    <Link href={item.url}>
+                  const Icon = item.icon;
+                  const isSubmenuOpen = openSubmenus[item.url];
+
+                  // For items with submenus, only highlight if we're on the exact parent route
+                  // or if we're on a submenu route (but don't highlight the parent if we're on a submenu)
+                  const isParentActive = item.hasSubmenu ? pathname === item.url : false;
+
+                  // Check if any submenu item is active for parent highlighting
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const hasActiveSubmenu = item.hasSubmenu && (item as any).submenu?.some((subItem: { url: string }) =>
+                    pathname === subItem.url || pathname.startsWith(subItem.url + '/')
+                  );
+
+                  // For items without submenus, use normal active detection
+                  const isActive = !item.hasSubmenu && (pathname === item.url || pathname.startsWith(item.url + '/'));
+
+                  const menuButton = item.hasSubmenu ? (
+                    <SidebarMenuButton
+                      onClick={() => toggleSubmenu(item.url)}
+                      isActive={isParentActive || hasActiveSubmenu}
+                      className={`hover:bg-accent/50! ${(isParentActive || hasActiveSubmenu) ? "bg-accent! text-primary!" : ""}`}
+                    >
                       <Icon className="h-4 w-4 text-current" />
-                      {state === "expanded" && <span>{item.title}</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                );
-                
-                return (
-                  <SidebarMenuItem key={item.url}>
-                    {state !== "expanded" ? (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          {menuButton}
-                        </TooltipTrigger>
-                        <TooltipContent side="right">
-                          {item.title}
-                        </TooltipContent>
-                      </Tooltip>
-                    ) : (
-                      menuButton
-                    )}
-                    {item.hasSubmenu && state === "expanded" && isSubmenuOpen && (
-                      <SidebarMenuSub>
-                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        {(item as any).submenu?.map((subItem: any) => {
-                          // More precise active detection for submenu items
-                          // For analytics, only highlight exact matches to prevent multi-selection
-                          let isSubActive = false;
-                          
-                          if (subItem.url === '/owner/analytics') {
-                            // Only highlight Overview if we're exactly on /owner/analytics
-                            isSubActive = pathname === '/owner/analytics';
-                          } else if (subItem.url === '/owner/analytics/advanced') {
-                            // Only highlight Advanced if we're on /owner/analytics/advanced or its sub-routes
-                            isSubActive = pathname === '/owner/analytics/advanced' || pathname.startsWith('/owner/analytics/advanced/');
-                          } else {
-                            // For other submenu items, use the original logic
-                            isSubActive = pathname === subItem.url || 
-                              (pathname.startsWith(subItem.url + '/') && 
-                               subItem.url !== '/owner/inventory' && 
-                               subItem.url !== '/owner/leads');
-                          }
-                          const SubIcon = subItem.icon;
-                          const isSubSubmenuOpen = openSubmenus[subItem.url];
-                          const hasActiveSubSubmenu = subItem.hasSubmenu && subItem.submenu?.some((subSubItem: { url: string }) => 
-                            pathname === subSubItem.url || pathname.startsWith(subSubItem.url + '/')
-                          );
-                          
-                          return (
-                            <SidebarMenuSubItem key={subItem.url}>
-                              {subItem.hasSubmenu ? (
-                                <SidebarMenuSubButton 
-                                  onClick={() => toggleSubmenu(subItem.url)}
-                                  isActive={hasActiveSubSubmenu}
-                                  className={`hover:!bg-accent/50 whitespace-nowrap ${hasActiveSubSubmenu ? "!bg-accent !text-primary" : ""}`}
-                                >
-                                  <SubIcon className="h-4 w-4 text-current" />
-                                  {subItem.title}
-                                  <ChevronDown 
-                                    className={`h-4 w-4 ml-auto transition-transform duration-200 ${
-                                      isSubSubmenuOpen ? "rotate-180" : ""
-                                    }`} 
-                                  />
-                                </SidebarMenuSubButton>
-                              ) : (
-                                <SidebarMenuSubButton 
-                                  asChild 
-                                  isActive={isSubActive} 
-                                  className={`hover:!bg-accent/50 ${isSubActive ? "!bg-accent !text-primary" : ""}`}
-                                >
-                                  <Link href={subItem.url}>
+                      {state === "expanded" && (
+                        <>
+                          <span>{item.title}</span>
+                          <ChevronDown
+                            className={`h-4 w-4 ml-auto transition-transform duration-200 ${isSubmenuOpen ? "rotate-180" : ""
+                              }`}
+                          />
+                        </>
+                      )}
+                    </SidebarMenuButton>
+                  ) : (
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      className={` hover:bg-accent/50! ${isActive ? "bg-accent! text-primary!" : ""}`}
+                    >
+                      <Link href={item.url}>
+                        <Icon className="h-4 w-4 text-current" />
+                        {state === "expanded" && <span>{item.title}</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  );
+
+                  return (
+                    <SidebarMenuItem key={item.url}>
+                      {state !== "expanded" ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            {menuButton}
+                          </TooltipTrigger>
+                          <TooltipContent side="right">
+                            {item.title}
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        menuButton
+                      )}
+                      {item.hasSubmenu && state === "expanded" && isSubmenuOpen && (
+                        <SidebarMenuSub>
+                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                          {(item as any).submenu?.map((subItem: any) => {
+                            // More precise active detection for submenu items
+                            // For analytics, only highlight exact matches to prevent multi-selection
+                            let isSubActive = false;
+
+                            if (subItem.url === '/owner/analytics') {
+                              // Only highlight Overview if we're exactly on /owner/analytics
+                              isSubActive = pathname === '/owner/analytics';
+                            } else if (subItem.url === '/owner/analytics/advanced') {
+                              // Only highlight Advanced if we're on /owner/analytics/advanced or its sub-routes
+                              isSubActive = pathname === '/owner/analytics/advanced' || pathname.startsWith('/owner/analytics/advanced/');
+                            } else {
+                              // For other submenu items, use the original logic
+                              isSubActive = pathname === subItem.url ||
+                                (pathname.startsWith(subItem.url + '/') &&
+                                  subItem.url !== '/owner/inventory' &&
+                                  subItem.url !== '/owner/leads');
+                            }
+                            const SubIcon = subItem.icon;
+                            const isSubSubmenuOpen = openSubmenus[subItem.url];
+                            const hasActiveSubSubmenu = subItem.hasSubmenu && subItem.submenu?.some((subSubItem: { url: string }) =>
+                              pathname === subSubItem.url || pathname.startsWith(subSubItem.url + '/')
+                            );
+
+                            return (
+                              <SidebarMenuSubItem key={subItem.url}>
+                                {subItem.hasSubmenu ? (
+                                  <SidebarMenuSubButton
+                                    onClick={() => toggleSubmenu(subItem.url)}
+                                    isActive={hasActiveSubSubmenu}
+                                    className={`hover:!bg-accent/50 whitespace-nowrap ${hasActiveSubSubmenu ? "!bg-accent !text-primary" : ""}`}
+                                  >
                                     <SubIcon className="h-4 w-4 text-current" />
                                     {subItem.title}
-                                  </Link>
-                                </SidebarMenuSubButton>
-                              )}
-                              
-                              {/* Nested submenu rendering */}
-                              {subItem.hasSubmenu && isSubSubmenuOpen && (
-                                <SidebarMenuSub>
-                                  {subItem.submenu?.map((subSubItem: { url: string; title: string; icon: React.ComponentType<{ className?: string }> }) => {
-                                    const isSubSubActive = pathname === subSubItem.url || pathname.startsWith(subSubItem.url + '/');
-                                    const SubSubIcon = subSubItem.icon;
-                                    return (
-                                      <SidebarMenuSubItem key={subSubItem.url}>
-                                        <SidebarMenuSubButton 
-                                          asChild 
-                                          isActive={isSubSubActive} 
-                                          className={`hover:!bg-accent/50 w-full whitespace-nowrap text-xs ${isSubSubActive ? "!bg-accent !text-primary" : ""}`}
-                                        >
-                                          <Link href={subSubItem.url} className="w-full">
-                                            <SubSubIcon className="h-3 w-3 text-current" />
-                                            {subSubItem.title}
-                                          </Link>
-                                        </SidebarMenuSubButton>
-                                      </SidebarMenuSubItem>
-                                    );
-                                  })}
-                                </SidebarMenuSub>
-                              )}
-                            </SidebarMenuSubItem>
-                          );
-                        })}
-                      </SidebarMenuSub>
-                    )}
-                  </SidebarMenuItem>
-                );
-              })}
+                                    <ChevronDown
+                                      className={`h-4 w-4 ml-auto transition-transform duration-200 ${isSubSubmenuOpen ? "rotate-180" : ""
+                                        }`}
+                                    />
+                                  </SidebarMenuSubButton>
+                                ) : (
+                                  <SidebarMenuSubButton
+                                    asChild
+                                    isActive={isSubActive}
+                                    className={`hover:!bg-accent/50 ${isSubActive ? "!bg-accent !text-primary" : ""}`}
+                                  >
+                                    <Link href={subItem.url}>
+                                      <SubIcon className="h-4 w-4 text-current" />
+                                      {subItem.title}
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                )}
+
+                                {/* Nested submenu rendering */}
+                                {subItem.hasSubmenu && isSubSubmenuOpen && (
+                                  <SidebarMenuSub>
+                                    {subItem.submenu?.map((subSubItem: { url: string; title: string; icon: React.ComponentType<{ className?: string }> }) => {
+                                      const isSubSubActive = pathname === subSubItem.url || pathname.startsWith(subSubItem.url + '/');
+                                      const SubSubIcon = subSubItem.icon;
+                                      return (
+                                        <SidebarMenuSubItem key={subSubItem.url}>
+                                          <SidebarMenuSubButton
+                                            asChild
+                                            isActive={isSubSubActive}
+                                            className={`hover:!bg-accent/50 w-full whitespace-nowrap text-xs ${isSubSubActive ? "!bg-accent !text-primary" : ""}`}
+                                          >
+                                            <Link href={subSubItem.url} className="w-full">
+                                              <SubSubIcon className="h-3 w-3 text-current" />
+                                              {subSubItem.title}
+                                            </Link>
+                                          </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
+                                      );
+                                    })}
+                                  </SidebarMenuSub>
+                                )}
+                              </SidebarMenuSubItem>
+                            );
+                          })}
+                        </SidebarMenuSub>
+                      )}
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             )}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      
+
       <SidebarFooter className={`"border border-t border-sidebar-border cursor-pointer ${state === "expanded" ? "p-4" : "px-2 py-4"} "`}
-      onClick={() => {
-        router.push("/admin/profile");
-      }}
+        onClick={() => {
+          router.push("/admin/profile");
+        }}
       >
         {state !== "expanded" ? (
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="text-base font-medium flex items-center gap-2 relative">
                 {user?.imageUrl ? (
-                  <Image 
-                    src={user.imageUrl} 
-                    alt={user.fullName || "User"} 
+                  <Image
+                    src={user.imageUrl}
+                    alt={user.fullName || "User"}
                     className="h-8 w-8 rounded-full object-cover"
                     width={32}
                     height={32}
@@ -388,12 +392,12 @@ export default function AppSidebar() {
         ) : (
           <div className="text-base font-medium flex items-center gap-2">
             {user?.imageUrl ? (
-              <Image 
-              src={user.imageUrl} 
-              alt={user.fullName || "User"} 
-              className=" rounded-full object-cover"
-              width={32}
-              height={32}
+              <Image
+                src={user.imageUrl}
+                alt={user.fullName || "User"}
+                className=" rounded-full object-cover"
+                width={32}
+                height={32}
                 priority
               />
             ) : (
