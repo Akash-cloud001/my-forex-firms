@@ -73,7 +73,9 @@ export const initialScoresData = {
 };
 
 
-export const pillarsConfig = [
+import type { Pillar } from './constant.types';
+
+export const pillarsConfig: Pillar[] = [
     {
         id: "credibility",
         name: "Credibility & Transparency",

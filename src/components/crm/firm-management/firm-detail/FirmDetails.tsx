@@ -146,7 +146,7 @@ function FirmDetails({ id }: { id: string }) {
     // Open edit modal or navigate to edit page
     router.push(`/admin/firm-management/${id}/edit-program/${program._id}`);
   };
-
+  console.log(firmData)
   return (
     <div className="min-h-screen bg-background p-6">
       {/* Header */}
@@ -292,6 +292,17 @@ function FirmDetails({ id }: { id: string }) {
                   )}
                 </div>
               </div>
+              <Separator />
+              <div>
+                <label className="text-sm font-medium text-muted-foreground mb-3 block">
+                  Trading platform
+                </label>
+                {firmData?.trading?.tradingPlatforms?.map((platform, index) => (
+                  <p className="font-medium text-white" key={index}>
+                    {platform}
+                  </p>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -313,7 +324,7 @@ function FirmDetails({ id }: { id: string }) {
             </CardHeader>
             <CardContent>
               <div className="space-y-5 mx-auto">
-                {groupedCategories.map((category,idx:number) => (
+                {groupedCategories.map((category, idx: number) => (
                   <Sheet
                     key={category._id}
                     open={openDrawerId === category._id}
@@ -372,22 +383,21 @@ function FirmDetails({ id }: { id: string }) {
                         {category.questions.map((q, idx) => (
                           <div
                             key={q._id}
-                            className={`pb-4 pl-4 ${
-                              idx !== category.questions.length - 1
-                                ? "mb-4"
-                                : ""
-                            }`}
+                            className={`pb-4 pl-4 ${idx !== category.questions.length - 1
+                              ? "mb-4"
+                              : ""
+                              }`}
                           >
                             <div className="flex justify-between items-start gap-4">
                               <div className="flex-1 space-y-2 min-w-0">
                                 <div>
                                   <p className="text-sm font-medium mt-1 text-foreground whitespace-normal wrap-break-word">
-                                  Q{idx + 1}: {q.question}
+                                    Q{idx + 1}: {q.question}
                                   </p>
                                 </div>
                                 <div>
                                   <p className="text-sm text-muted-foreground mt-1 whitespace-normal wrap-break-word">
-                                  {q.answer}
+                                    {q.answer}
                                   </p>
                                 </div>
                               </div>

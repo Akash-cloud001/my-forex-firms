@@ -36,6 +36,7 @@ import {
   Shield,
   MessageCircleQuestionMark,
   Loader2,
+  Book,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -74,6 +75,12 @@ const adminNavigationItems = [
     title: "Affiliate Links",
     url: "/admin/affiliates",
     icon: Link2,
+    hasSubmenu: false,
+  },
+  {
+    title: "Blogs",
+    url: "/admin/blogs",
+    icon: Book,
     hasSubmenu: false,
   },
   {

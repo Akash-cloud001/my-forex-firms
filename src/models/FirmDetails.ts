@@ -51,6 +51,8 @@ export interface IFundingFirm extends Document {
     liquidityProviders?: string[];
     totalPayout?: string;
     slug?: string;
+    brokerBackedType?: string;
+    backedBrokerName?: string;
   };
 
   leadership: {
@@ -100,6 +102,7 @@ export interface IFundingFirm extends Document {
       }
     >;
     commissions?: Record<string, string>;
+    tradingPlatforms?: string[];
   };
 
   payments: {
@@ -140,6 +143,17 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
       liquidityProviders: [{ type: String }],
       totalPayout: { type: String, trim: true },
       slug: { type: String, trim: true },
+      brokerBackedType: {
+        type: String,
+        enum: ["reputed", "new", "no"],
+        default: "no",
+        required: false
+      },
+      backedBrokerName: {
+        type: String,
+        trim: true,
+        required: false
+      },
     },
 
     leadership: {
@@ -216,6 +230,7 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
         },
       },
       commissions: { type: Map, of: String },
+      tradingPlatforms: [String],
     },
 
     payments: {

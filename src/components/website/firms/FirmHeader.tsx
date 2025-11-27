@@ -2,7 +2,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Plus, Check } from 'lucide-react'
+import { Plus, Check, X, Globe } from 'lucide-react'
 import RadarChartComponent from '@/components/ui/RadarChart'
 import { IFundingFirm } from '@/models/FirmDetails'
 import {
@@ -13,7 +13,11 @@ import {
   InstagramIcon,
   DiscordIcon
 } from '@/components/svgs'
+import * as Flags from 'country-flag-icons/react/3x2'
+import countries from 'i18n-iso-countries'
+import enLocale from 'i18n-iso-countries/langs/en.json'
 
+countries.registerLocale(enLocale)
 interface RadarChartData {
   subject: string
   A: number
@@ -35,6 +39,20 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
   factor2,
   factor3
 }) => {
+  const getCountryCode = (name: string) => {
+    // Try to get alpha-2 code from name
+    const code = countries.getAlpha2Code(name, 'en')
+    return code
+  }
+  const renderFlag = (countryName: string) => {
+    const code = getCountryCode(countryName)
+    if (code && code in Flags) {
+      const FlagComponent = Flags[code as keyof typeof Flags]
+      return <FlagComponent className="w-4 h-4 " />
+    }
+    return <Globe className="w-4 h-4 text-foreground/60" />
+  }
+  console.log(firmData);
   return (
     <section className='max-w-7xl mx-auto p-8 card-custom-grad rounded-3xl'>
       <div className="flex items-start justify-between w-full">
@@ -74,39 +92,39 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
               <Image src={"/website/link.svg"} alt="link" width={24} height={24} />
             </Link>
             <div className='font-geist-sans flex items-start justify-center gap-4'>
-              <div className='flex flex-col items-start'>
+              {firmData?.firmDetails?.jurisdiction && <div className='flex flex-col items-start'>
                 <span className='text-xs text-foreground/80'>
                   Jurisdiction
                 </span>
                 <span className='text-base text-foreground font-medium flex items-center gap-1'>
-                  <div className='w-[32px] h-4 bg-red-400'></div> {firmData?.firmDetails.jurisdiction}
+                  { renderFlag(firmData.firmDetails.jurisdiction)} {firmData?.firmDetails?.jurisdiction || 'N/A'}
                 </span>
-              </div>
+              </div>}
 
-              <div className='flex flex-col items-start border-l border-foreground/20 pl-4 '>
+              {firmData?.firmDetails?.yearFounded && <div className='flex flex-col items-start border-l border-foreground/20 pl-4 '>
                 <span className='text-xs text-foreground/80'>
                   Years in Operation
                 </span>
                 <span className='text-base text-foreground font-medium'>
                   {firmData?.firmDetails.yearFounded}
                 </span>
-              </div>
-              <div className='flex flex-col items-start border-l border-foreground/20 pl-4 '>
+              </div>}
+              {firmData?.leadership.leadership?.[0]?.name && <div className='flex flex-col items-start border-l border-foreground/20 pl-4 '>
                 <span className='text-xs text-foreground/80'>
                   CEO
                 </span>
                 <span className='text-base text-foreground font-medium'>
                   {firmData?.leadership.leadership?.[0]?.name}
                 </span>
-              </div>
-              <div className='flex flex-col items-start border-l border-foreground/20 pl-4 '>
+              </div>}
+              {firmData?.firmDetails?.totalPayout && <div className='flex flex-col items-start border-l border-foreground/20 pl-4 '>
                 <span className='text-xs text-foreground/80'>
-                  Reviews
+                  Total Payout
                 </span>
-                <span className='text-base text-foreground font-medium'>
-                  560
+                <span className='text-base text-primary font-bold'>
+                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(firmData?.firmDetails?.totalPayout))}
                 </span>
-              </div>
+              </div>}
             </div>
           </div>
         </div>
@@ -187,42 +205,62 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
         <div className="flex flex-col gap-6">
           {/* Verified Features Section */}
           <div className="flex flex-col gap-3">
-            {firmData?.transparency?.ceoPublic && (
+            {firmData?.transparency?.ceoPublic !== null && firmData?.transparency?.ceoPublic !== undefined && (
               <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded bg-gradient-to-br from-[#F66435] to-[#672611] flex items-center justify-center shrink-0">
-                  <Check className="w-3 h-3 text-white" />
+                <div className={`w-5 h-5 rounded flex items-center justify-center shrink-0 bg-gradient-to-br from-[#F66435] to-[#672611]`}>
+                  {firmData.transparency.ceoPublic ? (
+                    <Check className="w-3 h-3 text-white" />
+                  ) : (
+                    <X className="w-3 h-3 text-white" />
+                  )}
                 </div>
                 <span className="text-foreground/80 text-sm">CEO Publicly Verified</span>
               </div>
             )}
-            {firmData?.transparency?.officeVerified && (
+            {firmData?.transparency?.officeVerified !== null && firmData?.transparency?.officeVerified !== undefined && (
               <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded bg-gradient-to-br from-[#F66435] to-[#672611] flex items-center justify-center shrink-0">
-                  <Check className="w-3 h-3 text-white" />
+                <div className={`w-5 h-5 rounded flex items-center justify-center shrink-0 bg-gradient-to-br from-[#F66435] to-[#672611]`}>
+                  {firmData.transparency.officeVerified ? (
+                    <Check className="w-3 h-3 text-white" />
+                  ) : (
+                    <X className="w-3 h-3 text-white" />
+                  )}
                 </div>
                 <span className="text-foreground/80 text-sm">Office Address Verified</span>
               </div>
             )}
-            {firmData?.transparency?.termsPublicUpdated && (
+            {firmData?.transparency?.termsPublicUpdated !== null && firmData?.transparency?.termsPublicUpdated !== undefined && (
               <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded bg-gradient-to-br from-[#F66435] to-[#672611] flex items-center justify-center shrink-0">
-                  <Check className="w-3 h-3 text-white" />
+                <div className={`w-5 h-5 rounded flex items-center justify-center shrink-0 bg-gradient-to-br from-[#F66435] to-[#672611]`}>
+                  {firmData.transparency.termsPublicUpdated ? (
+                    <Check className="w-3 h-3 text-white" />
+                  ) : (
+                    <X className="w-3 h-3 text-white" />
+                  )}
                 </div>
                 <span className="text-foreground/80 text-sm">Terms Publicly Updated</span>
               </div>
             )}
-            {firmData?.transparency?.payoutProofPublic && (
+            {firmData?.transparency?.payoutProofPublic !== null && firmData?.transparency?.payoutProofPublic !== undefined && (
               <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded bg-gradient-to-br from-[#F66435] to-[#672611] flex items-center justify-center shrink-0">
-                  <Check className="w-3 h-3 text-white" />
+                <div className={`w-5 h-5 rounded flex items-center justify-center shrink-0 bg-gradient-to-br from-[#F66435] to-[#672611]`}>
+                  {firmData.transparency.payoutProofPublic ? (
+                    <Check className="w-3 h-3 text-white" />
+                  ) : (
+                    <X className="w-3 h-3 text-white" />
+                  )}
                 </div>
                 <span className="text-foreground/80 text-sm">Payout Proof Available</span>
               </div>
             )}
-            {firmData?.transparency?.thirdPartyAudit && (
+            {firmData?.transparency?.thirdPartyAudit !== null && firmData?.transparency?.thirdPartyAudit !== undefined && (
               <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded bg-gradient-to-br from-[#F66435] to-[#672611] flex items-center justify-center shrink-0">
-                  <Check className="w-3 h-3 text-white" />
+                <div className={`w-5 h-5 rounded flex items-center justify-center shrink-0 bg-gradient-to-br from-[#F66435] to-[#672611] `}>
+                  {firmData.transparency.thirdPartyAudit ? (
+                    <Check className="w-3 h-3 text-white" />
+                  ) : (
+                    <X className="w-3 h-3 text-white" />
+                  )}
                 </div>
                 <span className="text-foreground/80 text-sm">Third Party Audited</span>
               </div>
@@ -230,10 +268,10 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
           </div>
 
           {/* Socials Available Section */}
-          <div className="border border-border rounded-lg px-6 py-5">
+          {firmData?.socialLinks?.socialLinks && Object.entries(firmData.socialLinks.socialLinks).length > 0 && <div className="border border-border rounded-lg px-6 py-5">
             <h3 className="text-foreground/80 text-sm mb-2 text-center font-medium">Socials Available</h3>
             <div className="flex items-center justify-center gap-3">
-              {firmData?.socialLinks?.socialLinks && Object.entries(firmData.socialLinks.socialLinks).map(([platform, url]) => {
+              {Object.entries(firmData.socialLinks.socialLinks).map(([platform, url]) => {
                 if (!url) return null;
 
                 // Map platform names to icon components
@@ -262,7 +300,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
                 );
               })}
             </div>
-          </div>
+          </div>}
         </div>
       </div>
     </section>

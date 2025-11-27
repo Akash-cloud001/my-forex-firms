@@ -27,6 +27,7 @@ interface FirmDashboardProps {
 const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
   const [isCountriesModalOpen, setIsCountriesModalOpen] = useState(false)
   const [isLanguagesModalOpen, setIsLanguagesModalOpen] = useState(false)
+  const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false)
 
   if (!firmData) {
     return <div className="text-foreground">Loading...</div>
@@ -131,27 +132,27 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
     <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
       {/* Left Panel - Company Information */}
       <div className="border border-border rounded-lg p-6 card-custom-grad space-y-4">
-        <div>
+        {(firmData.firmDetails?.legalEntityName || firmData.firmDetails?.name) && <div>
           <p className="text-xs text-foreground/60 mb-1">Legal Name</p>
           <p className="text-foreground font-medium">{firmData.firmDetails?.legalEntityName || firmData.firmDetails?.name}</p>
-        </div>
+        </div>}
 
-        <div>
+        {firmData.firmDetails?.registrationNumber && <div>
           <p className="text-xs text-foreground/60 mb-1">Registration Number</p>
           <p className="text-foreground font-medium">{firmData.firmDetails?.registrationNumber || 'N/A'}</p>
-        </div>
+        </div>}
 
-        <div>
+        {firmData.firmDetails?.licenseNumber && <div>
           <p className="text-xs text-foreground/60 mb-1">License Number</p>
           <p className="text-foreground font-medium">{firmData.firmDetails?.licenseNumber || 'N/A'}</p>
-        </div>
+        </div>}
 
-        <div>
+        {firmData.firmDetails?.regulator && <div>
           <p className="text-xs text-foreground/60 mb-1">Regulator</p>
           <p className="text-foreground font-medium">{firmData.firmDetails?.regulator || 'N/A'}</p>
-        </div>
+        </div>}
 
-        <div>
+        {firmData.firmDetails?.hqAddress && <div>
           <p className="text-xs text-foreground/60 mb-1">HeadQuarters</p>
           <a
             href={`https://maps.google.com/?q=${encodeURIComponent(firmData.firmDetails?.hqAddress || '')}`}
@@ -161,25 +162,31 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
           >
             {firmData.firmDetails?.hqAddress || 'N/A'}
           </a>
-        </div>
+        </div>}
 
-        <div>
+        {firmData.firmDetails?.yearFounded && <div>
           <p className="text-xs text-foreground/60 mb-1">Year Founded</p>
           <p className="text-foreground font-medium">{firmData.firmDetails?.yearFounded || 'N/A'}</p>
-        </div>
+        </div>}
 
-        <div>
+        {firmData.firmDetails?.companyDescription && <div>
           <p className="text-xs text-foreground/60 mb-1">Company Description</p>
-          <p className="text-foreground text-sm leading-relaxed line-clamp-4">
-            {firmData.firmDetails?.companyDescription || 'No description available.'}
-          </p>
-        </div>
+          <div 
+            className="cursor-pointer hover:bg-foreground/5 p-2 rounded-lg transition-colors"
+            onClick={() => setIsDescriptionModalOpen(true)}
+          >
+            <p className="text-foreground text-sm leading-relaxed line-clamp-3">
+              {firmData.firmDetails?.companyDescription || 'No description available.'}
+            </p>
+            <p className="text-primary text-xs mt-1 hover:underline">Click to read more...</p>
+          </div>
+        </div>}
       </div>
 
       {/* Right Panel - Operational Information */}
       <div className="border border-border rounded-lg p-6 card-custom-grad space-y-6">
         {/* Broker */}
-        <div>
+        {firmData?.firmDetails?.brokers && firmData?.firmDetails?.brokers?.length > 0 && <div>
           <p className="text-xs text-foreground/60 mb-2">Broker</p>
           <div className="flex items-center gap-2">
             {firmData?.firmDetails?.brokers?.map((broker: string, idx: number) => (
@@ -189,10 +196,10 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
               </span>
             ))}
           </div>
-        </div>
+        </div>}
 
         {/* Platform */}
-        <div>
+        {platforms && platforms.length > 0 && <div>
           <p className="text-xs text-foreground/60 mb-2">Platform</p>
           <div className="flex flex-wrap gap-2">
             {platforms.map((platform: string) => {
@@ -216,10 +223,10 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
               )
             })}
           </div>
-        </div>
+        </div>}
 
         {/* Payment Methods */}
-        <div>
+        {firmData?.payments?.methods && firmData?.payments?.methods?.length > 0 && <div>
           <p className="text-xs text-foreground/60 mb-2">Payment Methods</p>
           <div className="flex flex-wrap gap-2">
             {paymentMethods.slice(0, 3).map((method, idx) => {
@@ -243,10 +250,10 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
               )
             })}
           </div>
-        </div>
+        </div>}
 
         {/* Payout Methods */}
-        <div>
+        {payoutMethods && payoutMethods.length > 0 && <div>
           <p className="text-xs text-foreground/60 mb-2">Payout Methods</p>
           <div className="flex flex-wrap gap-2">
             {payoutMethods.slice(0, 3).map((method, idx) => {
@@ -270,14 +277,14 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
               )
             })}
           </div>
-        </div>
+        </div>}
 
 
 
 
 
         {/* Restricted Countries */}
-        <div>
+        {restrictedCountries.length > 0 && <div>
           <p className="text-xs text-foreground/60 mb-2">Restricted Countries</p>
           <div className="flex flex-wrap gap-2">
             {displayCountries.map((country, idx) => (
@@ -295,7 +302,7 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
               </button>
             )}
           </div>
-        </div>
+        </div>}
 
         {/* Restricted Countries Modal */}
         <Dialog open={isCountriesModalOpen} onOpenChange={setIsCountriesModalOpen}>
@@ -328,7 +335,7 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
         </Dialog>
 
         {/* Language Supported */}
-        <div>
+        {languagesSupported.length > 0 && <div>
           <p className="text-xs text-foreground/60 mb-2">Language Supported</p>
           <div className="flex flex-wrap gap-2">
             {displayLanguages.map((language, idx) => (
@@ -348,7 +355,7 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
               </button>
             )}
           </div>
-        </div>
+        </div>}
 
         {/* Supported Languages Modal */}
         <Dialog open={isLanguagesModalOpen} onOpenChange={setIsLanguagesModalOpen}>
@@ -375,6 +382,25 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
                   No supported languages listed.
                 </p>
               )}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Company Description Modal */}
+        <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-foreground">Company Description</DialogTitle>
+              <DialogDescription className="text-foreground/70">
+                Full company description for {firmData?.firmDetails?.name || 'this firm'}.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              <div className="prose prose-sm max-w-none text-foreground">
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {firmData?.firmDetails?.companyDescription || 'No description available.'}
+                </p>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

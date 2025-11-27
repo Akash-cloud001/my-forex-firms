@@ -25,9 +25,9 @@ export async function GET(req: Request) {
          *3. Dashboard/website user frindlyness       
          */
 
-        const isRegisteredLegalCompany = firm.firmDetails.legalEntityName ? 1 : 0;
+        const isRegisteredLegalCompany = firm.firmDetails.registrationNumber ? 1 : 0;
         const isPhysicalOfficeAddressVisible = firm.firmDetails.hqAddress ? 1 : 0;
-        const isDashboardWebsiteUserFriendly = firm.firmDetails.officialWebsite ? 1 : 0;
+        // const isDashboardWebsiteUserFriendly = firm.firmDetails.officialWebsite ? 1 : 0; => manual check
 
 
         //Public Identity & Transparency
@@ -38,10 +38,16 @@ export async function GET(req: Request) {
          *4. Brocker backed
          */
 
-        const isPublicCEO = firm.leadership.leadership?.[0].publicPresence ? 1 : 0;
-        const isGoodSupport = firm.support.avgResolutionTime ? 1 : 0;
-        const isClearRules = firm.firmDetails.companyDescription ? 1 : 0;
-        const isBrokerBacked = firm.firmDetails.brokers ? 1 : 0;
+        // const isPublicCEO = firm.transparency.publicCEO ? 1 : 0;
+        // const isGoodSupport = firm.support.avgResolutionTime ?  : 0;
+        // const isMultiChannel = firm.support.channels?.avgResolutionTime > 0 ? 0.2 : 0;
+        // we have to fine preffere from channel array and check avgResolutionTime if >1h == 0.5 , <1hr== 0.8
+        // const isResponseTime = firm.support.channels?.avgResolutionTime > 0 ? 0.2 : 0;
+
+        // clear rule will be manually
+        // const isClearRules = firm.firmDetails.companyDescription ? 1 : 0;
+        // need to update the form 
+        // const isBrokerBacked = firm.firmDetails.brokers ? 1 : 0;
 
 
 
@@ -50,8 +56,11 @@ export async function GET(req: Request) {
          *1. Active social media (X / IG / Discord) Consistent posting & announcements
          *2. Transparent communication during issues
          */
-        const isSocialMediaActive = firm.socialLinks.socialLinks?.length ? 1 : 0;
-        const isTransparentCommunication = firm.support.avgResolutionTime ? 1 : 0;
+
+        //manually
+        // const isSocialMediaActive = firm.socialLinks.socialLinks?.length ? 1 : 0;
+        // manully
+        // const isTransparentCommunication = firm.support.avgResolutionTime ? 1 : 0;
 
         // Trust Signals & History
         /**
@@ -65,12 +74,19 @@ export async function GET(req: Request) {
          *1.2 - $100M+)
          *4.Consistent operations
          */
-        const isVerifiedPayoutHistory = firm.transparency.payoutProofPublic ? 1 : 0;
-        const isNoMajorControversies = firm.transparency.thirdPartyAudit ? 1 : 0;
+        // manually
+        // const isVerifiedPayoutHistory = firm.transparency.payoutProofPublic ? 1 : 0;
         const isLifeTimePayouts = firm.firmDetails.totalPayout === "$500,000" ? 0.5 : firm.firmDetails.totalPayout === "$1,000,000" ? 0.7 : firm.firmDetails.totalPayout === "$10,000,000" ? 0.8 : firm.firmDetails.totalPayout === "$50,000,000" ? 1 : firm.firmDetails.totalPayout === "$100,000,000" ? 1.2 : 0;
-        const isConsistentOperations = firm.transparency.payoutProofPublic ? 1 : 0;
+        // manually
+        // const isNoMajorControversies = firm.transparency.thirdPartyAudit ? 1 : 0;
+
+        // const isConsistentOperations =  calculate by establish year
+
+
 
         // Trading Experience :- Piller-2
+
+
         const tradingExperiencePoints = 0;
         // Trading Conditions :
         /**
@@ -79,13 +95,25 @@ export async function GET(req: Request) {
         Acceptable slippage 1.0 - No Slippage 0.7 - Spipage
         Multiple trading Platforms 1.0 - All Major 0.8 - Only MT5 0.7 - Only Ctrader + Other 0.5 - No Mt5/ctrader
          */
+        // spread will be manually
 
+        // data for commisions  if 0 == 1
+        // if 0-5 == 0.7
+        // if 5+ == 0.5
+        const isCommissions = firm.trading.commissions
+        //  Acceptable slippage manually
+        // multiple trading platforms after fixes of form
 
         // Trading Freedom
         /**
          *PROFIT TARGETs 1.0 - 8 + 5  0.8 - 10+4  0.7 - 10+5  0.6 - 10+8
          Consistancy Rule 1.0 - NO 0.7 - Yes 0.9 - Multi Option
         NEWS TRADING 1.0 - Allowed - 1 On Funded and Evalutaion both, 0.8 - 5 min restrictions - 0.8 (Allowed in Evals),0.5 - Not allowed on Both (Evals + Funded),  0.1 - Holding ALLOWD, 0.0 - Holding Not ALLOWD
+
+    // for profit target evaluate according to 2 step
+    // consistency rule need to update challange form
+    // manually news trading
+
          */
         // Rules & Fairness
         /**
@@ -93,6 +121,23 @@ export async function GET(req: Request) {
          No hidden restrictions/Stratgy 1.0 - NO   0.7 - Yes
          DD TYPE 1.0 - BALANCE BASED DD 0.5 - EQUITY BASED DAILY or MAX
          */
+        // margin rule will be manually
+        // hidden restrictions/Stratgy will be manually
+        // dd type will be taken from challange 2 step
+
+
+        //Payout/payment Experience :- Piller-3
+
+        // payout reliability manually
+        //payout cycle  
+        //single highest payout manually
+
+        //payout time manually
+        //payout method 
+        //payout denial 1 initially 
+        //profit split
+        //payment methods
+        //resoanable min payout
 
 
 

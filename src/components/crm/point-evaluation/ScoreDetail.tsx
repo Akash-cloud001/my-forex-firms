@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { initialScoresData, pillarsConfig } from '@/components/crm/point-evaluation/types/constant';
+import type { Pillar, Category, FactorConfig as ImportedFactorConfig } from '@/components/crm/point-evaluation/types/constant.types';
 
 // ============================================================================
 // TypeScript Interfaces
@@ -91,11 +92,11 @@ const CompactScoresAdmin: React.FC = () => {
     /**
      * Calculate the total and maximum possible score for a pillar
      */
-    const calculatePillarScore = (pillar: any): ScoreResult => {
+    const calculatePillarScore = (pillar: Pillar): ScoreResult => {
         let total = 0;
         let maxTotal = 0;
 
-        pillar.categories.forEach((cat: any) => {
+        pillar.categories.forEach((cat: Category) => {
             const { total: catTotal, maxTotal: catMax } = calculateCategoryScore(
                 pillar.id,
                 cat.id,
@@ -188,7 +189,7 @@ const CompactScoresAdmin: React.FC = () => {
 
                 {/* Pillars */}
                 <div className="space-y-2">
-                    {pillarsConfig.map((pillar: any) => {
+                    {pillarsConfig.map((pillar: Pillar) => {
                         const { total, maxTotal } = calculatePillarScore(pillar);
                         const isExpanded = expandedPillar === pillar.id;
 
@@ -225,7 +226,7 @@ const CompactScoresAdmin: React.FC = () => {
                                     <>
                                         <Separator />
                                         <div>
-                                            {pillar.categories.map((category: any) => {
+                                            {pillar.categories.map((category: Category) => {
                                                 const { total: catTotal, maxTotal: catMax } =
                                                     calculateCategoryScore(pillar.id, category.id, category.factors);
                                                 const isCatExpanded = expandedCategories[category.id];
@@ -254,7 +255,7 @@ const CompactScoresAdmin: React.FC = () => {
                                                         {/* Factors */}
                                                         {isCatExpanded && (
                                                             <div className="px-3 py-2 pl-12 space-y-3 bg-accent/20">
-                                                                {Object.entries(category.factors).map(([key, config]: [string, any]) => {
+                                                                {Object.entries(category.factors).map(([key, config]: [string, ImportedFactorConfig]) => {
                                                                     const score = categoryData[key] || 0;
                                                                     const isEditing =
                                                                         editingFactor?.pillarId === pillar.id &&
