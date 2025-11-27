@@ -3,189 +3,80 @@ import React, { useState } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ChevronRight } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet'
-
-interface ChallengeDetail {
-  _id: string
-  propFirmId: string
-  type: string
-  name: string
-  evaluationPhases: number
-  evaluationSteps: Array<{
-    stepNumber: number
-    profitTarget: string
-    maxLoss: string
-    dailyLoss: string
-    minTradingDays: number
-    _id: string
-  }>
-  accountSizes: Array<{
-    size: number
-    price: number
-    _id: string
-  }>
-  profitSplit: string
-  payoutFrequency: Array<{
-    label: string
-    percentage: string
-    _id: string
-  }>
-  leverage: string
-  stopLossRequired: boolean
-  eaAllowed: boolean
-  weekendHolding: boolean
-  overnightHolding: boolean
-  newsTrading: boolean
-  copyTrading: boolean
-  refundFee: boolean
-  payoutMethods: string[]
-  profitTarget: string
-  dailyLoss: string
-  maxLoss: string
-  maxLossType: string
-  timeLimit: string
-  drawdownResetType: string
-  minTradingDays: number
-  createdAt: string
-  updatedAt: string
-}
+import { useFirmProgramList } from '@/hooks/queries/useFirmProgramList'
+import { useParams } from 'next/navigation'
+import { Pagination } from '@/components/common/Pagination'
+import { IProgram } from '@/models/FirmProgram'
 
 const ChallengesContent = () => {
-  const [selectedSteps, setSelectedSteps] = useState<string>('')
-  const [selectedSize, setSelectedSize] = useState<string>('')
-  const [selectedAssets, setSelectedAssets] = useState<string>('')
-  const [selectedChallenge, setSelectedChallenge] = useState<ChallengeDetail | null>(null)
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const params = useParams()
+  const slug = params.slug as string
 
-  // Sample data - in real app, this would come from props or API
-  const challenges = [
-    {
-      challenge: 'Alpha Pro 10%',
-      steps: '2-Step',
-      accountSize: '$5000',
-      fee: '$50',
-      profitTarget: '10%',
-      profitSplit: '80%',
-      leverage: '1:100',
-      maxLoss: '10%',
-      dailyLoss: '5%'
-    },
-    {
-      challenge: 'Alpha Pro 10%',
-      steps: '2-Step',
-      accountSize: '$5000',
-      fee: '$50',
-      profitTarget: '10%',
-      profitSplit: '80%',
-      leverage: '1:100',
-      maxLoss: '10%',
-      dailyLoss: '5%'
-    },
-    {
-      challenge: 'Alpha Pro 10%',
-      steps: '2-Step',
-      accountSize: '$5000',
-      fee: '$50',
-      profitTarget: '10%',
-      profitSplit: '80%',
-      leverage: '1:100',
-      maxLoss: '10%',
-      dailyLoss: '5%'
-    },
-    {
-      challenge: 'Alpha Pro 10%',
-      steps: '2-Step',
-      accountSize: '$5000',
-      fee: '$50',
-      profitTarget: '10%',
-      profitSplit: '80%',
-      leverage: '1:100',
-      maxLoss: '10%',
-      dailyLoss: '5%'
-    },
-    {
-      challenge: 'Alpha Pro 10%',
-      steps: '2-Step',
-      accountSize: '$5000',
-      fee: '$50',
-      profitTarget: '10%',
-      profitSplit: '80%',
-      leverage: '1:100',
-      maxLoss: '10%',
-      dailyLoss: '5%'
-    },
-    {
-      challenge: 'Alpha Pro 10%',
-      steps: '2-Step',
-      accountSize: '$5000',
-      fee: '$50',
-      profitTarget: '10%',
-      profitSplit: '80%',
-      leverage: '1:100',
-      maxLoss: '10%',
-      dailyLoss: '5%'
-    },
-    {
-      challenge: 'Alpha Pro 10%',
-      steps: '2-Step',
-      accountSize: '$5000',
-      fee: '$50',
-      profitTarget: '10%',
-      profitSplit: '80%',
-      leverage: '1:100',
-      maxLoss: '10%',
-      dailyLoss: '5%'
-    },
-    {
-      challenge: 'Alpha Pro 10%',
-      steps: '2-Step',
-      accountSize: '$5000',
-      fee: '$50',
-      profitTarget: '10%',
-      profitSplit: '80%',
-      leverage: '1:100',
-      maxLoss: '10%',
-      dailyLoss: '5%'
-    },
-    {
-      challenge: 'Alpha Pro 10%',
-      steps: '2-Step',
-      accountSize: '$5000',
-      fee: '$50',
-      profitTarget: '10%',
-      profitSplit: '80%',
-      leverage: '1:100',
-      maxLoss: '10%',
-      dailyLoss: '5%'
-    },
-    {
-      challenge: 'Alpha Pro 10%',
-      steps: '2-Step',
-      accountSize: '$5000',
-      fee: '$50',
-      profitTarget: '10%',
-      profitSplit: '80%',
-      leverage: '1:100',
-      maxLoss: '10%',
-      dailyLoss: '5%'
+  const [selectedSteps, setSelectedSteps] = useState<string>('all')
+  const [selectedSize, setSelectedSize] = useState<string>('all')
+  const [selectedAssets, setSelectedAssets] = useState<string>('all')
+  const [selectedChallenge, setSelectedChallenge] = useState<IProgram | null>(null)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [page, setPage] = useState(1)
+  const [limit] = useState(10)
+
+  const { data, isLoading } = useFirmProgramList({
+    slug,
+    type: selectedSteps !== 'all' ? selectedSteps : undefined,
+    size: selectedSize !== 'all' ? parseInt(selectedSize) : undefined,
+    page,
+    limit
+  })
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    }).format(value)
+  }
+
+  const getDisplaySizeAndFee = (program: IProgram) => {
+    if (selectedSize !== 'all') {
+      const sizeObj = program.accountSizes.find(s => s.size === parseInt(selectedSize))
+      if (sizeObj) {
+        return {
+          size: formatCurrency(sizeObj.size),
+          fee: formatCurrency(sizeObj.price)
+        }
+      }
     }
-  ]
+
+    if (program.accountSizes.length === 0) return { size: '-', fee: '-' }
+
+    const minSize = Math.min(...program.accountSizes.map(s => s.size))
+    const maxSize = Math.max(...program.accountSizes.map(s => s.size))
+    const minFee = Math.min(...program.accountSizes.map(s => s.price))
+
+    return {
+      size: minSize === maxSize ? formatCurrency(minSize) : `${formatCurrency(minSize)} - ${formatCurrency(maxSize)}`,
+      fee: `${formatCurrency(minFee)}`
+    }
+  }
 
   return (
     <div className="w-full border border-border p-8 rounded-lg card-custom-grad">
       {/* Filter Section */}
       <div className="flex gap-4 mb-6">
-        <Select value={selectedSteps} onValueChange={setSelectedSteps}>
+        <Select value={selectedSteps} onValueChange={(val) => { setSelectedSteps(val); setPage(1); }}>
           <SelectTrigger className="w-[180px] !bg-white/10 !text-white">
             <SelectValue placeholder="Steps: Select" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All</SelectItem>
-            <SelectItem value="1-step">1-Step</SelectItem>
-            <SelectItem value="2-step">2-Step</SelectItem>
+            <SelectItem value="1-Step">1-Step</SelectItem>
+            <SelectItem value="2-Step">2-Step</SelectItem>
+            <SelectItem value="3-Step">3-Step</SelectItem>
+            <SelectItem value="Instant">Instant</SelectItem>
           </SelectContent>
         </Select>
 
-        <Select value={selectedSize} onValueChange={setSelectedSize}>
+        <Select value={selectedSize} onValueChange={(val) => { setSelectedSize(val); setPage(1); }}>
           <SelectTrigger className="w-[180px] !bg-white/10 !text-white">
             <SelectValue placeholder="Size: Select" />
           </SelectTrigger>
@@ -252,105 +143,80 @@ const ChallengesContent = () => {
               </tr>
             </thead>
             <tbody>
-              {challenges.map((challenge, index) => (
-                <tr 
-                  key={index} 
-                  className="border-b border-foreground/20 last:border-b-0 hover:bg-foreground/5 transition-colors cursor-pointer"
-                  onClick={() => {
-                    // In real app, fetch challenge details by ID
-                    // For now, using sample data structure
-                    const sampleChallenge: ChallengeDetail = {
-                      _id: `challenge-${index}`,
-                      propFirmId: '690cbdca770e44adfbaddd4a',
-                      type: challenge.steps,
-                      name: challenge.challenge,
-                      evaluationPhases: 2,
-                      evaluationSteps: [
-                        {
-                          stepNumber: 1,
-                          profitTarget: challenge.profitTarget.replace('%', ''),
-                          maxLoss: challenge.maxLoss.replace('%', ''),
-                          dailyLoss: challenge.dailyLoss.replace('%', ''),
-                          minTradingDays: 7,
-                          _id: `step-${index}`
-                        }
-                      ],
-                      accountSizes: [
-                        {
-                          size: parseInt(challenge.accountSize.replace('$', '').replace(',', '')),
-                          price: parseInt(challenge.fee.replace('$', '')),
-                          _id: `size-${index}`
-                        }
-                      ],
-                      profitSplit: challenge.profitSplit.replace('%', ''),
-                      payoutFrequency: [
-                        { label: 'Bi-weekly', percentage: '80', _id: 'freq-1' },
-                        { label: 'Monthly', percentage: '90', _id: 'freq-2' }
-                      ],
-                      leverage: challenge.leverage,
-                      stopLossRequired: true,
-                      eaAllowed: true,
-                      weekendHolding: true,
-                      overnightHolding: true,
-                      newsTrading: true,
-                      copyTrading: false,
-                      refundFee: false,
-                      payoutMethods: ['Paypal', 'UPI'],
-                      profitTarget: challenge.profitTarget.replace('%', ''),
-                      dailyLoss: challenge.dailyLoss.replace('%', ''),
-                      maxLoss: challenge.maxLoss.replace('%', ''),
-                      maxLossType: 'Static',
-                      timeLimit: '30',
-                      drawdownResetType: 'Daily',
-                      minTradingDays: 5,
-                      createdAt: new Date().toISOString(),
-                      updatedAt: new Date().toISOString()
-                    }
-                    setSelectedChallenge(sampleChallenge)
-                    setIsDrawerOpen(true)
-                  }}
-                >
-                  <td className="px-4 py-4 text-sm text-foreground">
-                    {challenge.challenge}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-foreground">
-                    {challenge.steps}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-primary">
-                    {challenge.accountSize}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-red-500">
-                    {challenge.fee}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-green-500">
-                    {challenge.profitTarget}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-green-500">
-                    {challenge.profitSplit}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-foreground">
-                    {challenge.leverage}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-red-500">
-                    {challenge.maxLoss}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-red-500">
-                    {challenge.dailyLoss}
-                  </td>
-                  <td className="px-4 py-4 text-center">
-                    <ChevronRight className="w-5 h-5 text-primary cursor-pointer hover:opacity-80" />
-                  </td>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={10} className="px-4 py-8 text-center text-foreground">Loading...</td>
                 </tr>
-              ))}
+              ) : data?.programs.map((program, index) => {
+                const { size, fee } = getDisplaySizeAndFee(program)
+                return (
+                  <tr
+                    key={program._id as string}
+                    className="border-b border-foreground/20 last:border-b-0 hover:bg-foreground/5 transition-colors cursor-pointer"
+                    onClick={() => {
+                      setSelectedChallenge(program)
+                      setIsDrawerOpen(true)
+                    }}
+                  >
+                    <td className="px-4 py-4 text-sm text-foreground">
+                      {program.name}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-foreground">
+                      {program.type}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-primary">
+                      {size}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-red-500">
+                      {fee}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-green-500">
+                      {program.profitTarget}%
+                    </td>
+                    <td className="px-4 py-4 text-sm text-green-500">
+                      {program.profitSplit}%
+                    </td>
+                    <td className="px-4 py-4 text-sm text-foreground">
+                      {program.leverage}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-red-500">
+                      {program.maxLoss}%
+                    </td>
+                    <td className="px-4 py-4 text-sm text-red-500">
+                      {program.dailyLoss}%
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <ChevronRight className="w-5 h-5 text-primary cursor-pointer hover:opacity-80" />
+                    </td>
+                  </tr>
+                )
+              })}
+              {!isLoading && (!data?.programs || data.programs.length === 0) && (
+                <tr>
+                  <td colSpan={10} className="px-4 py-8 text-center text-foreground">No programs found</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
+
+        {data?.pagination && data.pagination.totalPages > 1 && (
+          <div className="mt-4">
+            <Pagination
+              currentPage={page}
+              totalPages={data.pagination.totalPages}
+              totalItems={data.pagination.total}
+              itemsPerPage={limit}
+              onPageChange={setPage}
+            />
+          </div>
+        )}
       </div>
 
       {/* Challenge Details Drawer */}
       <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-        <SheetContent 
-          side="right" 
+        <SheetContent
+          side="right"
           className="w-full max-w-[320px] md:max-w-[575px] overflow-y-auto text-white border-none bg-card"
         >
           {selectedChallenge && (
@@ -422,8 +288,8 @@ const ChallengesContent = () => {
                       Evaluation Steps
                     </h3>
                     <div className="space-y-3 mt-4">
-                      {selectedChallenge.evaluationSteps.map((step) => (
-                        <div key={step._id} className="p-3 bg-foreground/5 rounded-lg">
+                      {selectedChallenge.evaluationSteps.map((step, idx) => (
+                        <div key={step.stepNumber || idx} className="p-3 bg-foreground/5 rounded-lg">
                           <p className="font-medium text-foreground mb-2">Step {step.stepNumber}</p>
                           <div className="grid grid-cols-2 gap-2 text-sm">
                             <div>
@@ -456,8 +322,8 @@ const ChallengesContent = () => {
                       Account Sizes
                     </h3>
                     <div className="space-y-2">
-                      {selectedChallenge.accountSizes.map((size) => (
-                        <div key={size._id} className="flex justify-between items-center p-2 bg-foreground/5 rounded">
+                      {selectedChallenge.accountSizes.map((size, idx) => (
+                        <div key={size.size || idx} className="flex justify-between items-center p-2 bg-foreground/5 rounded">
                           <span className="text-primary font-medium">${size.size.toLocaleString()}</span>
                           <span className="text-red-500">${size.price}</span>
                         </div>
@@ -508,8 +374,8 @@ const ChallengesContent = () => {
                     {selectedChallenge.payoutFrequency && selectedChallenge.payoutFrequency.length > 0 && (
                       <div>
                         <p className="text-sm text-foreground/60 mb-2">Payout Frequency</p>
-                        {selectedChallenge.payoutFrequency.map((freq) => (
-                          <div key={freq._id} className="flex justify-between items-center p-2 bg-foreground/5 rounded mb-1">
+                        {selectedChallenge.payoutFrequency.map((freq, idx) => (
+                          <div key={freq.label || idx} className="flex justify-between items-center p-2 bg-foreground/5 rounded mb-1">
                             <span className="text-foreground">{freq.label}</span>
                             <span className="text-green-500 font-medium">{freq.percentage}%</span>
                           </div>

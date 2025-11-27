@@ -89,7 +89,7 @@ export const FirmSelector: React.FC<FirmSelectorProps> = ({
       isFetchingRef.current = false;
       setLoading(false);
     }
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (!showDropdown) return;
@@ -147,7 +147,7 @@ export const FirmSelector: React.FC<FirmSelectorProps> = ({
     if (showDropdown && firms.length === 0 && !loading && !isFetchingRef.current) {
       fetchFirms(true);
     }
-  }, [showDropdown]); 
+  }, [showDropdown]);
 
   const handleSelect = (firm: Firm) => {
     setSearch(firm.name);
@@ -195,9 +195,13 @@ export const FirmSelector: React.FC<FirmSelectorProps> = ({
         {showDropdown && (
           <div className="absolute z-10 w-full mt-1 bg-background border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
             {!loading && firms.length === 0 && (
-              <div className="px-4 py-3 text-muted-foreground">
-                No firms found.
-              </div>
+              <button
+                type="button"
+                className="w-full px-4 py-3 text-left hover:bg-muted text-primary font-medium"
+                onClick={() => handleSelect({ id: 'other', name: 'Other' })}
+              >
+                Other (My firm is not listed)
+              </button>
             )}
 
             {firms.map((firm, idx) => (
@@ -217,8 +221,6 @@ export const FirmSelector: React.FC<FirmSelectorProps> = ({
                 <Loader2 className="h-4 w-4 animate-spin" />
               </div>
             )}
-
-           
           </div>
         )}
       </div>

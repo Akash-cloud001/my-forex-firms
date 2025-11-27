@@ -4,20 +4,27 @@ export interface Firm {
   verified: boolean
 }
 
-export interface IssueType {
+export interface SubCategory {
   value: string
   label: string
   description: string
 }
 
+export interface IssueCategory {
+  id: string
+  label: string
+  subCategories: SubCategory[]
+}
+
 export interface ReviewFormData {
   firmName: string
-  firmId?:string
+  firmId?: string
   customFirmName?: string
-  issueType: string
+  issueCategory: string
+  issueSubCategory: string
   customIssueType?: string
   description: string
-  rating: number
+  // rating: number
   files?: File[]
 }
 
@@ -35,14 +42,15 @@ export interface StarRatingProps {
 
 export interface FirmSelectorProps {
   value: string;
-  onChange: (name: string, id?: string) => void; 
+  onChange: (name: string, id?: string) => void;
   error?: string;
 }
 
-
 export interface IssueTypeSelectorProps {
-  value: string
-  onChange: (value: string) => void
+  issueCategories: IssueCategory[]
+  selectedCategory: string
+  selectedSubCategory: string
+  onCategoryChange: (category: string) => void
+  onSubCategoryChange: (subCategory: string) => void
   error?: string
-  issueTypes: IssueType[]
 }

@@ -5,13 +5,13 @@ import Link from 'next/link'
 import { Plus, Check } from 'lucide-react'
 import RadarChartComponent from '@/components/ui/RadarChart'
 import { IFundingFirm } from '@/models/FirmDetails'
-import { 
-  FacebookIcon, 
-  RedditIcon, 
-  TwitterIcon, 
-  LinkedInIcon, 
-  InstagramIcon, 
-  DiscordIcon 
+import {
+  FacebookIcon,
+  RedditIcon,
+  TwitterIcon,
+  LinkedInIcon,
+  InstagramIcon,
+  DiscordIcon
 } from '@/components/svgs'
 
 interface RadarChartData {
@@ -28,32 +28,32 @@ interface FirmHeaderProps {
   factor3: RadarChartData[]
 }
 
-const FirmHeader: React.FC<FirmHeaderProps> = ({ 
-  firmData, 
-  firmId, 
-  factor1, 
-  factor2, 
-  factor3 
+const FirmHeader: React.FC<FirmHeaderProps> = ({
+  firmData,
+  firmId,
+  factor1,
+  factor2,
+  factor3
 }) => {
   return (
     <section className='max-w-7xl mx-auto p-8 card-custom-grad rounded-3xl'>
       <div className="flex items-start justify-between w-full">
         <div className='flex items-center gap-4'>
           <figure className="relative h-24 w-24 bg-foreground/10 rounded-[8px]">
-            <Image 
-              src={firmData?.firmDetails.image?.url || ""} 
-              alt={firmData?.firmDetails.name || ""} 
-              fill 
-              className='object-contain scale-70' 
+            <Image
+              src={firmData?.firmDetails.image?.url || "/website/firm/imagePlac.png"}
+              alt={firmData?.firmDetails.name || ""}
+              fill
+              className='object-contain scale-70'
             />
           </figure>
           <figure className="h-24 w-24 bg-foreground/10 rounded-[8px] relative flex flex-col items-center justify-end pb-2">
             <figure className='absolute h-5 w-6 right-1.5 top-1.5'>
-              <Image 
-                src="/website/badge/badge1.png" 
-                alt="PTI INDEX" 
-                fill 
-                className='object-contain' 
+              <Image
+                src="/website/badge/badge1.png"
+                alt="PTI INDEX"
+                fill
+                className='object-contain'
               />
             </figure>
             <span className='text-primary text-[32px] font-bold'>
@@ -65,12 +65,12 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
           </figure>
 
           <div className='flex flex-col items-start justify-between h-full w-fit'>
-            <Link 
-              href={firmData?.firmDetails.officialWebsite || ""} 
-              target='_blank' 
+            <Link
+              href={firmData?.firmDetails.officialWebsite || ""}
+              target='_blank'
               className='flex items-center gap-2 gradient-text text-[32px] font-semibold capitalize'
             >
-              {firmData?.firmDetails.name} 
+              {firmData?.firmDetails.name}
               <Image src={"/website/link.svg"} alt="link" width={24} height={24} />
             </Link>
             <div className='font-geist-sans flex items-start justify-center gap-4'>
@@ -82,7 +82,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
                   <div className='w-[32px] h-4 bg-red-400'></div> {firmData?.firmDetails.jurisdiction}
                 </span>
               </div>
-              
+
               <div className='flex flex-col items-start border-l border-foreground/20 pl-4 '>
                 <span className='text-xs text-foreground/80'>
                   Years in Operation
@@ -111,8 +111,8 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
           </div>
         </div>
 
-        <Link 
-          href={`/post-review?firmId=${firmId}`} 
+        <Link
+          href={`/post-review?firmId=${firmId}`}
           className='flex items-center gap-2 px-4 py-2 rounded-full border-gradient text-primary tracking-tight'
         >
           <Plus className='w-4 h-4 text-primary' />
@@ -122,18 +122,18 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
       <div className='flex items-start justify-between gap-4'>
         <div className='flex items-start justify-start gap-4 opacity-80'>
           <figure className='flex flex-col items-center justify-center'>
-            <RadarChartComponent 
-              data={factor1} 
-              width={300} 
-              height={300} 
-              outerRadius={60} 
-              innerRadius={0} 
-              dataKey="A" 
-              stroke="#F66435" 
-              fill="#F66435" 
-              fillOpacity={0.5} 
-              name="Mike" 
-              margin={{ top: 20, left: 20, right: 20, bottom: 20 }} 
+            <RadarChartComponent
+              data={factor1}
+              width={300}
+              height={300}
+              outerRadius={60}
+              innerRadius={0}
+              dataKey="A"
+              stroke="#F66435"
+              fill="#F66435"
+              fillOpacity={0.5}
+              name="Mike"
+              margin={{ top: 20, left: 20, right: 20, bottom: 20 }}
             />
             <figcaption>
               <h3 className='text-base text-foreground font-semibold -mt-2 uppercase'>
@@ -143,18 +143,18 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
           </figure>
 
           <figure className='flex flex-col items-center justify-center'>
-            <RadarChartComponent 
-              data={factor2} 
-              width={300} 
-              height={300} 
-              outerRadius={60} 
-              innerRadius={0} 
-              dataKey="A" 
-              stroke="#F66435" 
-              fill="#F66435" 
-              fillOpacity={0.5} 
-              name="Mike" 
-              margin={{ top: 20, left: 20, right: 20, bottom: 20 }} 
+            <RadarChartComponent
+              data={factor2}
+              width={300}
+              height={300}
+              outerRadius={60}
+              innerRadius={0}
+              dataKey="A"
+              stroke="#F66435"
+              fill="#F66435"
+              fillOpacity={0.5}
+              name="Mike"
+              margin={{ top: 20, left: 20, right: 20, bottom: 20 }}
             />
             <figcaption>
               <h3 className='text-base text-foreground font-semibold -mt-2 uppercase'>
@@ -164,18 +164,18 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
           </figure>
 
           <figure className='flex flex-col items-center justify-center'>
-            <RadarChartComponent 
-              data={factor3} 
-              width={300} 
-              height={300} 
-              outerRadius={60} 
-              innerRadius={0} 
-              dataKey="A" 
-              stroke="#F66435" 
-              fill="#F66435" 
-              fillOpacity={0.5} 
-              name="Mike" 
-              margin={{ top: 20, left: 20, right: 20, bottom: 20 }} 
+            <RadarChartComponent
+              data={factor3}
+              width={300}
+              height={300}
+              outerRadius={60}
+              innerRadius={0}
+              dataKey="A"
+              stroke="#F66435"
+              fill="#F66435"
+              fillOpacity={0.5}
+              name="Mike"
+              margin={{ top: 20, left: 20, right: 20, bottom: 20 }}
             />
             <figcaption>
               <h3 className='text-base text-foreground font-semibold -mt-2 uppercase'>
@@ -235,7 +235,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
             <div className="flex items-center justify-center gap-3">
               {firmData?.socialLinks?.socialLinks && Object.entries(firmData.socialLinks.socialLinks).map(([platform, url]) => {
                 if (!url) return null;
-                
+
                 // Map platform names to icon components
                 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
                   'Facebook': FacebookIcon,
@@ -246,15 +246,15 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
                   'Reddit': RedditIcon,
                   'Discord': DiscordIcon,
                 };
-                
+
                 const IconComponent = iconMap[platform];
                 if (!IconComponent) return null;
-                
+
                 return (
-                  <Link 
-                    key={platform} 
-                    href={url as string} 
-                    target='_blank' 
+                  <Link
+                    key={platform}
+                    href={url as string}
+                    target='_blank'
                     className="relative h-6 w-6 rounded flex items-center justify-center hover:opacity-80 transition-opacity"
                   >
                     <IconComponent className='w-5 h-5 text-foreground/50' />

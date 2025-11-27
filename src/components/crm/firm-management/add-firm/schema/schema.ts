@@ -26,6 +26,8 @@ export const firmDetailsSchema = z.object({
   officialWebsite: z.string().url("Invalid URL").optional().or(z.literal("")),
   brokers: z.array(z.string()).optional(),
   liquidityProviders: z.array(z.string()).optional(),
+  totalPayout: z.string().optional(),
+  slug: z.string().optional(),
 });
 
 export const leadershipMemberSchema = z.object({
@@ -94,7 +96,6 @@ export const transparencySchema = z.object({
   payoutProofPublic: z.boolean().default(false),
   thirdPartyAudit: z.boolean().default(false),
   notes: z.string().optional(),
-  transparencyScore: z.number().min(0).max(10).optional(),
 });
 
 export const leverageMatrixSchema = z.record(

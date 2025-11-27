@@ -5,13 +5,43 @@ import mongoose, { Schema, Document } from 'mongoose';
 // ============================================================================
 
 export type ReviewStatus = 'pending' | 'approved' | 'rejected';
-export type IssueType = 
-  | 'user-complaints'
+export type IssueType =
+  // Payout Issues
   | 'payout-delays'
-  | 'slippage-reports'
+  | 'payout-denial'
+  | 'other-payout'
+  // Account/Platform Issues
+  | 'missing-account'
+  | 'technical-problems'
+  | 'platform-instability'
+  | 'other-account'
+  // Trading Conditions Issues
+  | 'slippage'
+  | 'spreads'
+  | 'execution'
+  | 'rule-enforcement'
+  | 'commissions-discrepancy'
+  | 'other-trading'
+  // Rule/Policy Issues
+  | 'rule-changes'
+  | 'unclear-terms'
+  | 'hidden-rules'
+  | 'other-rule'
+  // Support/Communication Issues
+  | 'ignored-emails'
+  | 'no-response'
+  | 'slow-support'
+  | 'miscommunication'
+  | 'immature-support'
+  | 'other-support'
+  // Misconduct
+  | 'misleading-marketing'
+  | 'unfair-practices'
+  | 'fake-claims'
+  // Legacy/Fallback
+  | 'user-complaints'
   | 'payout-denials'
   | 'poor-practices'
-  | 'platform-instability'
   | 'unethical-marketing'
   | 'community-trust'
   | 'other';
@@ -20,48 +50,86 @@ export type IssueType =
 // SUB-SCHEMAS (Best Practice: Break down complex schemas)
 // ============================================================================
 
+const FileSchema = new Schema({
+  name: { type: String, required: true },
+  type: { type: String, required: true },
+  size: { type: Number, required: true },
+  url: { type: String, required: true },
+  uploadedAt: { type: Date, default: Date.now }
+}, { _id: false });
+
 // ============================================================================
 // MAIN REVIEW SCHEMA
 // ============================================================================
 
 
 const ReviewSchema = new Schema({
-    userId: String,
-    firmId: String,
-    firmName: String,
-    customFirmName: String,
-    issueType: {
-      type: String,
-      enum: [
-        'user-complaints',
-        'payout-delays', 
-        'slippage-reports',
-        'payout-denials',
-        'poor-practices',
-        'platform-instability',
-        'unethical-marketing',
-        'community-trust',
-        'other'
-      ]
-    },
-    customIssueType: String,
-    description: String,
-    rating: Number,
-    files: Array,                // instead of nested schema
-    status: String,
-    isVerified: Boolean,
-    adminNotes: String,
-    reviewedBy: String,
-    reviewedAt: Date,
-    analytics: Object,           // simplify nested ReviewAnalyticsSchema
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
-    createdBy: String,
-    lastModifiedBy: String
-  }, { 
-    timestamps: true,
-    collection: 'reviews'
-  });
+  userId: String,
+  firmId: String,
+  firmName: String,
+  customFirmName: String,
+  issueCategory: { type: String, required: true }, // Added to match Zod schema
+  issueType: {
+    type: String,
+    enum: [
+      // Payout Issues
+      'payout-delays',
+      'payout-denial',
+      'other-payout',
+      // Account/Platform Issues
+      'missing-account',
+      'technical-problems',
+      'platform-instability',
+      'other-account',
+      // Trading Conditions Issues
+      'slippage',
+      'spreads',
+      'execution',
+      'rule-enforcement',
+      'commissions-discrepancy',
+      'other-trading',
+      // Rule/Policy Issues
+      'rule-changes',
+      'unclear-terms',
+      'hidden-rules',
+      'other-rule',
+      // Support/Communication Issues
+      'ignored-emails',
+      'no-response',
+      'slow-support',
+      'miscommunication',
+      'immature-support',
+      'other-support',
+      // Misconduct
+      'misleading-marketing',
+      'unfair-practices',
+      'fake-claims',
+      // Legacy/Fallback
+      'user-complaints',
+      'payout-denials',
+      'poor-practices',
+      'unethical-marketing',
+      'community-trust',
+      'other'
+    ]
+  },
+  customIssueType: String,
+  description: String,
+  files: [FileSchema],         // Use strict sub-schema
+  status: String,
+  isVerified: Boolean,
+  adminNotes: String,
+  reviewedBy: String,
+  reviewedAt: Date,
+  analytics: Object,           // simplify nested ReviewAnalyticsSchema
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+  createdBy: String,
+  lastModifiedBy: String
+}, {
+  timestamps: true,
+  collection: 'reviews'
+});
 
 // ============================================================================
 // INDEXES (Best Practice: Define indexes for performance)
@@ -71,12 +139,12 @@ const ReviewSchema = new Schema({
 ReviewSchema.index({ firmId: 1, status: 1 });
 ReviewSchema.index({ userId: 1, createdAt: -1 });
 ReviewSchema.index({ status: 1, isVerified: 1, createdAt: -1 });
-ReviewSchema.index({ firmName: 1, rating: 1 });
 ReviewSchema.index({ issueType: 1, status: 1 });
+ReviewSchema.index({ issueCategory: 1, status: 1 }); // Index for new field
 
 // Text search index for description and firm name
-ReviewSchema.index({ 
-  description: 'text', 
+ReviewSchema.index({
+  description: 'text',
   firmName: 'text',
   customFirmName: 'text'
 });
@@ -86,22 +154,22 @@ ReviewSchema.index({
 // ============================================================================
 
 // Virtual for display name (firm name or custom firm name)
-ReviewSchema.virtual('displayFirmName').get(function() {
+ReviewSchema.virtual('displayFirmName').get(function () {
   return this.firmName === 'Other' ? this.customFirmName : this.firmName;
 });
 
 // Virtual for display issue type (issue type or custom issue type)
-ReviewSchema.virtual('displayIssueType').get(function() {
+ReviewSchema.virtual('displayIssueType').get(function () {
   return this.issueType === 'other' ? this.customIssueType : this.issueType;
 });
 
 // Virtual for review age
-ReviewSchema.virtual('ageInDays').get(function() {
+ReviewSchema.virtual('ageInDays').get(function () {
   return Math.floor((Date.now() - this.createdAt.getTime()) / (1000 * 60 * 60 * 24));
 });
 
 // Virtual for helpfulness ratio
-ReviewSchema.virtual('helpfulnessRatio').get(function() {
+ReviewSchema.virtual('helpfulnessRatio').get(function () {
   const total = this.analytics.helpfulVotes + this.analytics.notHelpfulVotes;
   return total > 0 ? (this.analytics.helpfulVotes / total) : 0;
 });
@@ -111,7 +179,7 @@ ReviewSchema.virtual('helpfulnessRatio').get(function() {
 // ============================================================================
 
 // Method to approve review
-ReviewSchema.methods.approve = function(adminUserId: string, notes?: string) {
+ReviewSchema.methods.approve = function (adminUserId: string, notes?: string) {
   this.status = 'approved';
   this.isVerified = true;
   this.reviewedBy = adminUserId;
@@ -121,7 +189,7 @@ ReviewSchema.methods.approve = function(adminUserId: string, notes?: string) {
 };
 
 // Method to reject review
-ReviewSchema.methods.reject = function(adminUserId: string, notes?: string) {
+ReviewSchema.methods.reject = function (adminUserId: string, notes?: string) {
   this.status = 'rejected';
   this.isVerified = false;
   this.reviewedBy = adminUserId;
@@ -131,19 +199,19 @@ ReviewSchema.methods.reject = function(adminUserId: string, notes?: string) {
 };
 
 // Method to mark as helpful
-ReviewSchema.methods.markHelpful = function() {
+ReviewSchema.methods.markHelpful = function () {
   this.analytics.helpfulVotes += 1;
   return this.save();
 };
 
 // Method to mark as not helpful
-ReviewSchema.methods.markNotHelpful = function() {
+ReviewSchema.methods.markNotHelpful = function () {
   this.analytics.notHelpfulVotes += 1;
   return this.save();
 };
 
 // Method to increment views
-ReviewSchema.methods.incrementViews = function() {
+ReviewSchema.methods.incrementViews = function () {
   this.analytics.views += 1;
   this.analytics.lastViewedAt = new Date();
   return this.save();
@@ -154,42 +222,35 @@ ReviewSchema.methods.incrementViews = function() {
 // ============================================================================
 
 // Static method to get reviews by firm
-ReviewSchema.statics.findByFirm = function(firmId: string, options: Record<string, unknown> = {}) {
+ReviewSchema.statics.findByFirm = function (firmId: string, options: Record<string, unknown> = {}) {
   return this.find({ firmId, ...options });
 };
 
 // Static method to get reviews by user
-ReviewSchema.statics.findByUser = function(userId: string, options: Record<string, unknown> = {}) {
+ReviewSchema.statics.findByUser = function (userId: string, options: Record<string, unknown> = {}) {
   return this.find({ userId, ...options });
 };
 
 // Static method to get pending reviews
-ReviewSchema.statics.findPending = function(options: Record<string, unknown> = {}) {
+ReviewSchema.statics.findPending = function (options: Record<string, unknown> = {}) {
   return this.find({ status: 'pending', ...options });
 };
 
 // Static method to get approved reviews
-ReviewSchema.statics.findApproved = function(options: Record<string, unknown> = {}) {
+ReviewSchema.statics.findApproved = function (options: Record<string, unknown> = {}) {
   return this.find({ status: 'approved', isVerified: true, ...options });
 };
 
-// Static method to get reviews by rating range
-ReviewSchema.statics.findByRatingRange = function(minRating: number, maxRating: number, options: Record<string, unknown> = {}) {
-  return this.find({ 
-    rating: { $gte: minRating, $lte: maxRating }, 
-    ...options 
-  });
-};
+
 
 // Static method to get review statistics
-ReviewSchema.statics.getStats = function(filters: Record<string, unknown> = {}) {
+ReviewSchema.statics.getStats = function (filters: Record<string, unknown> = {}) {
   return this.aggregate([
     { $match: filters },
     {
       $group: {
         _id: null,
         totalReviews: { $sum: 1 },
-        averageRating: { $avg: '$rating' },
         pendingCount: { $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] } },
         approvedCount: { $sum: { $cond: [{ $eq: ['$status', 'approved'] }, 1, 0] } },
         rejectedCount: { $sum: { $cond: [{ $eq: ['$status', 'rejected'] }, 1, 0] } },
@@ -204,7 +265,7 @@ ReviewSchema.statics.getStats = function(filters: Record<string, unknown> = {}) 
 // ============================================================================
 
 // Update lastModifiedBy before saving
-ReviewSchema.pre('save', function(next) {
+ReviewSchema.pre('save', function (next) {
   if (this.isModified() && !this.isNew) {
     this.lastModifiedBy = this.createdBy; // In real app, get from auth context
   }
@@ -216,7 +277,7 @@ ReviewSchema.pre('save', function(next) {
 // ============================================================================
 
 // Update firm statistics after review is approved
-ReviewSchema.post('save', async function(doc) {
+ReviewSchema.post('save', async function (doc) {
   if (doc.status === 'approved' && doc.firmId) {
     // Here you would update the firm's review statistics
     // This could trigger a recalculation of the PropTrust Index
@@ -233,10 +294,10 @@ export interface IReview extends Document {
   firmId?: string;
   firmName: string;
   customFirmName?: string;
+  issueCategory: string; // Added
   issueType: IssueType;
   customIssueType?: string;
   description: string;
-  rating: number;
   files: Array<{
     name: string;
     type: string;
@@ -260,13 +321,13 @@ export interface IReview extends Document {
   updatedAt: Date;
   createdBy: string;
   lastModifiedBy: string;
-  
+
   // Virtual fields
   displayFirmName: string;
   displayIssueType: string;
   ageInDays: number;
   helpfulnessRatio: number;
-  
+
   // Instance methods
   approve(adminUserId: string, notes?: string): Promise<IReview>;
   reject(adminUserId: string, notes?: string): Promise<IReview>;

@@ -1,8 +1,13 @@
 "use client"
 import React, { useState } from 'react'
+import * as Flags from 'country-flag-icons/react/3x2'
+import countries from 'i18n-iso-countries'
+import enLocale from 'i18n-iso-countries/langs/en.json'
+
+countries.registerLocale(enLocale)
 import Image from 'next/image'
-import { 
-  CreditCard, 
+import {
+  CreditCard,
   Globe,
   ChartLine
 } from 'lucide-react'
@@ -35,7 +40,7 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
   // Map platform names to SVG file paths
   const getPlatformSvgPath = (platformName: string): string | null => {
     const normalized = platformName.toLowerCase().replace(/\s+/g, '')
-    
+
     const platformMap: Record<string, string> = {
       'ctrader': '/website/platforms/ctrader.svg',
       'matchtrader': '/website/platforms/matchtrader.svg',
@@ -48,14 +53,14 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
       'traderlocker': '/website/platforms/traderlocker.svg',
       'trader locker': '/website/platforms/traderlocker.svg',
     }
-    
+
     return platformMap[normalized] || null
   }
 
   // Map payment method names to SVG file paths
   const getPaymentSvgPath = (methodName: string): string | null => {
     const normalized = methodName.toLowerCase().replace(/\s+/g, '')
-    
+
     const paymentMap: Record<string, string> = {
       'credit': '/website/payments/credit.svg',
       'debit': '/website/payments/credit.svg',
@@ -77,23 +82,23 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
       'riseworks': '/website/payments/riseworks.svg',
       'rise works': '/website/payments/riseworks.svg',
     }
-    
+
     return paymentMap[normalized] || null
   }
 
   // Get platforms - check if tradingInfrastructure exists, otherwise use default
   // Note: tradingInfrastructure may not be in IFundingFirm interface but could be in data
   const platforms = (firmData as IFundingFirm & { tradingInfrastructure?: { tradingPlatforms?: string[] } }).tradingInfrastructure?.tradingPlatforms || ['cTrader', 'Match Trader', 'MT5']
-  
+
   // Format payment methods from data
   const paymentMethods = firmData.payments?.methods || []
   const payoutMethods = firmData.payments?.payoutMethods || []
-  
+
   // Map payment methods to display format and get SVG path
   const getPaymentMethodDisplay = (method: string) => {
     const lowerMethod = method.toLowerCase()
     let display = method
-    
+
     // Normalize display names
     if (lowerMethod.includes('card') || lowerMethod.includes('debit') || lowerMethod.includes('credit')) {
       display = 'Credit/Debit Card'
@@ -102,9 +107,24 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
     } else if (lowerMethod.includes('bank') || lowerMethod.includes('wire')) {
       display = 'Bank Transfer'
     }
-    
+
     const svgPath = getPaymentSvgPath(method)
     return { display, svgPath }
+  }
+
+  const getCountryCode = (name: string) => {
+    // Try to get alpha-2 code from name
+    const code = countries.getAlpha2Code(name, 'en')
+    return code
+  }
+
+  const renderFlag = (countryName: string) => {
+    const code = getCountryCode(countryName)
+    if (code && code in Flags) {
+      const FlagComponent = Flags[code as keyof typeof Flags]
+      return <FlagComponent className="w-4 h-4 " />
+    }
+    return <Globe className="w-4 h-4 text-foreground/60" />
   }
 
   return (
@@ -115,25 +135,25 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
           <p className="text-xs text-foreground/60 mb-1">Legal Name</p>
           <p className="text-foreground font-medium">{firmData.firmDetails?.legalEntityName || firmData.firmDetails?.name}</p>
         </div>
-        
+
         <div>
           <p className="text-xs text-foreground/60 mb-1">Registration Number</p>
           <p className="text-foreground font-medium">{firmData.firmDetails?.registrationNumber || 'N/A'}</p>
         </div>
-        
+
         <div>
           <p className="text-xs text-foreground/60 mb-1">License Number</p>
           <p className="text-foreground font-medium">{firmData.firmDetails?.licenseNumber || 'N/A'}</p>
         </div>
-        
+
         <div>
           <p className="text-xs text-foreground/60 mb-1">Regulator</p>
           <p className="text-foreground font-medium">{firmData.firmDetails?.regulator || 'N/A'}</p>
         </div>
-        
+
         <div>
           <p className="text-xs text-foreground/60 mb-1">HeadQuarters</p>
-          <a 
+          <a
             href={`https://maps.google.com/?q=${encodeURIComponent(firmData.firmDetails?.hqAddress || '')}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -142,12 +162,12 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
             {firmData.firmDetails?.hqAddress || 'N/A'}
           </a>
         </div>
-        
+
         <div>
           <p className="text-xs text-foreground/60 mb-1">Year Founded</p>
           <p className="text-foreground font-medium">{firmData.firmDetails?.yearFounded || 'N/A'}</p>
         </div>
-        
+
         <div>
           <p className="text-xs text-foreground/60 mb-1">Company Description</p>
           <p className="text-foreground text-sm leading-relaxed line-clamp-4">
@@ -162,12 +182,12 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
         <div>
           <p className="text-xs text-foreground/60 mb-2">Broker</p>
           <div className="flex items-center gap-2">
-            {firmData?.firmDetails?.brokers?.map((broker:string, idx:number)=>(
+            {firmData?.firmDetails?.brokers?.map((broker: string, idx: number) => (
               <span key={idx} className="px-5 py-1.5 bg-foreground/5 rounded-full text-sm text-foreground flex items-center gap-2">
                 <ChartLine className="w-4 h-4 text-primary" />
-              {broker}
+                {broker}
               </span>
-            )) }
+            ))}
           </div>
         </div>
 
@@ -181,11 +201,11 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
                 <div key={platform} className="flex items-center gap-2 px-5 py-1.5 bg-foreground/5 rounded-full">
                   {svgPath ? (
                     <div className="relative w-4 h-4">
-                      <Image 
-                        src={svgPath} 
-                        alt={platform} 
-                        fill 
-                        className="object-contain" 
+                      <Image
+                        src={svgPath}
+                        alt={platform}
+                        fill
+                        className="object-contain"
                       />
                     </div>
                   ) : (
@@ -208,11 +228,11 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
                 <div key={idx} className="flex items-center gap-2 px-5 py-1.5 bg-foreground/5 rounded-full">
                   {svgPath ? (
                     <div className="relative w-4 h-4">
-                      <Image 
-                        src={svgPath} 
-                        alt={display} 
-                        fill 
-                        className="object-contain" 
+                      <Image
+                        src={svgPath}
+                        alt={display}
+                        fill
+                        className="object-contain"
                       />
                     </div>
                   ) : (
@@ -235,11 +255,11 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
                 <div key={idx} className="flex items-center gap-2 px-5 py-1.5 bg-foreground/5 rounded-full">
                   {svgPath ? (
                     <div className="relative w-4 h-4">
-                      <Image 
-                        src={svgPath} 
-                        alt={display} 
-                        fill 
-                        className="object-contain" 
+                      <Image
+                        src={svgPath}
+                        alt={display}
+                        fill
+                        className="object-contain"
                       />
                     </div>
                   ) : (
@@ -252,13 +272,17 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
           </div>
         </div>
 
+
+
+
+
         {/* Restricted Countries */}
         <div>
           <p className="text-xs text-foreground/60 mb-2">Restricted Countries</p>
           <div className="flex flex-wrap gap-2">
             {displayCountries.map((country, idx) => (
               <div key={idx} className="flex items-center gap-2 px-5 py-1.5 bg-foreground/5 rounded-full">
-                <Globe className="w-4 h-4 text-foreground/60" />
+                {renderFlag(country)}
                 <span className="text-sm text-foreground">{country}</span>
               </div>
             ))}
@@ -285,11 +309,11 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
             <div className="mt-4">
               <div className="flex flex-wrap gap-2">
                 {restrictedCountries.map((country, idx) => (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     className="flex items-center gap-2 px-4 py-2 bg-foreground/5 rounded-full border border-border hover:bg-foreground/10 transition-colors"
                   >
-                    <Globe className="w-4 h-4 text-foreground/60" />
+                    {renderFlag(country)}
                     <span className="text-sm text-foreground font-medium">{country}</span>
                   </div>
                 ))}
@@ -308,8 +332,8 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
           <p className="text-xs text-foreground/60 mb-2">Language Supported</p>
           <div className="flex flex-wrap gap-2">
             {displayLanguages.map((language, idx) => (
-              <span 
-                key={idx} 
+              <span
+                key={idx}
                 className="px-5 py-1.5 bg-foreground/5 text-primary rounded-full text-sm font-medium"
               >
                 {language}
@@ -338,8 +362,8 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
             <div className="mt-4">
               <div className="flex flex-wrap gap-2">
                 {languagesSupported.map((language, idx) => (
-                  <span 
-                    key={idx} 
+                  <span
+                    key={idx}
                     className="px-4 py-2 bg-foreground/5 text-primary rounded-full border border-border hover:bg-foreground/10 transition-colors text-sm font-medium"
                   >
                     {language}
