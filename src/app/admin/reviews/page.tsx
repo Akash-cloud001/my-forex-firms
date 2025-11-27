@@ -155,7 +155,7 @@ export default function ReviewsList() {
   };
 
   const getRatingColor = (rating: number) => {
-    if (rating >= 4) return 'text-green-500';
+    if (rating >= 4) return 'text-success';
     if (rating >= 3) return 'text-yellow-500';
     return 'text-red-500';
   };
