@@ -34,7 +34,7 @@ export default function Page() {
                   dividerLine: "bg-[#ffffff]",
                   dividerText: "text-sm",
                   footerActionText: "text-muted-foreground text-sm",
-                  formFieldSuccessText: "!text-green-500 !text-xs",
+                  formFieldSuccessText: "!text-success !text-xs",
                   formFieldErrorText: "!text-destructive !text-xs",
                   alertText: "!text-destructive !text-xs",
                   formResendCodeLink: "text-primary hover:text-primary/80 text-sm",

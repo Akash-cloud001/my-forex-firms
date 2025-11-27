@@ -77,9 +77,9 @@ const Subscribe = () => {
             </form>
             {isSubmitted ? (
           <div className="text-center mt-2 opacity-80">
-            <p className="font-geist-sans text-xs text-green-500 flex items-center justify-start">
+            <p className="font-geist-sans text-xs text-success flex items-center justify-start">
               {/* Check your email for confirmation.  */}
-              <CheckCircle className="w-4 h-4 mr-1 text-green-500" /> Thank you for subscribing!
+              <CheckCircle className="w-4 h-4 mr-1 text-success" /> Thank you for subscribing!
             </p>
           </div>
         ) : (errorMessage && (

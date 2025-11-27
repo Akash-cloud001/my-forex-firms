@@ -530,7 +530,7 @@ export default function EmailManagementPage() {
             
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Edit3 className="h-5 w-5 text-green-500" />
+                <Edit3 className="h-5 w-5 text-success" />
                 <h3 className="font-semibold text-white">Editor</h3>
               </div>
               <p className="text-sm text-muted-foreground">

@@ -2,7 +2,8 @@
 import React, { useState } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ChevronRight } from 'lucide-react'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useFirmProgramList } from '@/hooks/queries/useFirmProgramList'
 import { useParams } from 'next/navigation'
 import { Pagination } from '@/components/common/Pagination'
@@ -63,8 +64,10 @@ const ChallengesContent = () => {
     <div className="w-full border border-border p-8 rounded-lg card-custom-grad">
       {/* Filter Section */}
       <div className="flex gap-4 mb-6">
-        <Select value={selectedSteps} onValueChange={(val) => { setSelectedSteps(val); setPage(1); }}>
-          <SelectTrigger className="w-[180px] !bg-white/10 !text-white">
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-foreground/60">Steps:</p>
+          <Select value={selectedSteps} onValueChange={(val) => { setSelectedSteps(val); setPage(1); }}>
+          <SelectTrigger className="w-[100px] !bg-white/10 !text-white">
             <SelectValue placeholder="Steps: Select" />
           </SelectTrigger>
           <SelectContent>
@@ -75,10 +78,12 @@ const ChallengesContent = () => {
             <SelectItem value="Instant">Instant</SelectItem>
           </SelectContent>
         </Select>
-
-        <Select value={selectedSize} onValueChange={(val) => { setSelectedSize(val); setPage(1); }}>
-          <SelectTrigger className="w-[180px] !bg-white/10 !text-white">
-            <SelectValue placeholder="Size: Select" />
+        </div>
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-foreground/60">Size:</p>
+          <Select value={selectedSize} onValueChange={(val) => { setSelectedSize(val); setPage(1); }}>
+          <SelectTrigger className="w-[120px] !bg-white/10 !text-white">
+            <SelectValue placeholder=" Select" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All</SelectItem>
@@ -89,19 +94,23 @@ const ChallengesContent = () => {
             <SelectItem value="100000">$100,000</SelectItem>
           </SelectContent>
         </Select>
+        </div>
 
-        <Select value={selectedAssets} onValueChange={setSelectedAssets}>
-          <SelectTrigger className="w-[180px] !bg-white/10 !text-white">
-            <SelectValue placeholder="Assets: Select" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="forex">Forex</SelectItem>
-            <SelectItem value="crypto">Crypto</SelectItem>
-            <SelectItem value="stocks">Stocks</SelectItem>
-            <SelectItem value="indices">Indices</SelectItem>
-          </SelectContent>
-        </Select>
+        {/* <div className="flex items-center gap-2">
+          <p className="text-sm text-foreground/60">Assets:</p>
+          <Select value={selectedAssets} onValueChange={setSelectedAssets}>
+            <SelectTrigger className="w-[150px] !bg-white/10 !text-white">
+              <SelectValue placeholder=" Select" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="forex">Forex</SelectItem>
+              <SelectItem value="crypto">Crypto</SelectItem>
+              <SelectItem value="stocks">Stocks</SelectItem>
+              <SelectItem value="indices">Indices</SelectItem>
+            </SelectContent>
+          </Select>
+        </div> */}
       </div>
 
       {/* Table Section */}
@@ -144,9 +153,41 @@ const ChallengesContent = () => {
             </thead>
             <tbody>
               {isLoading ? (
-                <tr>
-                  <td colSpan={10} className="px-4 py-8 text-center text-foreground">Loading...</td>
-                </tr>
+                // Skeleton rows
+                Array.from({ length: 5 }).map((_, index) => (
+                  <tr key={index} className="border-b border-foreground/20">
+                    <td className="px-4 py-4">
+                      <Skeleton className="h-4 w-32" />
+                    </td>
+                    <td className="px-4 py-4">
+                      <Skeleton className="h-4 w-20" />
+                    </td>
+                    <td className="px-4 py-4">
+                      <Skeleton className="h-4 w-16" />
+                    </td>
+                    <td className="px-4 py-4">
+                      <Skeleton className="h-4 w-12" />
+                    </td>
+                    <td className="px-4 py-4">
+                      <Skeleton className="h-4 w-10" />
+                    </td>
+                    <td className="px-4 py-4">
+                      <Skeleton className="h-4 w-10" />
+                    </td>
+                    <td className="px-4 py-4">
+                      <Skeleton className="h-4 w-14" />
+                    </td>
+                    <td className="px-4 py-4">
+                      <Skeleton className="h-4 w-10" />
+                    </td>
+                    <td className="px-4 py-4">
+                      <Skeleton className="h-4 w-10" />
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <Skeleton className="h-5 w-5 mx-auto" />
+                    </td>
+                  </tr>
+                ))
               ) : data?.programs.map((program, index) => {
                 const { size, fee } = getDisplaySizeAndFee(program)
                 return (
@@ -170,23 +211,23 @@ const ChallengesContent = () => {
                     <td className="px-4 py-4 text-sm text-red-500">
                       {fee}
                     </td>
-                    <td className="px-4 py-4 text-sm text-green-500">
-                      {program.profitTarget}%
+                    <td className="px-4 py-4 text-sm text-success">
+                      {program.profitTarget ? program.profitTarget + '%' : '-'}
                     </td>
-                    <td className="px-4 py-4 text-sm text-green-500">
-                      {program.profitSplit}%
+                    <td className="px-4 py-4 text-sm text-success">
+                      {program.profitSplit ? program.profitSplit + '%' : '-'}
                     </td>
                     <td className="px-4 py-4 text-sm text-foreground">
                       {program.leverage}
                     </td>
                     <td className="px-4 py-4 text-sm text-red-500">
-                      {program.maxLoss}%
+                      {program.maxLoss ? program.maxLoss + '%' : '-'}
                     </td>
                     <td className="px-4 py-4 text-sm text-red-500">
-                      {program.dailyLoss}%
+                      {program.dailyLoss ? program.dailyLoss + '%' : '-'}
                     </td>
                     <td className="px-4 py-4 text-center">
-                      <ChevronRight className="w-5 h-5 text-primary cursor-pointer hover:opacity-80" />
+                      <ChevronRight className="w-5 h-5 text-muted-foreground cursor-pointer hover:opacity-80" />
                     </td>
                   </tr>
                 )
@@ -217,212 +258,146 @@ const ChallengesContent = () => {
       <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <SheetContent
           side="right"
-          className="w-full max-w-[320px] md:max-w-[575px] overflow-y-auto text-white border-none bg-card"
+          className="w-full max-w-[380px] overflow-y-auto text-white border-none bg-background p-0"
         >
           {selectedChallenge && (
-            <div className="space-y-6">
-              <SheetHeader>
-                <SheetTitle className="text-2xl font-bold text-foreground">
-                  {selectedChallenge.name}
-                </SheetTitle>
-                <SheetDescription className="text-foreground/60">
-                  Challenge Details
-                </SheetDescription>
+            <div className="h-full flex flex-col">
+              {/* Header */}
+              <SheetHeader className="mt-8 -mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xl gradient-text capitalize font-semibold text-foreground">{selectedChallenge.name}</h2>
+                  <p className="text-sm text-muted-foreground">Steps: {selectedChallenge.type}</p>
+                </div>
               </SheetHeader>
 
-              <div className="space-y-4 px-4 pb-8">
-                {/* Basic Information */}
-                <div className="space-y-3 mt-8 border-b border-foreground/20 pb-4">
-                  <h3 className="text-lg font-semibold text-foreground">
-                    Basic Information
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-foreground/60">Type</p>
-                      <p className="text-foreground font-medium">{selectedChallenge.type}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground/60">Evaluation Phases</p>
-                      <p className="text-foreground font-medium">{selectedChallenge.evaluationPhases}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground/60">Leverage</p>
-                      <p className="text-foreground font-medium">{selectedChallenge.leverage}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground/60">Profit Split</p>
-                      <p className="text-green-500 font-medium">{selectedChallenge.profitSplit}%</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Profit Targets */}
-                <div className="space-y-3 mt-8 border-b border-foreground/20 pb-4">
-                  <h3 className="text-lg font-semibold text-foreground">
-                    Profit Targets
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-foreground/60">Profit Target</p>
-                      <p className="text-green-500 font-medium">{selectedChallenge.profitTarget}%</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground/60">Max Loss</p>
-                      <p className="text-red-500 font-medium">{selectedChallenge.maxLoss}%</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground/60">Daily Loss</p>
-                      <p className="text-red-500 font-medium">{selectedChallenge.dailyLoss}%</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground/60">Max Loss Type</p>
-                      <p className="text-foreground font-medium">{selectedChallenge.maxLossType}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Evaluation Steps */}
-                {selectedChallenge.evaluationSteps && selectedChallenge.evaluationSteps.length > 0 && (
-                  <div className="space-y-3 mt-8 border-b border-foreground/20 pb-8">
-                    <h3 className="text-lg font-semibold text-foreground">
-                      Evaluation Steps
-                    </h3>
-                    <div className="space-y-3 mt-4">
-                      {selectedChallenge.evaluationSteps.map((step, idx) => (
-                        <div key={step.stepNumber || idx} className="p-3 bg-foreground/5 rounded-lg">
-                          <p className="font-medium text-foreground mb-2">Step {step.stepNumber}</p>
-                          <div className="grid grid-cols-2 gap-2 text-sm">
-                            <div>
-                              <p className="text-foreground/60">Profit Target</p>
-                              <p className="text-green-500">{step.profitTarget}%</p>
-                            </div>
-                            <div>
-                              <p className="text-foreground/60">Max Loss</p>
-                              <p className="text-red-500">{step.maxLoss}%</p>
-                            </div>
-                            <div>
-                              <p className="text-foreground/60">Daily Loss</p>
-                              <p className="text-red-500">{step.dailyLoss}%</p>
-                            </div>
-                            <div>
-                              <p className="text-foreground/60">Min Trading Days</p>
-                              <p className="text-foreground">{step.minTradingDays}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Account Sizes */}
-                {selectedChallenge.accountSizes && selectedChallenge.accountSizes.length > 0 && (
-                  <div className="space-y-3 mt-8 border-b border-foreground/20 pb-4">
-                    <h3 className="text-lg font-semibold text-foreground">
-                      Account Sizes
-                    </h3>
-                    <div className="space-y-2">
+              {/* Content */}
+              <div className="flex-1 px-4 py-4 space-y-4">
+                {/* Key Metrics Cards */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Max Drawdown & Profit Target Card */}
+                  <div className="bg-card border border-border rounded-lg p-4">
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">Account Size</p>
+                        <div className="space-y-2">
                       {selectedChallenge.accountSizes.map((size, idx) => (
-                        <div key={size.size || idx} className="flex justify-between items-center p-2 bg-foreground/5 rounded">
-                          <span className="text-primary font-medium">${size.size.toLocaleString()}</span>
-                          <span className="text-red-500">${size.price}</span>
-                        </div>
+                          <span key={idx} className="text-2xl font-bold text-success/80">${size.size.toLocaleString()}</span>
+                      ))}
+                    </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-card border border-border rounded-lg p-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Fee:</p>
+                      {selectedChallenge.accountSizes.map((size, idx) => (
+                        <span key={idx} className="text-2xl font-bold text-foreground/80">${size.price.toLocaleString()}</span>
                       ))}
                     </div>
                   </div>
-                )}
+                  
 
-                {/* Trading Rules */}
-                <div className="space-y-3 mt-8 border-b border-foreground/20 pb-4">
-                  <h3 className="text-lg font-semibold text-foreground">
-                    Trading Rules
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${selectedChallenge.stopLossRequired ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                      <span className="text-sm text-foreground">Stop Loss Required</span>
+                  {/* Daily Loss Card */}
+                  <div className="bg-card border border-border rounded-lg p-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Daily Loss:</p>
+                      <p className="text-xl font-bold text-destructive/80">{selectedChallenge.dailyLoss}%</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${selectedChallenge.eaAllowed ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                      <span className="text-sm text-foreground">EA Allowed</span>
+                  </div>
+
+                  {/* Max Loss Type Card */}
+                  <div className="bg-card border border-border rounded-lg p-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Max Loss Type:</p>
+                      <p className="text-lg font-bold text-foreground/80">{selectedChallenge.maxLossType}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${selectedChallenge.weekendHolding ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                      <span className="text-sm text-foreground">Weekend Holding</span>
+                  </div>
+
+                  <div className="bg-card border border-border rounded-lg p-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Profit Split</p>
+                      <p className="text-lg font-bold text-success/80">
+                      {selectedChallenge.profitSplit}%
+                      </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${selectedChallenge.overnightHolding ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                      <span className="text-sm text-foreground">Overnight Holding</span>
+                  </div>
+
+                  {/* Min Trading Days Card */}
+                  <div className="bg-card border border-border rounded-lg p-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Min Trading Days:</p>
+                      <p className="text-lg font-bold text-foreground/80">{selectedChallenge.minTradingDays} days</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${selectedChallenge.newsTrading ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                      <span className="text-sm text-foreground">News Trading</span>
+                  </div>
+
+                </div>
+                {/* Program Details */}
+                <div>
+                  <h3 className="text-sm font-medium text-foreground mb-3">Program Details</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Evaluation Phases</span>
+                      <span className="text-sm font-medium text-foreground">{selectedChallenge.evaluationPhases}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${selectedChallenge.copyTrading ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                      <span className="text-sm text-foreground">Copy Trading</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Min Trading Days</span>
+                      <span className="text-sm font-medium text-foreground">{selectedChallenge.minTradingDays} days</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Time Limit</span>
+                      <span className="text-sm font-medium text-foreground">{selectedChallenge.timeLimit === 'Unlimited' ? '∞ Unlimited' : `${selectedChallenge.timeLimit} days`}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Payout Information */}
-                <div className="space-y-3 mt-8 border-b border-foreground/20 pb-4">
-                  <h3 className="text-lg font-semibold text-foreground">
-                    Payout Information
-                  </h3>
+                {/* Challenge Trading Overview */}
+                <div>
+                  <h3 className="text-sm font-medium text-foreground mb-3">Challenge Trading Overview</h3>
                   <div className="space-y-2">
+                    {[
+                      { label: 'Max Drawdown', value: selectedChallenge.maxLoss + '%', allowed: true },
+                      { label: 'News Trading', value: selectedChallenge.newsTrading ? 'Yes' : 'No', allowed: selectedChallenge.newsTrading },
+                      { label: 'Copy Trading', value: selectedChallenge.copyTrading ? 'Yes' : 'No', allowed: selectedChallenge.copyTrading },
+                      { label: 'EA Trading', value: selectedChallenge.eaAllowed ? 'Yes' : 'No', allowed: selectedChallenge.eaAllowed },
+                      { label: 'Weekend Holding', value: selectedChallenge.weekendHolding ? 'Yes' : 'No', allowed: selectedChallenge.weekendHolding },
+                      { label: 'Overnight Holding', value: selectedChallenge.overnightHolding ? 'Yes' : 'No', allowed: selectedChallenge.overnightHolding },
+                      { label: 'Stop Loss Required', value: selectedChallenge.stopLossRequired ? 'Yes' : 'No', allowed: selectedChallenge.stopLossRequired }
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">{item.label}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-foreground">{item.value}</span>
+                          <div className={`w-2 h-2 rounded-full ${item.allowed ? 'bg-success' : 'bg-red-500'}`}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Payout Overview */}
+                <div>
+                  <h3 className="text-sm font-medium text-foreground mb-3">Payout Overview</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Refundable Fee</span>
+                      <span className="text-sm font-medium text-foreground">{selectedChallenge.refundFee ? 'Yes' : 'No'}</span>
+                    </div>
                     {selectedChallenge.payoutFrequency && selectedChallenge.payoutFrequency.length > 0 && (
                       <div>
-                        <p className="text-sm text-foreground/60 mb-2">Payout Frequency</p>
+                        <p className="text-sm text-muted-foreground mb-2">Payout Frequency</p>
                         {selectedChallenge.payoutFrequency.map((freq, idx) => (
-                          <div key={freq.label || idx} className="flex justify-between items-center p-2 bg-foreground/5 rounded mb-1">
-                            <span className="text-foreground">{freq.label}</span>
-                            <span className="text-green-500 font-medium">{freq.percentage}%</span>
+                          <div key={idx} className="flex justify-between items-center text-sm mb-0.5 px-2">
+                            <span className="text-muted-foreground">{freq.label}</span>
+                            <span className="font-medium text-foreground">{freq.percentage}</span>
                           </div>
                         ))}
                       </div>
                     )}
-                    {selectedChallenge.payoutMethods && selectedChallenge.payoutMethods.length > 0 && (
-                      <div>
-                        <p className="text-sm text-foreground/60 mb-2">Payout Methods</p>
-                        <div className="flex flex-wrap gap-2">
-                          {selectedChallenge.payoutMethods.map((method) => (
-                            <span key={method} className="px-3 py-1 bg-foreground/10 rounded text-sm text-foreground">
-                              {method}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
 
-                {/* Time Limits */}
-                <div className="space-y-3 mt-8">
-                  <h3 className="text-lg font-semibold text-foreground ">
-                    Time Limits
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-foreground/60">Time Limit</p>
-                      <p className="text-foreground font-medium">{selectedChallenge.timeLimit} days</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground/60">Min Trading Days</p>
-                      <p className="text-foreground font-medium">{selectedChallenge.minTradingDays} days</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground/60">Drawdown Reset</p>
-                      <p className="text-foreground font-medium">{selectedChallenge.drawdownResetType}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground/60">Refund Fee</p>
-                      <p className={selectedChallenge.refundFee ? 'text-green-500 font-medium' : 'text-red-500 font-medium'}>
-                        {selectedChallenge.refundFee ? 'Yes' : 'No'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                
+
               </div>
             </div>
           )}

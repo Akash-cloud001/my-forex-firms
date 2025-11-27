@@ -338,9 +338,9 @@ const ProgramForm = ({ programId }: { programId?: string }) => {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {submitStatus === "success" && (
-          <Alert className="mb-6 bg-green-500/10 border-green-500">
-            <Info className="h-4 w-4 text-green-500" />
-            <AlertDescription className="text-green-500 font-medium">
+          <Alert className="mb-6 bg-success/10 border-success">
+            <Info className="h-4 w-4 text-success" />
+            <AlertDescription className="text-success font-medium">
               Program saved successfully! Check console for details.
             </AlertDescription>
           </Alert>
