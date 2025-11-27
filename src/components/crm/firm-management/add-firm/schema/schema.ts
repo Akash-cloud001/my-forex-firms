@@ -28,6 +28,8 @@ export const firmDetailsSchema = z.object({
   liquidityProviders: z.array(z.string()).optional(),
   totalPayout: z.string().optional(),
   slug: z.string().optional(),
+  brokerBackedType: z.string().optional(),
+  backedBrokerName: z.string().optional(),
 });
 
 export const leadershipMemberSchema = z.object({
@@ -110,6 +112,7 @@ export const leverageMatrixSchema = z.record(
 export const tradingSchema = z.object({
   leverageMatrix: leverageMatrixSchema.optional(),
   commissions: z.record(z.string(), z.any()).optional(),
+  tradingPlatforms: z.array(z.string()).optional(),
 });
 
 export const paymentsSchema = z.object({

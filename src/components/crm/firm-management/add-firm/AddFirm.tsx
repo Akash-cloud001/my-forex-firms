@@ -81,6 +81,8 @@ export default function FundingFirmForm({
       liquidityProviders: [],
       totalPayout: "",
       slug: "",
+      brokerBackedType: "no",
+      backedBrokerName: "",
     },
     leadership: {
       leadership: [],
@@ -124,6 +126,7 @@ export default function FundingFirmForm({
       processingTime: "",
       payoutSchedule: "",
       refundPolicy: "",
+      tradingPlatforms: [],
     },
   };
 

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { pillarsConfig, initialScoresData } from '@/components/crm/point-evaluation/types/constant'
+import type { PillarScores, Pillar, Category, FactorConfig } from '@/components/crm/point-evaluation/types/constant.types'
 
 const sampleFirms = [
     {
@@ -151,14 +152,14 @@ const sampleFirms = [
 ]
 
 // Calculate pillar score based on the pillar configuration
-const calculatePillarScore = (scores: any, pillarConfig: any) => {
+const calculatePillarScore = (scores: PillarScores, pillarConfig: Pillar) => {
     let total = 0
     let maxTotal = 0
 
-    pillarConfig.categories.forEach((category: any) => {
+    pillarConfig.categories.forEach((category: Category) => {
         const categoryData = scores[category.id] || {}
 
-        Object.entries(category.factors).forEach(([key, config]: [string, any]) => {
+        Object.entries(category.factors).forEach(([key, config]: [string, FactorConfig]) => {
             total += categoryData[key] || 0
             maxTotal += config.max
         })

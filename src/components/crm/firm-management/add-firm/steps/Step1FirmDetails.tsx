@@ -30,6 +30,7 @@ interface Step1FirmDetailsProps {
   isLastStep: boolean;
   onSubmit: () => void;
 }
+const brokerBackedOptions = ["no", "new", "reputed"];
 
 export default function Step1FirmDetails({
   onNext,
@@ -156,6 +157,8 @@ export default function Step1FirmDetails({
   // console.log("🚀 ~ Step1FirmDetails ~ showExisting:", showExisting)
   const showNew = newImageFile;
   // const showPlaceholder = !existingImage && !newImageFile;
+  const brokerBackedValue = watch("firmDetails.brokerBackedType") || "";
+  const statusValue = watch("firmDetails.status") || "";
 
   return (
     <div className="space-y-6">
@@ -403,16 +406,26 @@ export default function Step1FirmDetails({
         </div>
 
         {/* Status */}
+
         <div className="space-y-2">
           <Label htmlFor="status" className="text-sm font-medium">
             Status
           </Label>
+
           <Select
-            onValueChange={(value) => setValue("firmDetails.status", value)}
+            value={statusValue}
+            onValueChange={(value) =>
+              setValue("firmDetails.status", value, {
+                shouldValidate: true,
+              })
+            }
           >
-            <SelectTrigger>
+            <SelectTrigger
+              className={errors.firmDetails?.status ? "border-red-500" : ""}
+            >
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
+
             <SelectContent>
               {statusOptions.map((status) => (
                 <SelectItem key={status} value={status}>
@@ -421,6 +434,47 @@ export default function Step1FirmDetails({
               ))}
             </SelectContent>
           </Select>
+
+          {errors.firmDetails?.status && (
+            <p className="text-sm text-red-500">
+              {errors.firmDetails.status.message as string}
+            </p>
+          )}
+        </div>
+
+        {/* Broker Backed */}
+        <div className="space-y-2">
+          <Label htmlFor="brokerBacked" className="text-sm font-medium">
+            Broker Backed
+          </Label>
+          <Select
+            value={brokerBackedValue}
+            onValueChange={(value) =>
+              setValue("firmDetails.brokerBackedType", value, { shouldValidate: true })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select broker backed" />
+            </SelectTrigger>
+            <SelectContent>
+              {brokerBackedOptions.map((brokerBacked) => (
+                <SelectItem key={brokerBacked} value={brokerBacked}>
+                  {brokerBacked.toUpperCase()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {/* Broker Name */}
+        <div className="space-y-2">
+          <Label htmlFor="brokerName" className="text-sm font-medium">
+            Broker Backed Name
+          </Label>
+          <Input
+            id="brokerName"
+            {...register("firmDetails.backedBrokerName")}
+            placeholder="Broker name"
+          />
         </div>
       </div>
 

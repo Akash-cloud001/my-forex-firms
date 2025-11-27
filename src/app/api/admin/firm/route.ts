@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     const body = {
       firmDetails: {
         ...parseNested("firmDetails"),
-        image: imageMeta, // ← inject Cloudinary result
+        image: imageMeta,
       },
       leadership: parseNested("leadership"),
       ratings: parseNested("ratings"),
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Remove the temporary imageFile from firmDetails
-    delete (body.firmDetails ).imageFile;
+    delete (body.firmDetails).imageFile;
     // 1. Create the firm
     const firm = await FundingFirm.create(body);
 

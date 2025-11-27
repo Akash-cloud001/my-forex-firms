@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 interface StepProps {
   onNext: () => void;
@@ -15,22 +16,32 @@ interface StepProps {
   onSubmit?: () => void;
 }
 
+const TRADING_PLATFORM_OPTIONS = [
+  { label: 'MT5', value: 'MT5' },
+  { label: 'CTrader', value: 'CTrader' },
+  { label: 'MatchTrader', value: 'MatchTrader' },
+  { label: 'DXTrade', value: 'DXTrade' },
+  { label: 'Other', value: 'Other' },
+];
+
 export function Step8Trading({ onNext, onPrevious }: StepProps) {
   const { watch, setValue } = useFormContext();
-  
+
   const [assetClass, setAssetClass] = useState('');
-  
+  const [customPlatform, setCustomPlatform] = useState('');
+
   const [commAssetClass, setCommAssetClass] = useState('');
   const [commissionDetails, setCommissionDetails] = useState('');
 
   const leverageMatrix = watch('trading.leverageMatrix') || {};
   const commissions = watch('trading.commissions') || {};
+  const tradingPlatforms = (watch('trading.tradingPlatforms') || []) as string[];
 
   const addLeverageRow = () => {
     if (assetClass.trim()) {
       setValue('trading.leverageMatrix', {
         ...leverageMatrix,
-        [assetClass.trim()]: { Instant: '', '1-Step': '', '2-Step': '','3-step':'' },
+        [assetClass.trim()]: { Instant: '', '1-Step': '', '2-Step': '', '3-step': '' },
       });
       setAssetClass('');
     }
@@ -49,6 +60,25 @@ export function Step8Trading({ onNext, onPrevious }: StepProps) {
     setValue('trading.leverageMatrix', updated);
   };
 
+  // ========== TRADING PLATFORMS ==========
+  const handlePlatformChange = (values: string[]) => {
+    setValue('trading.tradingPlatforms', values);
+  };
+
+  const addCustomPlatform = () => {
+    if (customPlatform.trim() && !tradingPlatforms.includes(customPlatform.trim())) {
+      // Remove 'Other' and add the custom platform
+      const newPlatforms = tradingPlatforms.filter(p => p !== 'Other');
+      setValue('trading.tradingPlatforms', [...newPlatforms, customPlatform.trim()]);
+      setCustomPlatform('');
+    }
+  };
+  const platformOptions = [
+    ...TRADING_PLATFORM_OPTIONS,
+    ...tradingPlatforms
+      .filter(p => !TRADING_PLATFORM_OPTIONS.some(opt => opt.value === p))
+      .map(p => ({ label: p, value: p }))
+  ];
   // ========== COMMISSIONS ==========
   const addCommission = () => {
     if (commAssetClass.trim() && commissionDetails.trim()) {
@@ -74,6 +104,8 @@ export function Step8Trading({ onNext, onPrevious }: StepProps) {
     });
   };
 
+  const showCustomPlatformInput = tradingPlatforms.includes('Other');
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -83,6 +115,56 @@ export function Step8Trading({ onNext, onPrevious }: StepProps) {
           Trading Conditions
         </h2>
         <p className="text-gray-600 mt-1">Configure leverage and commission structures</p>
+      </div>
+
+      {/* ========== TRADING PLATFORMS SECTION ========== */}
+      <div className="space-y-4 flex flex-col gap-4">
+        <div>
+          <Label className="text-lg font-semibold">Trading Platforms</Label>
+          <p className="text-sm text-gray-500 mt-1">
+            Select the trading platforms supported by this firm
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 w-[50%]">
+
+          <MultiSelect
+            options={platformOptions}
+            onValueChange={handlePlatformChange}
+            defaultValue={tradingPlatforms}
+            placeholder="Select trading platforms..."
+            resetOnDefaultValueChange={true}
+          />
+        </div>
+
+        {/* Custom Platform Input - shows when "Other" is selected */}
+        {showCustomPlatformInput && (
+          <Card className="p-4">
+            <div className="space-y-2">
+              <Label className="text-sm">Add Custom Platform</Label>
+              <p className="text-xs text-gray-500">
+                Enter the name of other trading platforms not listed above
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  value={customPlatform}
+                  onChange={(e) => setCustomPlatform(e.target.value)}
+                  placeholder="e.g., TradeLocker, Vertex"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addCustomPlatform();
+                    }
+                  }}
+                />
+                <Button type="button" onClick={addCustomPlatform}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
       </div>
 
       {/* ========== LEVERAGE MATRIX SECTION ========== */}
@@ -135,7 +217,7 @@ export function Step8Trading({ onNext, onPrevious }: StepProps) {
                   </Button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {['Instant', '1-Step', '2-Step','3-step'].map((type) => (
+                  {['Instant', '1-Step', '2-Step', '3-step'].map((type) => (
                     <div key={type}>
                       <Label className="text-xs text-gray-600">{type}</Label>
                       <Input
@@ -187,8 +269,8 @@ export function Step8Trading({ onNext, onPrevious }: StepProps) {
                 Include all account types and their respective rates
               </p>
             </div>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={addCommission}
               className="w-full"
             >
@@ -250,7 +332,7 @@ export function Step8Trading({ onNext, onPrevious }: StepProps) {
         )}
       </div>
 
-   
+
 
       {/* Navigation Buttons */}
       <div className="flex justify-between pt-6 ">

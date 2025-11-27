@@ -94,6 +94,22 @@ function FirmDetailsTab({ firmData }: any) {
                 {firmData.firmDetails.totalPayout}
               </p>
             </div>
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">
+                Broker Backed Type
+              </label>
+              <p className="text-base">
+                {firmData.firmDetails.brokerBackedType}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">
+                Backed Broker Name
+              </label>
+              <p className="text-base">
+                {firmData.firmDetails.backedBrokerName}
+              </p>
+            </div>
 
             <div className="flex flex-col">
               <Label className="text-sm font-medium text-muted-foreground">
