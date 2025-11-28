@@ -2,35 +2,50 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock, Star, CheckCircle, XCircle, Share2, Bookmark, Search, Scale, BarChart3, TrendingUp, List, Menu, X } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Star, CheckCircle, XCircle, Share2, Bookmark, Search, Scale, BarChart3, TrendingUp, List, Menu, X, LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import firmReviewsData from '@/data/firm-reviews.json';
+import { FirmReview, FirmReviewsData, TableOfContentsItem } from '@/types/firm-review';
 
 interface BlogPageProps {
-    params: Promise<{ blog_id: string }>;
+    params: Promise<{ slug: string }>;
 }
+
+// Icon mapping
+const iconMap: Record<string, LucideIcon> = {
+    Star,
+    Search,
+    Scale,
+    BarChart3,
+    TrendingUp,
+    List,
+};
 
 export default function BlogDetailPage({ params }: BlogPageProps) {
     const [activeSection, setActiveSection] = React.useState('overview');
     const [isMobileTocOpen, setIsMobileTocOpen] = React.useState(false);
+    const [reviewData, setReviewData] = React.useState<FirmReview | null>(null);
 
-    // Table of contents data
-    const tableOfContents = React.useMemo(() => [
-        { id: 'overview', title: 'Overview – Quick Snapshot', icon: Star },
-        { id: 'what-is-funding-pips', title: 'What is Funding Pips?', icon: Search },
-        { id: 'how-differs', title: 'How Funding Pips Differs', icon: Scale },
-        { id: 'programs-comparison', title: 'Programs Comparison', icon: BarChart3 },
-        { id: 'platforms-execution', title: 'Platforms & Execution', icon: TrendingUp },
-        { id: 'final-verdict', title: 'Final Verdict', icon: Star },
-    ], []);
-
-    // For now, we'll show the Funding Pips review for any blog_id
-    // In a real implementation, you'd fetch blog data based on the ID
+    // Get slug from params and find review data
     React.useEffect(() => {
-        params.then(({ blog_id }) => {
-            console.log('Blog ID:', blog_id);
+        params.then(({ slug: blogSlug }) => {
+            const data = (firmReviewsData as FirmReviewsData)[blogSlug];
+            if (data) {
+                setReviewData(data);
+            }
         });
     }, [params]);
+
+    // Table of contents data from review data
+    const tableOfContents = React.useMemo(() => {
+        if (!reviewData?.tableOfContents) return [];
+        return reviewData.tableOfContents.map((item: TableOfContentsItem) => ({
+            id: item.id,
+            title: item.title,
+            icon: iconMap[item.icon] || Star,
+        }));
+    }, [reviewData]);
 
     // Scroll tracking for active section
     React.useEffect(() => {
@@ -66,6 +81,18 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
             setIsMobileTocOpen(false); // Close mobile TOC after navigation
         }
     };
+
+    // Loading state
+    if (!reviewData) {
+        return (
+            <div className="min-h-screen bg-background pt-12 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Loading review...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-background pt-12">
@@ -107,9 +134,9 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
                         <Button
                             onClick={() => setIsMobileTocOpen(!isMobileTocOpen)}
                             size="lg"
-                            className="rounded-full shadow-lg bg-primary hover:bg-primary/90"
+                            className="rounded-full h-10 w-10 shadow-lg bg-primary hover:bg-primary/90"
                         >
-                            {isMobileTocOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                            {isMobileTocOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
                         </Button>
                     </div>
 
@@ -117,7 +144,7 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
                     {isMobileTocOpen && (
                         <div className="fixed inset-0 z-40 xl:hidden">
                             <div className="absolute inset-0 bg-black/50" onClick={() => setIsMobileTocOpen(false)} />
-                            <div className="absolute bottom-24 right-6 bg-background border border-border rounded-lg p-4 w-80 max-h-[60vh] overflow-y-auto shadow-xl">
+                            <div className="absolute bottom-20 left-8 bg-background border border-border rounded-lg p-4 w-80 max-h-[60vh] overflow-y-auto shadow-xl max-w-2xs">
                                 <div className="flex items-center gap-2 mb-4 pb-2 border-b border-border">
                                     <List className="h-4 w-4 text-primary" />
                                     <span className="font-semibold text-foreground text-sm">Table of Contents</span>
@@ -129,7 +156,7 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
                                             <button
                                                 key={item.id}
                                                 onClick={() => scrollToSection(item.id)}
-                                                className={`w-full flex items-center gap-3 p-3 rounded-md text-left text-sm transition-all duration-200 hover:bg-accent/50 ${activeSection === item.id
+                                                className={`w-full flex items-center gap-3 p-3 rounded-md text-left text-xs transition-all duration-200 hover:bg-accent/50 ${activeSection === item.id
                                                         ? 'bg-primary/10 text-primary border-l-2 border-primary'
                                                         : 'text-muted-foreground hover:text-foreground'
                                                     }`}
@@ -173,10 +200,10 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
                             {/* Article Meta */}
                             <div className="">
                                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
-                                    Funding Pips Review 2025
+                                    {reviewData?.title || 'Loading...'}
                                 </h1>
                                 <p className="text-lg sm:text-xl text-white/80 max-w-3xl font-light">
-                                    Honest, Deep & Complete Analysis
+                                    {reviewData?.subtitle || ''}
                                 </p>
                             </div>
                         </div>
@@ -184,16 +211,16 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-1">
                                     <Calendar className="h-4 w-4" />
-                                    <span>November 27, 2024</span>
+                                    <span>{reviewData?.publishedAt || ''}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
                                     <Clock className="h-4 w-4" />
-                                    <span>12 min read</span>
+                                    <span>{reviewData?.readTime || 0} min read</span>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                                <span className="font-semibold text-foreground">Trust Score: 8.4/10</span>
+                                <span className="font-semibold text-foreground">Trust Score: {reviewData?.trustScore || 0}/10</span>
                             </div>
                         </div>
                     </section>
@@ -202,398 +229,356 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
                     <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
 
                         {/* Introduction */}
-                        <div className="prose prose-lg max-w-none mb-12">
-                            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
-                                Is Funding Pips really a trader‑friendly prop firm, or just another hype-driven evaluation company?
-                                After researching their rules, payout structure, trader feedback, risk parameters, and comparing them
-                                with top prop firms in 2025, this is the most honest, complete, and data-based Funding Pips review
-                                you&apos;ll read this year.
-                            </p>
-                        </div>
+                        {reviewData?.introduction && (
+                            <div className="prose prose-lg max-w-none mb-12">
+                                <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+                                    {reviewData.introduction}
+                                </p>
+                            </div>
+                        )}
 
                         {/* Quick Snapshot Card */}
-                        <Card id="overview" className="mb-12 card-custom-grad border-border">
-                            <CardContent className="p-8">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <Star className="h-6 w-6 text-primary" />
-                                    <h2 className="text-2xl font-bold text-foreground">Overview – Quick Snapshot</h2>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-4">
-                                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                                            <span className="text-muted-foreground">Firm Name:</span>
-                                            <span className="font-semibold text-foreground">Funding Pips</span>
-                                        </div>
-                                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                                            <span className="text-muted-foreground">Founded:</span>
-                                            <span className="text-right font-semibold text-foreground">2022</span>
-                                        </div>
-                                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                                            <span className="text-muted-foreground">Headquarters:</span>
-                                            <span className="text-right font-semibold text-foreground">UAE</span>
-                                        </div>
-                                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                                            <span className="text-muted-foreground">Max Funding:</span>
-                                            <span className="text-right font-semibold text-primary">$200,000</span>
-                                        </div>
+                        {reviewData?.overview && (
+                            <Card id="overview" className="mb-12 card-custom-grad border-border">
+                                <CardContent className="p-8">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        {React.createElement(iconMap[reviewData.overview.icon] || Star, { className: "h-6 w-6 text-primary" })}
+                                        <h2 className="text-2xl font-bold text-foreground">{reviewData.overview.title}</h2>
                                     </div>
 
-                                    <div className="space-y-4">
-                                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                                            <span className="text-muted-foreground">Profit Split:</span>
-                                            <span className="text-right font-semibold text-success">Up to 85%–100%</span>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            {reviewData.overview.data.left.map((item, index) => (
+                                                <div key={index} className="flex justify-between items-center py-2 border-b border-border/50">
+                                                    <span className="text-muted-foreground">{item.label}</span>
+                                                    <span className={`text-right font-semibold ${item.highlight ? 'text-primary' : 'text-foreground'}`}>
+                                                        {item.value}
+                                                    </span>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                                            <span className="text-muted-foreground">Trust Score:</span>
-                                            <span className="text-right  font-semibold text-primary">8.4/10</span>
+
+                                        <div className="space-y-4">
+                                            {reviewData.overview.data.right.map((item, index) => (
+                                                <div key={index} className="flex justify-between items-center py-2 border-b border-border/50">
+                                                    <span className="text-muted-foreground">{item.label}</span>
+                                                    <span className={`text-right font-semibold ${
+                                                        item.highlight === 'success' ? 'text-green-400' : 
+                                                        item.highlight ? 'text-primary' : 
+                                                        'text-foreground'
+                                                    }`}>
+                                                        {item.value}
+                                                    </span>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                                            <span className="text-muted-foreground">Funding Model:</span>
-                                            <span className="text-right font-semibold text-foreground">Instant, 1‑Phase & 2‑Phase</span>
-                                        </div>
-                                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                                            <span className="text-muted-foreground">Best For:</span>
-                                            <span className="text-right  font-semibold text-foreground">Scalpers, Day Traders, EA</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* What is Funding Pips */}
-                        <section id="what-is-funding-pips" className="mb-12">
-                            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
-                                <Search className="h-6 sm:h-8 w-6 sm:w-8 text-primary" />
-                                What is Funding Pips?
-                            </h2>
-                            <div className="prose prose-lg max-w-none text-muted-foreground">
-                                <p className="mb-4">
-                                    Funding Pips is a forex and CFD proprietary trading firm that funds traders after they complete
-                                    an evaluation challenge. They provide access to funding capital, trading platforms like MT5,
-                                    cTrader, and MatchTrader, and allow traders to keep up to 85–100% of their profits.
-                                </p>
-
-                                <div className="bg-accent/20 border border-accent/30 rounded-lg p-6 my-6">
-                                    <h4 className="font-semibold text-foreground mb-3">It aims to offer:</h4>
-                                    <ul className="space-y-2">
-                                        <li className="flex items-center gap-2">
-                                            <CheckCircle className="h-4 w-4 text-success shrink-0" />
-                                            Simple rule structure
-                                        </li>
-                                        <li className="flex items-center gap-2">
-                                            <CheckCircle className="h-4 w-4 text-success shrink-0" />
-                                            Flexible time limits (unlimited days)
-                                        </li>
-                                        <li className="flex items-center gap-2">
-                                            <CheckCircle className="h-4 w-4 text-success shrink-0" />
-                                            Affordable challenge fees
-                                        </li>
-                                        <li className="flex items-center gap-2">
-                                            <CheckCircle className="h-4 w-4 text-success shrink-0" />
-                                            Fast verification & payouts
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <p>
-                                    For many traders, Funding Pips has become one of the easiest-to-pass 1-phase evaluation prop firms.
-                                </p>
-                            </div>
-                        </section>
-
-                        {/* How Funding Pips Differs */}
-                        <section id="how-differs" className="mb-12">
-                            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
-                                <Scale className="h-8 w-8 text-primary" />
-                                How Funding Pips Differs From Other Prop Firms
-                            </h2>
-
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {/* Pros */}
-                                <Card className="border-green-500/20 bg-green-500/5">
-                                    <CardContent className="p-6">
-                                        <h3 className="font-semibold text-success mb-4 flex items-center gap-2">
-                                            <CheckCircle className="h-5 w-5" />
-                                            Advantages
-                                        </h3>
-                                        <ul className="space-y-3">
-                                            <li className="flex items-start gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success shrink-0 mt-0.5" />
-                                                <div>
-                                                    <strong>No time limits on evaluation</strong>
-                                                    <p className="text-sm text-muted-foreground">Big plus for swing traders or low frequency traders.</p>
-                                                </div>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success shrink-0 mt-0.5" />
-                                                <div>
-                                                    <strong>Flexible account options</strong>
-                                                    <p className="text-sm text-muted-foreground">Choose instant funding, 1-step or 2-step.</p>
-                                                </div>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success shrink-0 mt-0.5" />
-                                                <div>
-                                                    <strong>Competitive profit splits</strong>
-                                                    <p className="text-sm text-muted-foreground">Up to 85–100% depending on model.</p>
-                                                </div>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success shrink-0 mt-0.5" />
-                                                <div>
-                                                    <strong>Strong community reputation</strong>
-                                                    <p className="text-sm text-muted-foreground">Fast support, transparent rules, good payout history.</p>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </CardContent>
-                                </Card>
-
-                                {/* Cons */}
-                                <Card className="border-red-500/20 bg-red-500/5">
-                                    <CardContent className="p-6">
-                                        <h3 className="font-semibold text-red-500 mb-4 flex items-center gap-2">
-                                            <XCircle className="h-5 w-5" />
-                                            Limitations
-                                        </h3>
-                                        <ul className="space-y-3">
-                                            <li className="flex items-start gap-2">
-                                                <XCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
-                                                <div>
-                                                    <strong>Not suitable for high-frequency traders</strong>
-                                                    <p className="text-sm text-muted-foreground">HFT, grid bots, latency arbitrage not allowed.</p>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        </section>
-
-                        {/* Program Comparison Table */}
-                        <section id="programs-comparison" className="mb-12">
-                            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
-                                <BarChart3 className="h-8 w-8 text-primary" />
-                                Funding Programs Comparison
-                            </h2>
-
-                            <div className="overflow-x-auto">
-                                <table className="w-full border-collapse border border-border rounded-lg overflow-hidden text-foreground">
-                                    <thead>
-                                        <tr className="bg-accent/20">
-                                            <th className="text-sm sm:text-base border border-border p-4 text-left font-semibold">Criteria</th>
-                                            <th className="text-sm sm:text-base border border-border p-4 text-center font-semibold">Instant Account</th>
-                                            <th className="text-sm sm:text-base border border-border p-4 text-center font-semibold">1‑Phase Evaluation</th>
-                                            <th className="text-sm sm:text-base border border-border p-4 text-center font-semibold">2‑Phase Evaluation</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td className="border border-border p-4 text-sm sm:text-base font-medium">Account Sizes</td>
-                                            <td className="border border-border p-4 text-sm sm:text-base text-center">$10k–$200k</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base">$10k–$200k</td>
-                                            <td className="border border-border p-4 text-sm sm:text-base text-center">$10k–$200k</td>
-                                        </tr>
-                                        <tr className="bg-accent/10">
-                                            <td className="border border-border p-4 text-sm sm:text-base font-medium">Challenge Fee</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base text-red-500">Highest</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base text-yellow-500">Moderate</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base text-success">Lowest</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border border-border p-4 text-sm sm:text-base font-medium">Profit Target</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base">N/A</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base">8–10%</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base">Phase 1: 8% / Phase 2: 5%</td>
-                                        </tr>
-                                        <tr className="bg-accent/10">
-                                            <td className="border border-border p-4 text-sm sm:text-base font-medium">Max Drawdown</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base">6%</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base">6%</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border border-border p-4 text-sm sm:text-base font-medium">Daily Drawdown</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base">3%</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base">3%</td>
-                                        </tr>
-                                        <tr className="bg-accent/10">
-                                            <td className="border border-border p-4 text-sm sm:text-base font-medium">Profit Split</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base">50–70%</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base text-success">Up to 85%</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base text-success">Up to 85%</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border border-border p-4 text-sm sm:text-base font-medium">Time Limit</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base text-success">Unlimited</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base text-success">Unlimited</td>
-                                            <td className="border border-border p-4 text-center text-sm sm:text-base text-success">Unlimited</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </section>
-
-                        {/* Platforms & Execution */}
-                        <section id="platforms-execution" className="mb-12">
-                            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
-                                <TrendingUp className="h-8 w-8 text-primary" />
-                                Platforms, Instruments & Execution
-                            </h2>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <Card className="card-custom-grad border-border">
-                                    <CardContent className="p-6">
-                                        <h3 className="font-semibold text-foreground mb-4">Trading Platforms</h3>
-                                        <ul className="space-y-2">
-                                            <li className="flex items-center gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success" />
-                                                MetaTrader 5 (MT5)
-                                            </li>
-                                            <li className="flex items-center gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success" />
-                                                cTrader
-                                            </li>
-                                            <li className="flex items-center gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success" />
-                                                MatchTrader
-                                            </li>
-                                        </ul>
-                                    </CardContent>
-                                </Card>
-
-                                <Card className="card-custom-grad border-border">
-                                    <CardContent className="p-6">
-                                        <h3 className="font-semibold text-foreground mb-4">Available Instruments</h3>
-                                        <ul className="space-y-2">
-                                            <li className="flex items-center gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success" />
-                                                Forex (majors/minors)
-                                            </li>
-                                            <li className="flex items-center gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success" />
-                                                Gold & metals
-                                            </li>
-                                            <li className="flex items-center gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success" />
-                                                Indices (US30, NAS100, GER40)
-                                            </li>
-                                            <li className="flex items-center gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success" />
-                                                Crypto CFDs
-                                            </li>
-                                            <li className="flex items-center gap-2">
-                                                <CheckCircle className="h-4 w-4 text-success" />
-                                                Commodities
-                                            </li>
-                                        </ul>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        </section>
-
-                        {/* Final Verdict */}
-                        <section id="final-verdict" className="mb-12">
-                            <Card className="relative overflow-hidden  border border-white/10 bg-linear-to-br from-black/80 via-neutral-900/80 to-black/70">
-                                <div className="absolute inset-0 bg-linear-to-b from-white/5 via-transparent to-black/60 pointer-events-none" />
-                                <div className="absolute -left-24 top-6 h-60 w-60 rounded-full bg-[#F66435]/20 blur-[120px]" />
-                                <div className="absolute -right-24 bottom-6 h-60 w-60 rounded-full bg-[#F66435]/25 blur-[120px]" />
-                                <CardContent className="relative p-8 z-10">
-                                    {/* Header Section */}
-                                    <div className="text-center mb-8">
-                                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/20 border border-primary/30 mb-4">
-                                            <Star className="h-10 w-10 text-primary fill-current" />
-                                        </div>
-                                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold gradient-text mb-2">Final Verdict</h2>
-                                        <p className="text-white/60 text-base sm:text-lg">Our comprehensive analysis conclusion</p>
-                                    </div>
-
-                                    {/* Rating Section */}
-                                    <div className="text-center mb-8">
-                                        <div className="inline-flex flex-col items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <span className="text-4xl sm:text-4xl md:text-5xl font-bold gradient-text">4.3</span>
-                                                <div className="text-left">
-                                                    <div className="flex mb-1">
-                                                        {[1, 2, 3, 4].map((star) => (
-                                                            <Star key={star} className="h-4 sm:h-5 md:h-6 w-4 sm:w-5 md:w-6 text-yellow-400 fill-current" />
-                                                        ))}
-                                                        <Star className="h-4 sm:h-5 md:h-6 w-4 sm:w-5 md:w-6 text-white/30" />
-                                                    </div>
-                                                    <p className="text-white/60 text-xs sm:text-sm">out of 5.0</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-xs sm:text-sm text-white/80">
-                                                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                                <span>Highly Recommended</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Key Strengths */}
-                                    <div className="mb-8">
-                                        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 text-center">Why Funding Pips Stands Out</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4">
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                                                        <CheckCircle className="h-4 w-4 text-green-400" />
-                                                    </div>
-                                                    <span className="font-medium text-white">Flexible Evaluation</span>
-                                                </div>
-                                                <p className="text-white/70 text-sm">Multiple program options with unlimited time limits</p>
-                                            </div>
-
-                                            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4">
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                                                        <CheckCircle className="h-4 w-4 text-green-400" />
-                                                    </div>
-                                                    <span className="font-medium text-white">High Profit Split</span>
-                                                </div>
-                                                <p className="text-white/70 text-sm">Up to 85-100% profit sharing for traders</p>
-                                            </div>
-
-                                            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4">
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                                                        <CheckCircle className="h-4 w-4 text-green-400" />
-                                                    </div>
-                                                    <span className="font-medium text-white">Reliable Payouts</span>
-                                                </div>
-                                                <p className="text-white/70 text-sm">Consistent payout history with fast processing</p>
-                                            </div>
-
-                                            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4">
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                                                        <CheckCircle className="h-4 w-4 text-green-400" />
-                                                    </div>
-                                                    <span className="font-medium text-white">Simple Rules</span>
-                                                </div>
-                                                <p className="text-white/70 text-sm">Easy-to-understand guidelines for all traders</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Final Recommendation */}
-                                    <div className="bg-linear-to-r from-green-500/10 via-green-500/5 to-green-500/10 border border-green-500/20 rounded-2xl p-6 text-center">
-                                        <div className="flex items-center justify-center gap-2 mb-4">
-                                            <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                                                <CheckCircle className="h-5 w-5 text-green-400" />
-                                            </div>
-                                            <h3 className="text-lg sm:text-xl font-semibold text-green-400">Our Recommendation</h3>
-                                        </div>
-                                        <p className="text-white/80 text-sm sm:text-base md:text-lg leading-relaxed mb-6">
-                                            If your strategy is compliant and you prefer <span className="text-white font-medium">low-stress evaluations</span>,
-                                            Funding Pips is one of the <span className="text-primary font-medium">best 1‑phase evaluation prop firms</span> to
-                                            consider in 2025.
-                                        </p>
-                                        <span className="text-white font-medium text-sm sm:text-base ">Start small, test execution, then scale</span>
                                     </div>
                                 </CardContent>
                             </Card>
-                        </section>
+                        )}
+
+                        {/* What is Section */}
+                        {reviewData?.whatIs && (
+                            <section id={reviewData.whatIs.id} className="mb-12">
+                                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
+                                    {React.createElement(iconMap[reviewData.whatIs.icon] || Search, { className: "h-6 sm:h-8 w-6 sm:w-8 text-primary" })}
+                                    {reviewData.whatIs.title}
+                                </h2>
+                                <div className="prose prose-lg max-w-none text-muted-foreground">
+                                    <p className="mb-4">
+                                        {reviewData.whatIs.content}
+                                    </p>
+
+                                    {reviewData.whatIs.highlights && (
+                                        <div className="bg-accent/20 border border-accent/30 rounded-lg p-6 my-6">
+                                            <h4 className="font-semibold text-foreground mb-3">{reviewData.whatIs.highlights.title}</h4>
+                                            <ul className="space-y-2">
+                                                {reviewData.whatIs.highlights.items.map((item: string, index: number) => (
+                                                    <li key={index} className="flex items-center gap-2">
+                                                        <CheckCircle className="h-4 w-4 text-green-400 shrink-0" />
+                                                        {item}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {reviewData.whatIs.conclusion && (
+                                        <p>
+                                            {reviewData.whatIs.conclusion}
+                                        </p>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* How Differs Section */}
+                        {reviewData?.howDiffers && (
+                            <section id={reviewData.howDiffers.id} className="mb-12">
+                                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
+                                    {React.createElement(iconMap[reviewData.howDiffers.icon] || Scale, { className: "h-8 w-8 text-primary" })}
+                                    {reviewData.howDiffers.title}
+                                </h2>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    {/* Advantages */}
+                                    {reviewData.howDiffers.advantages && reviewData.howDiffers.advantages.length > 0 && (
+                                        <Card className="border-green-500/20 bg-green-500/5">
+                                            <CardContent className="p-6">
+                                                <h3 className="font-semibold text-green-400 mb-4 flex items-center gap-2">
+                                                    <CheckCircle className="h-5 w-5" />
+                                                    Advantages
+                                                </h3>
+                                                <ul className="space-y-3">
+                                                    {reviewData.howDiffers.advantages.map((item, index) => (
+                                                        <li key={index} className="flex items-start gap-2">
+                                                            <CheckCircle className="h-4 w-4 text-green-400 shrink-0 mt-0.5" />
+                                                            <div>
+                                                                <strong>{item.title}</strong>
+                                                                {item.description && (
+                                                                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                                                                )}
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </CardContent>
+                                        </Card>
+                                    )}
+
+                                    {/* Limitations */}
+                                    {reviewData.howDiffers.limitations && reviewData.howDiffers.limitations.length > 0 && (
+                                        <Card className="border-red-500/20 bg-red-500/5">
+                                            <CardContent className="p-6">
+                                                <h3 className="font-semibold text-red-500 mb-4 flex items-center gap-2">
+                                                    <XCircle className="h-5 w-5" />
+                                                    Limitations
+                                                </h3>
+                                                <ul className="space-y-3">
+                                                    {reviewData.howDiffers.limitations.map((item, index) => (
+                                                        <li key={index} className="flex items-start gap-2">
+                                                            <XCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                                                            <div>
+                                                                <strong>{item.title}</strong>
+                                                                {item.description && (
+                                                                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                                                                )}
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </CardContent>
+                                        </Card>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Program Comparison Table */}
+                        {reviewData?.programsComparison && (
+                            <section id={reviewData.programsComparison.id} className="mb-12">
+                                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
+                                    {React.createElement(iconMap[reviewData.programsComparison.icon] || BarChart3, { className: "h-8 w-8 text-primary" })}
+                                    {reviewData.programsComparison.title}
+                                </h2>
+
+                                <div className="overflow-x-auto">
+                                    <table className="w-full border-collapse border border-border rounded-lg overflow-hidden text-foreground">
+                                        <thead>
+                                            <tr className="bg-accent/20">
+                                                {reviewData.programsComparison.headers.map((header: string, index: number) => (
+                                                    <th 
+                                                        key={index} 
+                                                        className={`text-sm sm:text-base border border-border p-4 ${index === 0 ? 'text-left' : 'text-center'} font-semibold`}
+                                                    >
+                                                        {header}
+                                                    </th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {reviewData.programsComparison.rows.map((row, rowIndex) => (
+                                                <tr key={rowIndex} className={rowIndex % 2 === 1 ? 'bg-accent/10' : ''}>
+                                                    <td className="border border-border p-4 text-sm sm:text-base font-medium">{row.criteria}</td>
+                                                    <td className={`border border-border p-4 text-sm sm:text-base text-center ${
+                                                        row.instantHighlight === 'red' ? 'text-red-500' :
+                                                        row.instantHighlight === 'yellow' ? 'text-yellow-500' :
+                                                        row.instantHighlight === 'success' ? 'text-green-400' : ''
+                                                    }`}>
+                                                        {row.instant || ''}
+                                                    </td>
+                                                    <td className={`border border-border p-4 text-center text-sm sm:text-base ${
+                                                        row.phase1Highlight === 'red' ? 'text-red-500' :
+                                                        row.phase1Highlight === 'yellow' ? 'text-yellow-500' :
+                                                        row.phase1Highlight === 'success' ? 'text-green-400' : ''
+                                                    }`}>
+                                                        {row.phase1 || ''}
+                                                    </td>
+                                                    <td className={`border border-border p-4 text-sm sm:text-base text-center ${
+                                                        row.phase2Highlight === 'red' ? 'text-red-500' :
+                                                        row.phase2Highlight === 'yellow' ? 'text-yellow-500' :
+                                                        row.phase2Highlight === 'success' ? 'text-green-400' : ''
+                                                    }`}>
+                                                        {row.phase2 || ''}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Platforms & Execution */}
+                        {reviewData?.platformsExecution && (
+                            <section id={reviewData.platformsExecution.id} className="mb-12">
+                                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
+                                    {React.createElement(iconMap[reviewData.platformsExecution.icon] || TrendingUp, { className: "h-8 w-8 text-primary" })}
+                                    {reviewData.platformsExecution.title}
+                                </h2>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {reviewData.platformsExecution.platforms && reviewData.platformsExecution.platforms.length > 0 && (
+                                        <Card className="card-custom-grad border-border">
+                                            <CardContent className="p-6">
+                                                <h3 className="font-semibold text-foreground mb-4">Trading Platforms</h3>
+                                                <ul className="space-y-2">
+                                                    {reviewData.platformsExecution.platforms.map((platform: string, index: number) => (
+                                                        <li key={index} className="flex items-center gap-2">
+                                                            <CheckCircle className="h-4 w-4 text-green-400" />
+                                                            {platform}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </CardContent>
+                                        </Card>
+                                    )}
+
+                                    {reviewData.platformsExecution.instruments && reviewData.platformsExecution.instruments.length > 0 && (
+                                        <Card className="card-custom-grad border-border">
+                                            <CardContent className="p-6">
+                                                <h3 className="font-semibold text-foreground mb-4">Available Instruments</h3>
+                                                <ul className="space-y-2">
+                                                    {reviewData.platformsExecution.instruments.map((instrument: string, index: number) => (
+                                                        <li key={index} className="flex items-center gap-2">
+                                                            <CheckCircle className="h-4 w-4 text-green-400" />
+                                                            {instrument}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </CardContent>
+                                        </Card>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Final Verdict */}
+                        {reviewData?.finalVerdict && (
+                            <section id={reviewData.finalVerdict.id} className="mb-12">
+                                <Card className="relative overflow-hidden  border border-white/10 bg-linear-to-br from-black/80 via-neutral-900/80 to-black/70">
+                                    <div className="absolute inset-0 bg-linear-to-b from-white/5 via-transparent to-black/60 pointer-events-none" />
+                                    <div className="absolute -left-24 top-6 h-60 w-60 rounded-full bg-[#F66435]/20 blur-[120px]" />
+                                    <div className="absolute -right-24 bottom-6 h-60 w-60 rounded-full bg-[#F66435]/25 blur-[120px]" />
+                                    <CardContent className="relative p-8 z-10">
+                                        {/* Header Section */}
+                                        <div className="text-center mb-8">
+                                            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/20 border border-primary/30 mb-4">
+                                                {React.createElement(iconMap[reviewData.finalVerdict.icon] || Star, { className: "h-10 w-10 text-primary fill-current" })}
+                                            </div>
+                                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold gradient-text mb-2">{reviewData.finalVerdict.title}</h2>
+                                            <p className="text-white/60 text-base sm:text-lg">{reviewData.finalVerdict.subtitle}</p>
+                                        </div>
+
+                                        {/* Rating Section */}
+                                        <div className="text-center mb-8">
+                                            <div className="inline-flex flex-col items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <span className="text-4xl sm:text-4xl md:text-5xl font-bold gradient-text">{reviewData.finalVerdict.rating}</span>
+                                                    <div className="text-left">
+                                                        <div className="flex mb-1">
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <Star 
+                                                                    key={star} 
+                                                                    className={`h-4 sm:h-5 md:h-6 w-4 sm:w-5 md:w-6 ${
+                                                                        star <= Math.round(reviewData.finalVerdict.rating) 
+                                                                            ? 'text-yellow-400 fill-current' 
+                                                                            : 'text-white/30'
+                                                                    }`} 
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                        <p className="text-white/60 text-xs sm:text-sm">out of 5.0</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-xs sm:text-sm text-white/80">
+                                                    <div className="w-2 h-2 bg-success rounded-full"></div>
+                                                    <span>{reviewData.finalVerdict.ratingLabel}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Key Strengths */}
+                                        {reviewData.finalVerdict.strengths && reviewData.finalVerdict.strengths.length > 0 && (
+                                            <div className="mb-8">
+                                                <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 text-center">Why {reviewData.firmName} Stands Out</h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {reviewData.finalVerdict.strengths.map((strength, index) => (
+                                                        <div key={index} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4">
+                                                            <div className="flex items-center gap-3 mb-2">
+                                                                <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+                                                                    <CheckCircle className="h-4 w-4 text-green-400" />
+                                                                </div>
+                                                                <span className="font-medium text-white">{strength.title}</span>
+                                                            </div>
+                                                            <p className="text-white/70 text-sm">{strength.description}</p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Key Weaknesses */}
+                                        {reviewData.finalVerdict.weaknesses && reviewData.finalVerdict.weaknesses.length > 0 && (
+                                            <div className="mb-8">
+                                                <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 text-center">Areas for Improvement</h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {reviewData.finalVerdict.weaknesses.map((weakness, index) => (
+                                                        <div key={index} className="bg-white/5 backdrop-blur-sm border border-red-500/20 rounded-xl p-4">
+                                                            <div className="flex items-center gap-3 mb-2">
+                                                                <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center">
+                                                                    <XCircle className="h-4 w-4 text-red-400" />
+                                                                </div>
+                                                                <span className="font-medium text-white">{weakness.title}</span>
+                                                            </div>
+                                                            <p className="text-white/70 text-sm">{weakness.description}</p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Final Recommendation */}
+                                        {reviewData.finalVerdict.recommendation && (
+                                            <div className="bg-linear-to-r from-green-500/10 via-green-500/5 to-green-500/10 border border-green-500/20 rounded-2xl p-6 text-center">
+                                                <div className="flex items-center justify-center gap-2 mb-4">
+                                                    <div className="w-8 h-8 rounded-full bg-green-500/20 items-center justify-center hidden sm:flex">
+                                                        <CheckCircle className="h-5 w-5 text-green-400" />
+                                                    </div>
+                                                    <h3 className="text-lg sm:text-xl font-semibold text-green-400">{reviewData.finalVerdict.recommendation.title}</h3>
+                                                </div>
+                                                <p className="text-white/80 text-sm sm:text-base md:text-lg leading-relaxed mb-6">
+                                                    {reviewData.finalVerdict.recommendation.content}
+                                                </p>
+                                                {reviewData.finalVerdict.recommendation.footer && (
+                                                    <span className="text-white font-medium text-sm sm:text-base">{reviewData.finalVerdict.recommendation.footer}</span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            </section>
+                        )}
                     </section>
                 </article>
             </div>
