@@ -26,8 +26,53 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "My Forex Firms",
-  description: "Transparency, Verified Ratings, and Traders Trust.",
+  title: {
+    default: "My Forex Firms",
+    template: "%s | My Forex Firms",
+  },
+  description: "Transparency, Verified Ratings, and Traders Trust. Discover verified prop trading firms, read honest reviews, and make informed decisions about funded trading accounts.",
+  keywords: ["prop trading", "forex firms", "funded trading", "prop firms", "trading reviews", "forex reviews", "funded accounts"],
+  authors: [{ name: "My Forex Firms" }],
+  creator: "My Forex Firms",
+  publisher: "My Forex Firms",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://myforexfirms.com"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: "My Forex Firms",
+    title: "My Forex Firms - Transparency, Verified Ratings, and Traders Trust",
+    description: "Discover verified prop trading firms, read honest reviews, and make informed decisions about funded trading accounts.",
+    images: [
+      {
+        url: "/my-forex-firms-full.png",
+        width: 1200,
+        height: 630,
+        alt: "My Forex Firms - Prop Trading Firm Reviews",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "My Forex Firms - Transparency, Verified Ratings, and Traders Trust",
+    description: "Discover verified prop trading firms, read honest reviews, and make informed decisions about funded trading accounts.",
+    images: ["/my-forex-firms-full.png"],
+    creator: "@myforexfirms",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
