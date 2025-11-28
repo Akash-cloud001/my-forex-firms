@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     description: "Discover verified prop trading firms, read honest reviews, and make informed decisions about funded trading accounts.",
     images: [
       {
-        url: "/my-forex-firms-full.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "My Forex Firms - Prop Trading Firm Reviews",
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "My Forex Firms - Transparency, Verified Ratings, and Traders Trust",
     description: "Discover verified prop trading firms, read honest reviews, and make informed decisions about funded trading accounts.",
-    images: ["/my-forex-firms-full.png"],
+    images: ["/og-image.png"],
     creator: "@myforexfirms",
   },
   robots: {

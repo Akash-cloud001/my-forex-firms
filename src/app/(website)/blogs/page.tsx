@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     description: "Discover the latest insights, guides, and comprehensive reviews of prop trading firms. Written by traders for traders.",
     images: [
       {
-        url: "/my-forex-firms-full.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "My Forex Firms Blog",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Blog - Trading Insights & Prop Firm Reviews",
     description: "Discover the latest insights, guides, and comprehensive reviews of prop trading firms.",
-    images: ["/my-forex-firms-full.png"],
+    images: ["/og-image.png"],
   },
   alternates: {
     canonical: "/blogs",

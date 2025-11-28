@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     description: "View and manage all your submitted prop trading firm reviews. Track the status of your reviews.",
     images: [
       {
-        url: "/my-forex-firms-full.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "My Reviews - My Forex Firms",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "My Reviews - Manage Your Submissions",
     description: "View and manage all your submitted prop trading firm reviews.",
-    images: ["/my-forex-firms-full.png"],
+    images: ["/og-image.png"],
   },
   alternates: {
     canonical: "/reviews",
