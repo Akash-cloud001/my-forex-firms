@@ -13,6 +13,7 @@ import {
 } from "@clerk/nextjs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "../ui/skeleton";
+import { ArrowRight } from "lucide-react";
 const Navbar = () => {
   const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
@@ -42,7 +43,7 @@ const Navbar = () => {
         </h1>
       </Link>
 
-      <div className="text-xl flex items-center gap-4">
+      <div className="text-xl flex items-center gap-0 sm:gap-4">
         <SignedOut>
           <SignInButton>
             <Button variant="outline" className="btn-grad hover:text-white">
@@ -59,6 +60,13 @@ const Navbar = () => {
           </SignUpButton>
         </SignedOut>
         <SignedIn>
+        <div 
+            onClick={() => router.push('/reviews')} 
+            variant="outline" 
+            className="text-primary/90 hover:text-primary font-semibold w-full sm:w-auto text-sm capitalize font-geist-sans cursor-pointer"
+          >
+            My Reviews
+          </div>
           <div onClick={() => router.push("/profile")} className="relative cursor-pointer">
             {user?.imageUrl ? (
               <Image

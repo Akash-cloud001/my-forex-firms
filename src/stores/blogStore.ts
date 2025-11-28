@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { FirmReview } from '@/types/firm-review';
+import { apiGet } from '@/lib/api/apiWrapper';
+import { ApiError } from '@/lib/axios/interceptors';
 
 // Blog state interface
 export interface BlogState {
@@ -19,7 +21,7 @@ export interface BlogState {
   clearCurrentBlog: () => void;
 }
 
-export const useBlogStore = create<BlogState>((set, get) => ({
+export const useBlogStore = create<BlogState>((set) => ({
   // Initial State
   blogs: [],
   currentBlog: null,
@@ -32,24 +34,21 @@ export const useBlogStore = create<BlogState>((set, get) => ({
     set({ isLoading: true, error: null });
     
     try {
-      const response = await fetch('/api/public/firm-reviews');
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to fetch blogs');
-      }
-
-      const data = await response.json();
+      // Note: baseURL is already '/api', so we don't include it in the path
+      const data = await apiGet<{ success: boolean; reviews: FirmReview[]; pagination?: unknown }>('/public/firm-reviews');
       
       if (data.success && data.reviews) {
         set({ blogs: data.reviews });
       } else {
-        throw new Error(data.error || 'Invalid response format');
+        throw new Error('Invalid response format');
       }
     } catch (error) {
       console.error('Error fetching blogs:', error);
+      const errorMessage = 
+        (error as ApiError)?.message || 
+        (error instanceof Error ? error.message : 'Failed to fetch blogs');
       set({ 
-        error: error instanceof Error ? error.message : 'Failed to fetch blogs',
+        error: errorMessage,
         blogs: [] // Clear blogs on error
       });
     } finally {
@@ -62,27 +61,21 @@ export const useBlogStore = create<BlogState>((set, get) => ({
     set({ isLoadingBlog: true, error: null });
     
     try {
-      const response = await fetch(`/api/public/firm-reviews/${slug}`);
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('Blog not found');
-        }
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to fetch blog');
-      }
-
-      const data = await response.json();
+      // Note: baseURL is already '/api', so we don't include it in the path
+      const data = await apiGet<{ success: boolean; review: FirmReview }>(`/public/firm-reviews/${slug}`);
       
       if (data.success && data.review) {
         set({ currentBlog: data.review });
       } else {
-        throw new Error(data.error || 'Invalid response format');
+        throw new Error('Invalid response format');
       }
     } catch (error) {
       console.error('Error fetching blog:', error);
+      const errorMessage = 
+        (error as ApiError)?.message || 
+        (error instanceof Error ? error.message : 'Failed to fetch blog');
       set({ 
-        error: error instanceof Error ? error.message : 'Failed to fetch blog',
+        error: errorMessage,
         currentBlog: null // Clear current blog on error
       });
     } finally {
