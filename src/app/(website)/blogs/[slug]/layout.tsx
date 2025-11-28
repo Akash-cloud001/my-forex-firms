@@ -25,7 +25,7 @@ export async function generateMetadata(
   const description = blogData.introduction || `${blogData.title} - ${blogData.subtitle}`;
   const imageUrl = blogData.overview?.data?.left?.find(item => item.label === "Firm Name:") 
     ? `${siteUrl}/website/firm/${slug}.png` 
-    : `${siteUrl}/my-forex-firms-full.png`;
+    : `${siteUrl}/og-image.png`;
 
   return {
     title: blogData.title,

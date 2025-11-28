@@ -34,7 +34,7 @@ export async function generateMetadata(
     const firmUrl = `${siteUrl}/firms/${slug}`;
     const imageUrl = firm.firmDetails?.image?.url 
       ? firm.firmDetails.image.url 
-      : `${siteUrl}/my-forex-firms-full.png`;
+      : `${siteUrl}/og-image.png`;
 
     const trustScore = firm.ratings?.trustPilotRating 
       ? `${firm.ratings.trustPilotRating}/5` 

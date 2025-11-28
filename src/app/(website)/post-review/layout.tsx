@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     description: "Share your honest review of prop trading firms. Help the trading community make informed decisions.",
     images: [
       {
-        url: "/my-forex-firms-full.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Submit a Review - My Forex Firms",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Submit a Review - Share Your Trading Experience",
     description: "Share your honest review of prop trading firms. Help the trading community make informed decisions.",
-    images: ["/my-forex-firms-full.png"],
+    images: ["/og-image.png"],
   },
   alternates: {
     canonical: "/post-review",
