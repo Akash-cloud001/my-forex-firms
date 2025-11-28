@@ -93,19 +93,19 @@ export default function ProfilePage() {
         {/* Header */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">My Profile</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">My Profile</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
               Manage your account settings and personal information
             </p>
           </div>
-          <Button 
+          {/* <Button 
             onClick={() => router.push('/reviews')} 
             variant="outline" 
             className="text-white/80 hover:text-white font-semibold w-full sm:w-auto"
           >
             View Reviews
             <ArrowRight className="h-4 w-4 ml-2" />
-          </Button>
+          </Button> */}
         </div>
 
         <div className="grid gap-6"></div>
@@ -130,7 +130,7 @@ export default function ProfilePage() {
                       alt={user.fullName || "Profile"}
                       width={100}
                       height={100}
-                      className="rounded-full object-cover border-4 border-background shadow-lg w-20 h-20 sm:w-24 sm:h-24"
+                      className="rounded-full object-cover border-4 border-primary/70 shadow-lg w-20 h-20 sm:w-24 sm:h-24"
                     />
                   ) : (
                     <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-4 border-background shadow-lg">
@@ -140,13 +140,13 @@ export default function ProfilePage() {
                       </AvatarFallback>
                     </Avatar>
                   )}
-                  <Button
+                  {/* <Button
                     size="sm"
                     variant="outline"
                     className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 h-6 w-6 sm:h-8 sm:w-8 rounded-full p-0 shadow-lg"
                   >
                     <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
-                  </Button>
+                  </Button> */}
                 </div>
                 
                 <div className="flex-1 space-y-3 text-left md:text-center sm:text-left">
