@@ -2,12 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock, Star, CheckCircle, XCircle, Share2, Bookmark, Search, Scale, BarChart3, TrendingUp, List, Menu, X, LucideIcon } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Star, CheckCircle, XCircle, Share2, Search, Scale, BarChart3, TrendingUp, List, Menu, X, LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import firmReviewsData from '@/data/firm-reviews.json';
-import { FirmReview, FirmReviewsData, TableOfContentsItem } from '@/types/firm-review';
-
+import { TableOfContentsItem } from '@/types/firm-review';
+import { useBlog } from '@/stores/blogStore';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 interface BlogPageProps {
     params: Promise<{ slug: string }>;
 }
@@ -25,17 +25,19 @@ const iconMap: Record<string, LucideIcon> = {
 export default function BlogDetailPage({ params }: BlogPageProps) {
     const [activeSection, setActiveSection] = React.useState('overview');
     const [isMobileTocOpen, setIsMobileTocOpen] = React.useState(false);
-    const [reviewData, setReviewData] = React.useState<FirmReview | null>(null);
+    const { blog: reviewData, isLoading, error, fetchBlog, clearBlog } = useBlog();
 
-    // Get slug from params and find review data
+    // Get slug from params and fetch blog
     React.useEffect(() => {
         params.then(({ slug: blogSlug }) => {
-            const data = (firmReviewsData as FirmReviewsData)[blogSlug];
-            if (data) {
-                setReviewData(data);
-            }
+            fetchBlog(blogSlug);
         });
-    }, [params]);
+        
+        // Cleanup: clear blog when component unmounts
+        return () => {
+            clearBlog();
+        };
+    }, [params, fetchBlog, clearBlog]);
 
     // Table of contents data from review data
     const tableOfContents = React.useMemo(() => {
@@ -83,12 +85,21 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
     };
 
     // Loading state
-    if (!reviewData) {
+    if (isLoading) {
+        return (
+            <LoadingScreen />
+        );
+    }
+
+    // Error state
+    if (error || !reviewData) {
         return (
             <div className="min-h-screen bg-background pt-12 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Loading review...</p>
+                    <p className="text-destructive text-lg mb-4">{error || 'Review not found'}</p>
+                    <Button asChild variant="link">
+                        <Link href="/blogs">Back to Blogs</Link>
+                    </Button>
                 </div>
             </div>
         );
@@ -178,7 +189,7 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
                                 {/* Back Button */}
                                 <Button
                                     asChild
-                                    variant="ghost"
+                                    variant="link"
                                     className=" text-white/80 hover:text-white hover:bg-white/10"
                                 >
                                     <Link href="/blogs" className="flex items-center gap-2">
@@ -191,10 +202,10 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
                                         <Share2 className="h-4 w-4" />
                                         <span className='hidden sm:inline'>Share</span>
                                     </Button>
-                                    <Button variant="ghost" size="sm" className='text-primary/90 font-medium hover:text-primary transition-all duration-300'>
+                                    {/* <Button variant="ghost" size="sm" className='text-primary/90 font-medium hover:text-primary transition-all duration-300'>
                                         <Bookmark className="h-4 w-4" />
                                         <span className='hidden sm:inline'>Save</span>
-                                    </Button>
+                                    </Button> */}
                                 </div>
                             </div>
                             {/* Article Meta */}

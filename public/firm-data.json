@@ -1,0 +1,295 @@
+{
+    "_id": {
+      "$oid": "690cbdca770e44adfbaddd4a"
+    },
+    "firmDetails": {
+      "name": "FTMO",
+      "legalEntityName": "FTMO s.r.o.",
+      "registrationNumber": "640 619 521",
+      "licenseNumber": "525757",
+      "regulator": "ASIC (Australian Securities and Investments Commission)",
+      "jurisdiction": "Australia",
+      "yearFounded": 2015,
+      "status": "Inactive",
+      "hqAddress": "Purkyňova 2121/3, Nové Město, 110 00 Prague 1, Czech Republic",
+      "languagesSupported": [
+        "English",
+        "Czech",
+        "Spanish",
+        "German",
+        "Portuguese"
+      ],
+      "companyDescription": "FTMO is a proprietary trading firm based in Prague, Czech Republic, founded in 2015 by Otakar Šuffner and Marek Vašíček.\n\nThe company helps traders prove their skills through an online evaluation program.\nIf traders pass the challenge by trading profitably and following risk rules, FTMO gives them access to a funded trading account, where they can trade with the company’s capital and keep a share of the profits (usually up to 90%).\n\nFTMO doesn’t act as a broker — it doesn’t hold customer deposits or provide trading to the public. Instead, it’s a performance-based funding platform that partners with various liquidity providers and brokers to simulate real trading conditions.\n\nFTMO has grown into one of the largest and most trusted prop firms in the world, serving thousands of traders globally and expanding its presence through FTMO Australia (VRGK Tech Pty Ltd) and a strategic partnership with OANDA.",
+      "officialWebsite": "https://ftmo.com/en/",
+      "brokers": [],
+      "liquidityProviders": [
+        "OANDA"
+      ]
+    },
+    "leadership": {
+      "leadership": [
+        {
+          "name": "Otakar Šuffner",
+          "role": "CEO",
+          "verified": true,
+          "links": {
+            "twitter": "",
+            "instagram": "",
+            "telegram": "",
+            "linkedin": "https://www.linkedin.com/in/otakar-%C5%A1uffner-93a277144?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+            "website": "https://ftmo.com/en/"
+          },
+          "_id": {
+            "$oid": "6910226e70cdf0e77cba09cb"
+          }
+        },
+        {
+          "name": "Marek Vašíček",
+          "role": "CTO",
+          "verified": true,
+          "links": {
+            "twitter": "",
+            "instagram": "",
+            "telegram": "",
+            "linkedin": "https://www.linkedin.com/in/marekvasicek/",
+            "website": ""
+          },
+          "_id": {
+            "$oid": "6910226e70cdf0e77cba09cc"
+          }
+        },
+        {
+          "name": "Michael Kamerman",
+          "role": "Chief Executive of Brokerage Division",
+          "verified": true,
+          "links": {
+            "twitter": "",
+            "instagram": "",
+            "telegram": "",
+            "linkedin": "https://www.linkedin.com/in/michaelkamerman",
+            "website": ""
+          },
+          "_id": {
+            "$oid": "6910226e70cdf0e77cba09cd"
+          }
+        }
+      ]
+    },
+    "ratings": {
+      "trustPilotRating": 4.8,
+      "otherRatings": []
+    },
+    "socialLinks": {
+      "socialLinks": {
+        "X": "https://x.com/FTMO_com",
+        "Instagram": "https://www.instagram.com/ftmocom/",
+        "Facebook": "https://www.facebook.com/ftmocom/",
+        "Discord": "https://discord.gg/weWam4KCQ2"
+      }
+    },
+    "support": {
+      "channels": [
+        {
+          "type": "chat",
+          "link": "https://ftmo.com/en/",
+          "preferred": true,
+          "responseTime": "2",
+          "status": "active",
+          "_id": {
+            "$oid": "6910226e70cdf0e77cba09ca"
+          }
+        }
+      ],
+      "avgResolutionTime": "24",
+      "supportHours": "24/7"
+    },
+    "compliance": {
+      "kycRequirements": [
+        "Passport",
+        "National ID card",
+        "Driving Licence",
+        "PAN card",
+        "Official government letter showing address",
+        "Internet / Phone bill",
+        "Electricity / Water / Gas bill",
+        "Bank statement"
+      ],
+      "kycProvider": "Inhouse",
+      "restrictedCountries": [
+        "Afghanistan",
+        "Anguilla",
+        "Antarctica",
+        "Antigua and Barbuda",
+        "Belarus",
+        "Belize",
+        "Bhutan",
+        "Bouvet Island",
+        "Burundi",
+        "Cape Verde",
+        "Central African Republic",
+        "Chad",
+        "Comoros",
+        "Cook Islands",
+        "Crimea (Region of Ukraine)",
+        "Cuba",
+        "Djibouti",
+        "Dominica",
+        "Equatorial Guinea",
+        "Eritrea",
+        "Eswatini (fmr. \"Swaziland\")",
+        "Fiji",
+        "Gabon",
+        "Gambia",
+        "Grenada",
+        "Guinea",
+        "Guinea-Bissau",
+        "India",
+        "Indonesia",
+        "Iran",
+        "Iraq",
+        "Kazakhstan",
+        "Kiribati",
+        "Kosovo",
+        "Kyrgyzstan",
+        "Lesotho",
+        "Liberia",
+        "Malawi",
+        "Mali",
+        "Marshall Islands",
+        "Mauritania",
+        "Micronesia",
+        "Nauru",
+        "Niger",
+        "Niue",
+        "North Korea",
+        "Papua New Guinea",
+        "Regions of Ukraine: Crimea, Donetsk, and Luhansk",
+        "Republic of the Congo (Congo Brazzaville)",
+        "Russia",
+        "Saint Barthélemy",
+        "Saint Kitts and Nevis",
+        "Saint Lucia",
+        "Saint Vincent and the Grenadines",
+        "Samoa",
+        "San Marino",
+        "Sao Tome and Principe",
+        "Seychelles",
+        "Sierra Leone",
+        "Solomon Islands",
+        "Somalia",
+        "South Sudan",
+        "Sudan",
+        "Suriname",
+        "Syria",
+        "Tajikistan",
+        "Timor-Leste",
+        "Tokelau",
+        "Tonga",
+        "Turkmenistan",
+        "Tuvalu",
+        "Uzbekistan",
+        "Vanuatu",
+        "Vatican City",
+        "Venezuela",
+        "Western Sahara",
+        "Zaporizhzhia (Region of Ukraine)"
+      ],
+      "regulationsComplied": [],
+      "amlLink": ""
+    },
+    "transparency": {
+      "ceoPublic": true,
+      "officeVerified": true,
+      "termsPublicUpdated": true,
+      "payoutProofPublic": true,
+      "thirdPartyAudit": true,
+      "notes": "📘 1. Business Model Transparency\n\nFTMO is not a broker — it does not handle client deposits for live market trading.\nTraders only pay for the evaluation fee, not for trading capital.\nProfits are simulated until a trader passes and signs the FTMO Agreement.\n\n🧾 2. Legal Structure\n\nOperates under FTMO s.r.o., a Czech-registered company (IC 03136752).\nAlso operates through FTMO Proprietary Trading Pty Ltd (Australia) for global compliance and transparency.\nThe company is not regulated by any financial authority (like ASIC or CySEC) but follows AML/KYC laws and data-protection (GDPR) requirements.\n\n💰 3. Fund & Payment Transparency\n\nPayouts are processed through verified payment partners (e.g. Deel, bank transfer, crypto channels).\nTraders must complete iDenfy KYC verification before any payout.\nProfits are paid from FTMO’s internal business funds, not other traders’ fees.\n\n🔐 4. Compliance & Data Protection\n\nFTMO complies with EU GDPR standards.\nHas published AML/KYC policies and Privacy Policy on its official site.\nAll client data is encrypted and used only for verification & payout purposes.\n\n🌍 5. Communication Transparency\n\nProvides 24/7 chat & email support.\nShares key company details publicly — CEO names, address, and registration numbers.\nMaintains open community presence via Discord, YouTube, LinkedIn, X (Twitter) etc.",
+      "transparencyScore": 10
+    },
+    "trading": {
+      "leverageMatrix": {
+        "Metals": {
+          "Instant": "n/a",
+          "1-Step": "n/a",
+          "2-Step": "1:30",
+          "_id": {
+            "$oid": "6910226e70cdf0e77cba09c4"
+          }
+        },
+        "Indices": {
+          "Instant": "n/a",
+          "1-Step": "n/a",
+          "2-Step": "1:50",
+          "_id": {
+            "$oid": "6910226e70cdf0e77cba09c5"
+          }
+        },
+        "Energy": {
+          "Instant": "n/a",
+          "1-Step": "n/a",
+          "2-Step": "1:30",
+          "_id": {
+            "$oid": "6910226e70cdf0e77cba09c6"
+          }
+        },
+        "Crypto": {
+          "Instant": "n/a",
+          "1-Step": "n/a",
+          "2-Step": "1:3",
+          "_id": {
+            "$oid": "6910226e70cdf0e77cba09c7"
+          }
+        },
+        "Stocks": {
+          "Instant": "n/a",
+          "1-Step": "n/a",
+          "2-Step": "1:3",
+          "_id": {
+            "$oid": "6910226e70cdf0e77cba09c8"
+          }
+        },
+        "Forex": {
+          "Instant": "n/a",
+          "1-Step": "n/a",
+          "2-Step": "1:100",
+          "_id": {
+            "$oid": "6910226e70cdf0e77cba09c9"
+          }
+        }
+      },
+      "commissions": {
+        "Fx": "$5 per lot",
+        "Metals": "0.0010%/Volume",
+        "Indices": "$0",
+        "Energy": "$0",
+        "Crypto": "0.0650%/Volume",
+        "Stocks": "0.0040%/Volume"
+      }
+    },
+    "payments": {
+      "methods": [
+        "Bank wire transfer",
+        "Debit/credit card",
+        "Skrill — instant",
+        "Cryptocurrencies"
+      ],
+      "payoutMethods": [
+        "Bank wire transfer",
+        "Skrill",
+        "Cryptocurrencies",
+        "bank wires (e.g., via Revolut) for US persons"
+      ],
+      "baseCurrency": "EUR, USD, GBP",
+      "minWithdrawal": 50,
+      "processingTime": "1-2 business days",
+      "payoutSchedule": "14 days",
+      "refundPolicy": "The initial fee is only reimbursed in the following cases:\n\n1.  Unused Challenge:\nIf you have not used your FTMO Challenge account and are still within 14 days of purchase, you are eligible for a full refund as stated in our Terms & Conditions.\n\n2.  Successful Completion:\nIf you have successfully passed both the FTMO Challenge and Verification phases and made your first payout on the FTMO Account, your fee will be reimbursed with your first reward."
+    },
+    "createdAt": {
+      "$date": "2025-11-06T15:24:58.295Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-09T05:11:10.166Z"
+    },
+    "__v": 0
+  }

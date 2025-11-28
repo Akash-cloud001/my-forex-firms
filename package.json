@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "add-firm-review": "node scripts/add-firm-review.js"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.5",
