@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     description: "Browse verified prop trading firms. Read honest reviews, explore funding options, and find the best prop firm for your trading style.",
     images: [
       {
-        url: "/my-forex-firms-full.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Prop Trading Firms - My Forex Firms",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Prop Trading Firms - Reviews & Ratings",
     description: "Browse verified prop trading firms. Read honest reviews and find the best prop firm for your trading style.",
-    images: ["/my-forex-firms-full.png"],
+    images: ["/og-image.png"],
   },
   alternates: {
     canonical: "/firms",
