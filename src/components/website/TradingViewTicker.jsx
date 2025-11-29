@@ -40,7 +40,7 @@ function TradingViewTicker() {
           "largeChartUrl": "",
           "isTransparent": false,
           "showSymbolLogo": true,
-          "displayMode": "adaptive"
+          "displayMode": "regular"
         }`;
       container.current.appendChild(script);
     },
