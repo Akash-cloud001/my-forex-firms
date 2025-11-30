@@ -35,7 +35,6 @@ const ReviewsPage = () => {
         sortOrder: 'desc'
       })
       setReviews(response.reviews)
-      console.log(response.reviews,'response.reviews')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -74,7 +73,6 @@ const ReviewsPage = () => {
       setDeleteModalOpen(false);
       setReviewToDelete(null);
     } catch (err) {
-      console.error('Error deleting review:', err);
       setError(err.message || 'Failed to delete review');
     } finally {
       setLoading(false);

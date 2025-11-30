@@ -32,11 +32,6 @@ export async function generateMetadata(
     }
 
     const blog = data.review;
-    console.log(blog.title, " :: blog.title")
-    console.log(blog.introduction?.substring(0, 160) || blog.subtitle, " :: blog.introduction?.substring(0, 160) || blog.subtitle")
-    console.log(blog.firmName, " :: blog.firmName")
-    console.log(blog.publishedAt, " :: blog.publishedAt")
-    console.log(blog.seoTags, " :: blog.seoTags")
     return {
       title: blog.title,
       description: blog.introduction?.substring(0, 160) || blog.subtitle,
@@ -71,8 +66,6 @@ export async function generateMetadata(
       },
     };
   } catch (error) {
-    console.error("Metadata generation error:", error);
-    
     return {
       title: `${slug.replace('-review', '')} Review | My Forex Firms`,
       description: "Honest and comprehensive prop firm review.",

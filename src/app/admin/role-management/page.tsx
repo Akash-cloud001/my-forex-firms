@@ -58,7 +58,6 @@ export default function EmailManagementPage() {
       setUsers(data.users);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch users';
-      console.error('Error fetching users:', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -84,7 +83,6 @@ export default function EmailManagementPage() {
       setSearchResults(data.users);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to search users';
-      console.error('Error searching users:', errorMessage);
       toast.error(errorMessage);
     } finally {
       setIsSearching(false);
