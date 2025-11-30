@@ -1,0 +1,66 @@
+"use client";
+
+import React from 'react';
+import { MessageCircle, ThumbsUp, ThumbsDown, LucideIcon } from 'lucide-react';
+import AnimatedSection from '@/components/website/AnimatedSection';
+import { TraderFeedbackSection } from '@/types/firm-review';
+
+interface BlogTraderFeedbackProps {
+    traderFeedback: TraderFeedbackSection;
+    iconMap: Record<string, LucideIcon>;
+}
+
+export default function BlogTraderFeedback({ traderFeedback, iconMap }: BlogTraderFeedbackProps) {
+    if (!traderFeedback) return null;
+
+    const IconComponent = iconMap[traderFeedback.icon] || MessageCircle;
+
+    return (
+        <AnimatedSection id="blog-trader-feedback">
+            <section id={traderFeedback.id} className="mb-12">
+                {/* <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-8 flex items-center gap-3">
+                    <IconComponent className="h-8 w-8 text-primary" />
+                    {traderFeedback.title}
+                </h2> */}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Praised Section */}
+                    {traderFeedback.praised && traderFeedback.praised.length > 0 && (
+                        <div className="rounded-lg border border-border p-8 bg-accent/5">
+                            <div className="flex items-center gap-3 mb-6">
+                                    <ThumbsUp className="h-6 w-6 text-muted-foreground" />
+                                <h3 className="font-semibold text-foreground text-lg">What Traders Praise</h3>
+                            </div>
+                            <ul className="space-y-3">
+                                {traderFeedback.praised.map((item: string, index: number) => (
+                                    <li key={index} className="flex items-start gap-3">
+                                        <div className="h-2 w-2 rounded-full bg-muted-foreground mt-2 shrink-0" />
+                                        <span className="text-sm text-foreground leading-relaxed">{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {/* Complaints Section */}
+                    {traderFeedback.complaints && traderFeedback.complaints.length > 0 && (
+                        <div className="rounded-lg border border-border p-8 bg-accent/5">
+                            <div className="flex items-center gap-3 mb-6">
+                                <ThumbsDown className="h-6 w-6 text-muted-foreground" />
+                                <h3 className="font-semibold text-foreground text-lg">Common Complaints</h3>
+                            </div>
+                            <ul className="space-y-3">
+                                {traderFeedback.complaints.map((item: string, index: number) => (
+                                    <li key={index} className="flex items-start gap-3">
+                                        <div className="h-2 w-2 rounded-full bg-muted-foreground mt-2 shrink-0" />
+                                        <span className="text-sm text-foreground leading-relaxed">{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            </section>
+        </AnimatedSection>
+    );
+}

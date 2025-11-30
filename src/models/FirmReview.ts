@@ -400,6 +400,7 @@ const WhoShouldUseSectionSchema = new Schema({
 }, { _id: false });
 
 const FundedAccountProcessSchema = new Schema({
+    id: { type: String, required: true },
     steps: { type: [String], required: true },
 }, { _id: false });
 

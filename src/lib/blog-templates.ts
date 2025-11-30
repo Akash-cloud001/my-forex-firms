@@ -111,6 +111,71 @@ export function getReviewTemplate(): Omit<FirmReview, 'slug'> {
             platforms: [],
             instruments: [],
         },
+        // ✅ NEW SECTION 1: Payouts & Withdrawal
+        payoutsWithdrawal: {
+            id: 'payouts-withdrawal',
+            title: 'Payouts, Profit Split & Withdrawal Process',
+            icon: 'DollarSign',
+            profitSplit: '',
+            firstPayout: '',
+            subsequentPayouts: '',
+            payoutMethods: [],
+            payoutSpeed: '',
+            payoutProof: '',
+            notes: '',
+        },
+        // ✅ NEW SECTION 2: Support & Reputation
+        supportReputation: {
+            id: 'support-reputation',
+            title: 'Support & Reputation',
+            icon: 'Users',
+            supportQuality: {
+                responseTime: '',
+                description: '',
+            },
+            ratings: {
+                trustpilot: 0,
+                communitySize: '',
+            },
+            mostLoved: [],
+            mostComplained: [],
+        },
+        // ✅ NEW SECTION 3: Trader Feedback
+        traderFeedback: {
+            id: 'trader-feedback',
+            title: 'Trader Feedback – Real User Sentiment',
+            icon: 'MessageCircle',
+            praised: [],
+            complaints: [],
+        },
+        // ✅ NEW SECTION 4: Pros & Cons
+        prosCons: {
+            id: 'pros-cons',
+            title: 'Pros & Cons',
+            icon: 'CheckCircle',
+            pros: [],
+            cons: [],
+        },
+        // ✅ NEW SECTION 5: Red Flags
+        redFlags: {
+            id: 'red-flags',
+            title: 'Red Flags (If Any)',
+            icon: 'AlertTriangle',
+            items: [],
+        },
+        // ✅ NEW SECTION 6: Who Should Use
+        whoShouldUse: {
+            id: 'who-should-use',
+            title: 'Who Should Use [Firm Name]?',
+            icon: 'Target',
+            perfectFor: [],
+            notIdealFor: [],
+        },
+        // ✅ NEW SECTION 7: Funded Account Process
+        fundedAccountProcess: {
+            id: 'funded-account-process',
+            steps: [],
+        },
         finalVerdict: {
             id: 'final-verdict',
             title: 'Final Verdict',
@@ -132,8 +197,17 @@ export function getReviewTemplate(): Omit<FirmReview, 'slug'> {
             { id: 'how-differs', title: 'How [Firm Name] Differs', icon: 'Scale' },
             { id: 'programs-comparison', title: 'Programs Comparison', icon: 'BarChart3' },
             { id: 'platforms-execution', title: 'Platforms & Execution', icon: 'TrendingUp' },
+            { id: 'payouts-withdrawal', title: 'Payouts & Withdrawals', icon: 'DollarSign' },
+            { id: 'support-reputation', title: 'Support & Reputation', icon: 'Users' },
+            { id: 'trader-feedback', title: 'Trader Feedback', icon: 'MessageCircle' },
+            { id: 'pros-cons', title: 'Pros & Cons', icon: 'CheckCircle' },
+            { id: 'red-flags', title: 'Red Flags', icon: 'AlertTriangle' },
+            { id: 'who-should-use', title: 'Who Should Use', icon: 'Target' },
+            { id: 'funded-account-process', title: 'Step-by-Step: How to Get Funded', icon: 'List' },
             { id: 'final-verdict', title: 'Final Verdict', icon: 'Star' },
         ],
+        // ✅ Optional: SEO tags and FAQs
+        seoTags: [],
+        faqs: [],
     };
 }
-

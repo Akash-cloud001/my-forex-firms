@@ -10,9 +10,10 @@ interface BlogFinalVerdictProps {
     finalVerdict: FinalVerdictSection;
     firmName: string;
     iconMap: Record<string, LucideIcon>;
+    trustScore: number;
 }
 
-export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap }: BlogFinalVerdictProps) {
+export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap, trustScore }: BlogFinalVerdictProps) {
     if (!finalVerdict) return null;
 
     const IconComponent = iconMap[finalVerdict.icon] || Star;
@@ -36,22 +37,8 @@ export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap }: Bl
                         <div className="text-center mb-8">
                             <div className="inline-flex flex-col items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <span className="text-4xl sm:text-4xl md:text-5xl font-bold gradient-text">{finalVerdict.rating}</span>
-                                    <div className="text-left">
-                                        <div className="flex mb-1">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <Star 
-                                                    key={star} 
-                                                    className={`h-4 sm:h-5 md:h-6 w-4 sm:w-5 md:w-6 ${
-                                                        star <= Math.round(finalVerdict.rating) 
-                                                            ? 'text-yellow-400 fill-current' 
-                                                            : 'text-white/30'
-                                                    }`} 
-                                                />
-                                            ))}
-                                        </div>
-                                        <p className="text-white/60 text-xs sm:text-sm">out of 5.0</p>
-                                    </div>
+                                    <span className="text-4xl sm:text-4xl md:text-5xl font-bold gradient-text">{trustScore}</span>
+                                   
                                 </div>
                                 <div className="flex items-center gap-2 text-xs sm:text-sm text-white/80">
                                     <div className="w-2 h-2 bg-success rounded-full"></div>

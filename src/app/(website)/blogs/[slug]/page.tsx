@@ -16,6 +16,13 @@ import BlogProgramsComparison from '@/components/website/blog/BlogProgramsCompar
 import BlogPlatforms from '@/components/website/blog/BlogPlatforms';
 import BlogFinalVerdict from '@/components/website/blog/BlogFinalVerdict';
 import BlogTableOfContents from '@/components/website/blog/BlogTableOfContents';
+import BlogPayoutsWithdrawal from '@/components/website/blog/BlogPayoutsWithdrawalProps';
+import BlogSupportReputation from '@/components/website/blog/BlogSupportReputationProps';
+import BlogTraderFeedback from '@/components/website/blog/BlogTraderFeedbackProps';
+import BlogProsConsProps from '@/components/website/blog/BlogProsConsProps';
+import BlogRedFlags from '@/components/website/blog/BlogRedFlags';
+import BlogWhoShouldUse from '@/components/website/blog/BlogWhoShouldUse';
+import BlogFundedAccountProcess from '@/components/website/blog/BlogFundedAccountProcess';
 interface BlogPageProps {
     params: Promise<{ slug: string }>;
 }
@@ -180,11 +187,33 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
                         {/* Platforms & Execution */}
                         <BlogPlatforms platformsExecution={reviewData.platformsExecution} iconMap={iconMap} />
 
+                        {/* Payouts & Withdrawal */}
+                        <BlogPayoutsWithdrawal payoutsWithdrawal={reviewData.payoutsWithdrawal} iconMap={iconMap} />
+                        
+                        {/* Support & Reputation */}
+                        <BlogSupportReputation supportReputation={reviewData.supportReputation} iconMap={iconMap} />
+
+                        {/* Trader Feedback */}
+                        <BlogTraderFeedback traderFeedback={reviewData.traderFeedback} iconMap={iconMap} />
+
+                        {/* Pros and Cons */}
+                        <BlogProsConsProps prosCons={reviewData.prosCons} iconMap={iconMap} />
+
+                        {/* Red Flags */}
+                        <BlogRedFlags redFlags={reviewData.redFlags} iconMap={iconMap} />
+
+                        {/* Who Should Use */}
+                        <BlogWhoShouldUse whoShouldUse={reviewData.whoShouldUse} iconMap={iconMap} />
+
+                        {/* Funded Account Process */}
+                        <BlogFundedAccountProcess fundedAccountProcess={reviewData.fundedAccountProcess} />
+
                         {/* Final Verdict */}
                         <BlogFinalVerdict
                             finalVerdict={reviewData.finalVerdict}
                             firmName={reviewData.firmName}
                             iconMap={iconMap}
+                            trustScore={reviewData.trustScore}
                         />
                     </section>
                 </article>

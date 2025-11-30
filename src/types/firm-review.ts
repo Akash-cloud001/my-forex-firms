@@ -155,8 +155,10 @@ export interface WhoShouldUseSection {
 }
 
 export interface FundedAccountProcess {
+  id: string;                    // ← ADD THIS
   steps: string[];
 }
+
 
 export interface FaqItem {
   question: string;
@@ -170,9 +172,6 @@ export interface TableOfContentsItem {
 }
 
 export interface FirmReview {
-  _id?: {
-    $oid: string;
-  };
   slug: string;
   firmName: string;
   title: string;
@@ -199,13 +198,6 @@ export interface FirmReview {
   tableOfContents: TableOfContentsItem[];
   seoTags: string[];
   faqs: FaqItem[];
-  createdAt?: {
-    $date: string;
-  };
-  updatedAt?: {
-    $date: string;
-  };
-  __v?: number;
 }
 
 export interface FirmReviewsData {
