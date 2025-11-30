@@ -71,7 +71,7 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/sitemap" className="text-white hover:text-[#F66435] transition-colors font-geist-sans text-sm sm:text-base">
+                  <Link href="/site-map" className="text-white hover:text-[#F66435] transition-colors font-geist-sans text-sm sm:text-base">
                     Sitemap
                   </Link>
                 </li>
@@ -115,7 +115,7 @@ const Footer = () => {
                 className="w-5 h-5 sm:w-6 sm:h-6"
               />
             </a>
-            <a 
+            {/* <a 
               href="https://www.instagram.com/myforexfirms?igsh=eWdydHMyNmN5aTFk" 
               target="_blank" 
               rel="noopener noreferrer"
@@ -129,7 +129,7 @@ const Footer = () => {
                 height={24}
                 className="w-5 h-5 sm:w-6 sm:h-6"
               />
-            </a>
+            </a> */}
           </div>
         </div>
       </div>
