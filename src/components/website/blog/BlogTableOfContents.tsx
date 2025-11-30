@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { List, Menu, X } from 'lucide-react';
+import { Dot, List, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableOfContentsItem } from '@/types/firm-review';
 import { LucideIcon } from 'lucide-react';
@@ -47,7 +47,8 @@ export default function BlogTableOfContents({
                                             : 'text-muted-foreground hover:text-foreground'
                                     }`}
                                 >
-                                    <IconComponent className="h-4 w-4 shrink-0" />
+                                    {/* <IconComponent className="h-4 w-4 shrink-0" /> */}
+                                    <Dot className="h-4 w-4 shrink-0" />
                                     <span className="truncate">{item.title}</span>
                                 </button>
                             );
@@ -89,7 +90,8 @@ export default function BlogTableOfContents({
                                                 : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                     >
-                                        <IconComponent className="h-4 w-4 shrink-0" />
+                                        {/* <IconComponent className="h-4 w-4 shrink-0" /> */}
+                                        <Dot className="h-4 w-4 shrink-0" />
                                         <span className="truncate">{item.title}</span>
                                     </button>
                                 );

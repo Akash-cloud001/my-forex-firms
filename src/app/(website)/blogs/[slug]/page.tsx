@@ -40,7 +40,7 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
         params.then(({ slug: blogSlug }) => {
             fetchBlog(blogSlug);
         });
-        
+
         // Cleanup: clear blog when component unmounts
         return () => {
             clearBlog();
@@ -57,26 +57,55 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
         }));
     }, [reviewData]);
 
-    // Scroll tracking for active section
+ 
+    // Replace the existing "Scroll tracking for active section" useEffect with this:
     React.useEffect(() => {
-        const handleScroll = () => {
-            const sections = tableOfContents.map(item => document.getElementById(item.id));
-            const scrollPosition = window.scrollY + 150; // 150px offset to account for navbar and better UX
+        if (!tableOfContents || tableOfContents.length === 0) return;
 
-            for (let i = sections.length - 1; i >= 0; i--) {
-                const section = sections[i];
-                if (section && section.offsetTop <= scrollPosition) {
-                    setActiveSection(tableOfContents[i].id);
-                    break;
-                }
-            }
+        // If the overview section exists right away, ensure activeSection starts as 'overview'
+        const overviewEl = document.getElementById('overview');
+        if (overviewEl) {
+            setActiveSection('overview');
+        }
+
+        // IntersectionObserver options: rootMargin moves the "viewport" so
+        // the section becomes active roughly when it's near the middle of the screen.
+        const observerOptions: IntersectionObserverInit = {
+            root: null,
+            rootMargin: '-40% 0px -40% 0px', // triggers roughly when section is in center area
+            threshold: 0, // 0 is fine because rootMargin handles when it becomes active
         };
 
-        window.addEventListener('scroll', handleScroll);
-        handleScroll(); // Initial check
+        const observer = new IntersectionObserver((entries) => {
+            // We want the entry that's intersecting and has the largest intersectionRatio / isIntersecting
+            // Since rootMargin shrinks the intersection area, first intersecting entry is usually what we want.
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    setActiveSection(entry.target.id);
+                }
+            });
+        }, observerOptions);
 
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [tableOfContents]);
+        // Observe each section element that exists
+        tableOfContents.forEach((item) => {
+            const el = document.getElementById(item.id);
+            if (el) observer.observe(el);
+        });
+
+        // Fallback: ensure initial active is 'overview' if nothing intersects quickly
+        const initialTimeout = window.setTimeout(() => {
+            if (!document.getElementById(activeSection)) {
+                // if activeSection is invalid for some reason, set to overview if present
+                if (overviewEl) setActiveSection('overview');
+            }
+        }, 200); // short timeout — safe fallback
+
+        return () => {
+            observer.disconnect();
+            clearTimeout(initialTimeout);
+        };
+    }, [tableOfContents]); // only re-run when tableOfContents changes
+
 
     const scrollToSection = (sectionId: string) => {
         const element = document.getElementById(sectionId);
@@ -152,8 +181,8 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
                         <BlogPlatforms platformsExecution={reviewData.platformsExecution} iconMap={iconMap} />
 
                         {/* Final Verdict */}
-                        <BlogFinalVerdict 
-                            finalVerdict={reviewData.finalVerdict} 
+                        <BlogFinalVerdict
+                            finalVerdict={reviewData.finalVerdict}
                             firmName={reviewData.firmName}
                             iconMap={iconMap}
                         />
