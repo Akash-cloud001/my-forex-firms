@@ -70,10 +70,10 @@ export default function BlogHero({ reviewData }: BlogHeroProps) {
                             <span>{reviewData?.readTime || 0} min read</span>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                         <Star className="h-4 w-4 text-yellow-500 fill-current" />
                         <span className="font-semibold text-foreground">Trust Score: {reviewData?.trustScore || 0}/10</span>
-                    </div>
+                    </div> */}
                 </div>
             </section>
         </AnimatedSection>

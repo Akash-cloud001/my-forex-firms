@@ -5,6 +5,7 @@ import { Star, CheckCircle, XCircle, LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import AnimatedSection from '@/components/website/AnimatedSection';
 import { FinalVerdictSection } from '@/types/firm-review';
+import Image from 'next/image';
 
 interface BlogFinalVerdictProps {
     finalVerdict: FinalVerdictSection;
@@ -35,11 +36,15 @@ export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap, trus
                         </div>
 
                         <div className="text-center mb-8">
-                            <div className="inline-flex flex-col items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <span className="text-4xl sm:text-4xl md:text-5xl font-bold gradient-text">{trustScore}</span>
-                                   
-                                </div>
+                            <div className="inline-flex flex-col gap-1 items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+                                <figure className=" rounded-[8px] relative flex flex-col items-center justify-end ">
+                                    <span className='text-primary text-[32px] font-bold'>
+                                    {trustScore}<span className='text-xl font-light'>/10</span>
+                                    </span>
+                                    <span className='text-base text-foreground/90 -mt-1'>
+                                    PTI INDEX
+                                    </span>
+                                </figure>
                                 <div className="flex items-center gap-2 text-xs sm:text-sm text-white/80">
                                     <div className="w-2 h-2 bg-success rounded-full"></div>
                                     <span>{finalVerdict.ratingLabel}</span>

@@ -28,9 +28,7 @@ export default function BlogWhoShouldUse({ whoShouldUse, iconMap }: BlogWhoShoul
                     {whoShouldUse.perfectFor && whoShouldUse.perfectFor.length > 0 && (
                         <div className="rounded-lg border border-border p-8 bg-accent/5">
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="p-3 bg-accent/10 rounded-lg">
-                                    <CheckCircle className="h-6 w-6 text-muted-foreground" />
-                                </div>
+                                <CheckCircle className="h-6 w-6 text-muted-foreground" />
                                 <h3 className="font-semibold text-foreground text-lg">Perfect For</h3>
                             </div>
                             <ul className="space-y-3">
@@ -48,9 +46,7 @@ export default function BlogWhoShouldUse({ whoShouldUse, iconMap }: BlogWhoShoul
                     {whoShouldUse.notIdealFor && whoShouldUse.notIdealFor.length > 0 && (
                         <div className="rounded-lg border border-border p-8 bg-accent/5">
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="p-3 bg-accent/10 rounded-lg">
-                                    <XCircle className="h-6 w-6 text-muted-foreground" />
-                                </div>
+                                <XCircle className="h-6 w-6 text-muted-foreground" />
                                 <h3 className="font-semibold text-foreground text-lg">Not Ideal For</h3>
                             </div>
                             <ul className="space-y-3">
