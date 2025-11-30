@@ -28,7 +28,7 @@ export default function SitemapPage() {
   };
 
   return (
-    <section className="w-full bg-background h-auto pt-10 pb-16 relative">
+    <section className="w-full overflow-hidden bg-background h-auto pt-10 pb-16 relative">
       <div className="absolute -left-[200px] top-1/2 -translate-y-1/2   h-[400px] w-[400px] rounded-full bg-[#F66435]/10 blur-[200px]" />
           <div className="absolute -right-[200px] top-1/2 -translate-y-1/2 h-[400px] w-[400px] rounded-full bg-[#F66435]/10 blur-[200px]" />
 
