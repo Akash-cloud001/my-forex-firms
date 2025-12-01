@@ -254,7 +254,7 @@ export const ReviewForm: React.FC = () => {
             {/* File Upload */}
             <div className="space-y-3">
               <Label className="text-base font-semibold">
-                Upload Proof Documents (Optional)
+                Upload Proof Documents <small>(upload atleast One)</small> 
               </Label>
               <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-start gap-2">

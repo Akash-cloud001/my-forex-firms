@@ -1,0 +1,195 @@
+{
+  "funding-pips-review": {
+    "slug": "funding-pips-review",
+    "firmName": "Funding Pips",
+    "title": "Funding Pips Review 2025",
+    "subtitle": "Honest, Deep & Complete Analysis",
+    "publishedAt": "November 27, 2024",
+    "readTime": 12,
+    "trustScore": 8.4,
+    "rating": 4.3,
+    "ratingLabel": "Highly Recommended",
+    "introduction": "Is Funding Pips really a trader‑friendly prop firm, or just another hype-driven evaluation company? After researching their rules, payout structure, trader feedback, risk parameters, and comparing them with top prop firms in 2025, this is the most honest, complete, and data-based Funding Pips review you'll read this year.",
+    "overview": {
+      "title": "Overview – Quick Snapshot",
+      "icon": "Star",
+      "data": {
+        "left": [
+          { "label": "Firm Name:", "value": "Funding Pips" },
+          { "label": "Founded:", "value": "2022" },
+          { "label": "Headquarters:", "value": "UAE" },
+          { "label": "Max Funding:", "value": "$200,000", "highlight": true }
+        ],
+        "right": [
+          { "label": "Profit Split:", "value": "Up to 85%–100%", "highlight": "success" },
+          { "label": "Trust Score:", "value": "8.4/10", "highlight": true },
+          { "label": "Funding Model:", "value": "Instant, 1‑Phase & 2‑Phase" },
+          { "label": "Best For:", "value": "Scalpers, Day Traders, EA" }
+        ]
+      }
+    },
+    "whatIs": {
+      "id": "what-is-funding-pips",
+      "title": "What is Funding Pips?",
+      "icon": "Search",
+      "content": "Funding Pips is a forex and CFD proprietary trading firm that funds traders after they complete an evaluation challenge. They provide access to funding capital, trading platforms like MT5, cTrader, and MatchTrader, and allow traders to keep up to 85–100% of their profits.",
+      "highlights": {
+        "title": "It aims to offer:",
+        "items": [
+          "Simple rule structure",
+          "Flexible time limits (unlimited days)",
+          "Affordable challenge fees",
+          "Fast verification & payouts"
+        ]
+      },
+      "conclusion": "For many traders, Funding Pips has become one of the easiest-to-pass 1-phase evaluation prop firms."
+    },
+    "howDiffers": {
+      "id": "how-differs",
+      "title": "How Funding Pips Differs From Other Prop Firms",
+      "icon": "Scale",
+      "advantages": [
+        {
+          "title": "No time limits on evaluation",
+          "description": "Big plus for swing traders or low frequency traders."
+        },
+        {
+          "title": "Flexible account options",
+          "description": "Choose instant funding, 1-step or 2-step."
+        },
+        {
+          "title": "Competitive profit splits",
+          "description": "Up to 85–100% depending on model."
+        },
+        {
+          "title": "Strong community reputation",
+          "description": "Fast support, transparent rules, good payout history."
+        }
+      ],
+      "limitations": [
+        {
+          "title": "Not suitable for high-frequency traders",
+          "description": "HFT, grid bots, latency arbitrage not allowed."
+        }
+      ]
+    },
+    "programsComparison": {
+      "id": "programs-comparison",
+      "title": "Funding Programs Comparison",
+      "icon": "BarChart3",
+      "headers": ["Criteria", "Instant Account", "1‑Phase Evaluation", "2‑Phase Evaluation"],
+      "rows": [
+        {
+          "criteria": "Account Sizes",
+          "instant": "$10k–$200k",
+          "phase1": "$10k–$200k",
+          "phase2": "$10k–$200k"
+        },
+        {
+          "criteria": "Challenge Fee",
+          "instant": "Highest",
+          "instantHighlight": "red",
+          "phase1": "Moderate",
+          "phase1Highlight": "yellow",
+          "phase2": "Lowest",
+          "phase2Highlight": "success"
+        },
+        {
+          "criteria": "Profit Target",
+          "instant": "N/A",
+          "phase1": "8–10%",
+          "phase2": "Phase 1: 8% / Phase 2: 5%"
+        },
+        {
+          "criteria": "Max Drawdown",
+          "instant": "6%",
+          "phase1": "6%",
+          "phase2": ""
+        },
+        {
+          "criteria": "Daily Drawdown",
+          "instant": "3%",
+          "phase1": "3%",
+          "phase2": ""
+        },
+        {
+          "criteria": "Profit Split",
+          "instant": "50–70%",
+          "phase1": "Up to 85%",
+          "phase1Highlight": "success",
+          "phase2": "Up to 85%",
+          "phase2Highlight": "success"
+        },
+        {
+          "criteria": "Time Limit",
+          "instant": "Unlimited",
+          "instantHighlight": "success",
+          "phase1": "Unlimited",
+          "phase1Highlight": "success",
+          "phase2": "Unlimited",
+          "phase2Highlight": "success"
+        }
+      ]
+    },
+    "platformsExecution": {
+      "id": "platforms-execution",
+      "title": "Platforms, Instruments & Execution",
+      "icon": "TrendingUp",
+      "platforms": [
+        "MetaTrader 5 (MT5)",
+        "cTrader",
+        "MatchTrader"
+      ],
+      "instruments": [
+        "Forex (majors/minors)",
+        "Gold & metals",
+        "Indices (US30, NAS100, GER40)",
+        "Crypto CFDs",
+        "Commodities"
+      ]
+    },
+    "finalVerdict": {
+      "id": "final-verdict",
+      "title": "Final Verdict",
+      "icon": "Star",
+      "subtitle": "Our comprehensive analysis conclusion",
+      "rating": 4.3,
+      "ratingLabel": "Highly Recommended",
+      "strengths": [
+        {
+          "title": "Flexible Evaluation",
+          "description": "Multiple program options with unlimited time limits"
+        },
+        {
+          "title": "High Profit Split",
+          "description": "Up to 85-100% profit sharing for traders"
+        },
+        {
+          "title": "Reliable Payouts",
+          "description": "Consistent payout history with fast processing"
+        },
+        {
+          "title": "Simple Rules",
+          "description": "Easy-to-understand guidelines for all traders"
+        }
+      ],
+      "weaknesses": [
+        
+      ],
+      "recommendation": {
+        "title": "Our Recommendation",
+        "content": "If your strategy is compliant and you prefer low-stress evaluations, Funding Pips is one of the best 1‑phase evaluation prop firms to consider in 2025.",
+        "footer": "Start small, test execution, then scale"
+      }
+    },
+    "tableOfContents": [
+      { "id": "overview", "title": "Overview – Quick Snapshot", "icon": "Star" },
+      { "id": "what-is-funding-pips", "title": "What is Funding Pips?", "icon": "Search" },
+      { "id": "how-differs", "title": "How Funding Pips Differs", "icon": "Scale" },
+      { "id": "programs-comparison", "title": "Programs Comparison", "icon": "BarChart3" },
+      { "id": "platforms-execution", "title": "Platforms & Execution", "icon": "TrendingUp" },
+      { "id": "final-verdict", "title": "Final Verdict", "icon": "Star" }
+    ]
+  }
+}
+

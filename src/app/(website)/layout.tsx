@@ -3,6 +3,7 @@ import Navbar from "@/components/website/navbar";
 import BottomBar from "@/components/website/bottombar";
 import Footer from "@/components/website/footer";
 import AnimatedSection from "@/components/website/AnimatedSection";
+import TradingViewTicker from "@/components/website/TradingViewTicker";
 const WebsiteLayout = ({
   children,
 }: Readonly<{
@@ -16,6 +17,7 @@ const WebsiteLayout = ({
       <AnimatedSection id="footer">
         <Footer />
       </AnimatedSection>
+      <TradingViewTicker />
     </section>
   );
 };

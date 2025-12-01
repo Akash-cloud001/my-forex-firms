@@ -18,7 +18,6 @@ export default function EditFirmPage() {
         const result = await response.json();
         setInitialData(result.data);
       } catch (error) {
-        console.error("Error fetching firm:", error);
       } finally {
         setIsLoading(false);
       }
