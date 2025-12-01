@@ -23,6 +23,8 @@ import BlogProsConsProps from '@/components/website/blog/BlogProsConsProps';
 import BlogRedFlags from '@/components/website/blog/BlogRedFlags';
 import BlogWhoShouldUse from '@/components/website/blog/BlogWhoShouldUse';
 import BlogFundedAccountProcess from '@/components/website/blog/BlogFundedAccountProcess';
+import AnimatedSection from '@/components/website/AnimatedSection';
+import { CustomAccordion } from '@/components/ui/custom-accordion';
 interface BlogPageProps {
     params: Promise<{ slug: string }>;
 }
@@ -215,6 +217,27 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
                             iconMap={iconMap}
                             trustScore={reviewData.trustScore}
                         />
+
+                        {/* FAQ's */}
+                        {reviewData.faqs && reviewData.faqs.length > 0 && 
+                        <AnimatedSection id="faqs">
+                            <section className='w-full pb-16'>
+                                <div className='flex w-full flex-col gap-10 btn-grad rounded-[32px] py-10 sm:py-16 px-6 sm:px-10'>
+                                    <h2 className='text-2xl font-semibold tracking-tight sm:text-4xl text-center text-wrap'>
+                                        Frequently Asked Questions
+                                    </h2>
+                                    <div className='relative font-geist-sans w-full md:max-w-4xl mx-auto'>
+                                        <CustomAccordion
+                                            items={reviewData.faqs.map((faq) => ({
+                                                question: faq.question,
+                                                answer: faq.answer,
+                                            }))}
+                                        />
+                                    </div>
+                                </div>
+                            </section>
+                        </AnimatedSection>}
+
                     </section>
                 </article>
             </div>
