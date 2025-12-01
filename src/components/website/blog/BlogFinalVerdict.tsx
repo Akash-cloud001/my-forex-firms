@@ -54,7 +54,7 @@ export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap, trus
 
                         {finalVerdict.strengths && finalVerdict.strengths.length > 0 && (
                             <div className="mb-8">
-                                <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 text-center">Why {firmName} Stands Out</h3>
+                                <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 text-center">Why <span className='uppercase text-primary'>{firmName} </span> Stands Out</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {finalVerdict.strengths.map((strength, index) => (
                                         <div key={index} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4">

@@ -51,10 +51,10 @@ export default function BlogHero({ reviewData }: BlogHeroProps) {
                             </Button>
                     </div>
                     <div className="">
-                        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight capitalize">
                             {reviewData?.title || 'Loading...'}
                         </h1>
-                        <p className="text-lg sm:text-xl text-white/80 max-w-3xl font-light">
+                        <p className="text-lg sm:text-xl text-white/80 max-w-3xl font-light capitalize">
                             {reviewData?.subtitle || ''}
                         </p>
                     </div>

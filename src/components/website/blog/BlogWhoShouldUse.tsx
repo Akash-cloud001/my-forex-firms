@@ -18,7 +18,7 @@ export default function BlogWhoShouldUse({ whoShouldUse, iconMap }: BlogWhoShoul
     return (
         <AnimatedSection id="blog-who-should-use">
             <section id={whoShouldUse.id} className="mb-12">
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-8 flex items-center gap-3">
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-8 flex items-center gap-3 capitalize">
                     <IconComponent className="h-8 w-8 text-primary" />
                     {whoShouldUse.title}
                 </h2>

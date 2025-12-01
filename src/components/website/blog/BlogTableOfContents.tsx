@@ -49,7 +49,7 @@ export default function BlogTableOfContents({
                                 >
                                     {/* <IconComponent className="h-4 w-4 shrink-0" /> */}
                                     <Dot className="h-4 w-4 shrink-0" />
-                                    <span className="truncate">{item.title}</span>
+                                    <span className="truncate capitalize">{item.title}</span>
                                 </button>
                             );
                         })}

@@ -19,7 +19,7 @@ export default function BlogHowDiffers({ howDiffers, iconMap }: BlogHowDiffersPr
     return (
         <AnimatedSection id="blog-how-differs">
             <section id={howDiffers.id} className="mb-12">
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3 capitalize">
                     <IconComponent className="h-8 w-8 text-primary" />
                     {howDiffers.title}
                 </h2>
@@ -28,7 +28,7 @@ export default function BlogHowDiffers({ howDiffers, iconMap }: BlogHowDiffersPr
                     {howDiffers.advantages && howDiffers.advantages.length > 0 && (
                         <Card className="border-green-500/20 bg-green-500/5">
                             <CardContent className="p-6">
-                                <h3 className="font-semibold text-green-400 mb-4 flex items-center gap-2">
+                                <h3 className="font-semibold text-green-400 mb-4 flex items-center gap-2 capitalize">
                                     <CheckCircle className="h-5 w-5" />
                                     Advantages
                                 </h3>

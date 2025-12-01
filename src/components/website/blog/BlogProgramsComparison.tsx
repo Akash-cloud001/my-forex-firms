@@ -54,7 +54,7 @@ export default function BlogProgramsComparison({
   return (
     <AnimatedSection id="blog-programs-comparison">
       <section id={programsComparison.id} className="mb-12">
-        <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
+        <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3 capitalize">
           <IconComponent className="h-8 w-8 text-primary" />
           {programsComparison.title}
         </h2>

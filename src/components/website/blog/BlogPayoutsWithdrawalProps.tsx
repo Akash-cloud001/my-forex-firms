@@ -18,7 +18,7 @@ export default function BlogPayoutsWithdrawal({ payoutsWithdrawal, iconMap }: Bl
     return (
         <AnimatedSection id="blog-payouts-withdrawal">
             <section id={payoutsWithdrawal.id} className="mb-12">
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3 capitalize">
                     <IconComponent className="h-8 w-8 text-primary" />
                     {payoutsWithdrawal.title}
                 </h2>
@@ -29,7 +29,7 @@ export default function BlogPayoutsWithdrawal({ payoutsWithdrawal, iconMap }: Bl
                         <tbody>
                             {/* Profit Split */}
                             <tr className="border-b border-border">
-                                <td className="py-4 px-4 sm:px-6 font-medium text-foreground">Profit Split</td>
+                                <td className="py-4 px-4 sm:px-6 font-medium text-foreground capitalize">Profit Split</td>
                                 <td className="py-4 px-4 sm:px-6 text-right text-green-400 font-semibold">
                                     {payoutsWithdrawal.profitSplit}
                                 </td>
