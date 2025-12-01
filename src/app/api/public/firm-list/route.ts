@@ -23,14 +23,12 @@ export async function GET(request: NextRequest) {
         const sortBy = searchParams.get("sortBy") || "name";
         const order = searchParams.get("order") === "desc" ? -1 : 1;
 
-        // Build search filter safely typed
         const filter: Record<string, unknown> = {};
 
         if (search) {
             filter["firmDetails.name"] = { $regex: search, $options: "i" };
         }
 
-        // Build sort object
         const sort: Record<string, 1 | -1> = {};
         if (sortBy === "name") {
             sort["firmDetails.name"] = order;

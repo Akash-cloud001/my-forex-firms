@@ -27,6 +27,7 @@ export const firmDetailsSchema = z.object({
   brokers: z.array(z.string()).optional(),
   liquidityProviders: z.array(z.string()).optional(),
   totalPayout: z.string().optional(),
+  maxAllocation: z.string().optional(),
   slug: z.string().optional(),
   brokerBackedType: z.string().optional(),
   backedBrokerName: z.string().optional(),
