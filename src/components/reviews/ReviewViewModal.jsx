@@ -32,7 +32,7 @@ const ReviewViewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className=" max-h-[90vh] overflow-y-auto p-0 border-none bg-background">
+      <DialogContent className="max-w-xs sm:max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-none bg-background">
         <div className="card-custom-grad rounded-lg overflow-hidden">
           {/* Header Image Section */}
           <div className="relative w-full ">
