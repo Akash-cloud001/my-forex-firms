@@ -81,7 +81,6 @@ export async function generateMetadata(
       },
     };
   } catch (error) {
-    console.error("Error generating firm metadata:", error);
     return {
       title: "Firm Review",
       description: "Complete review and analysis of prop trading firms.",

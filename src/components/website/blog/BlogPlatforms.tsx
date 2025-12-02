@@ -19,7 +19,7 @@ export default function BlogPlatforms({ platformsExecution, iconMap }: BlogPlatf
     return (
         <AnimatedSection id="blog-platforms">
             <section id={platformsExecution.id} className="mb-12">
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3 capitalize">
                     <IconComponent className="h-8 w-8 text-primary" />
                     {platformsExecution.title}
                 </h2>
@@ -28,7 +28,7 @@ export default function BlogPlatforms({ platformsExecution, iconMap }: BlogPlatf
                     {platformsExecution.platforms && platformsExecution.platforms.length > 0 && (
                         <Card className="card-custom-grad border-border">
                             <CardContent className="p-6">
-                                <h3 className="font-semibold text-foreground mb-4">Trading Platforms</h3>
+                                <h3 className="font-semibold text-foreground mb-4 capitalize">Trading Platforms</h3>
                                 <ul className="space-y-2">
                                     {platformsExecution.platforms.map((platform: string, index: number) => (
                                         <li key={index} className="flex items-center gap-2">
@@ -44,7 +44,7 @@ export default function BlogPlatforms({ platformsExecution, iconMap }: BlogPlatf
                     {platformsExecution.instruments && platformsExecution.instruments.length > 0 && (
                         <Card className="card-custom-grad border-border">
                             <CardContent className="p-6">
-                                <h3 className="font-semibold text-foreground mb-4">Available Instruments</h3>
+                                <h3 className="font-semibold text-foreground mb-4 capitalize">Available Instruments</h3>
                                 <ul className="space-y-2">
                                     {platformsExecution.instruments.map((instrument: string, index: number) => (
                                         <li key={index} className="flex items-center gap-2">

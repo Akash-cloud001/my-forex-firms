@@ -60,14 +60,43 @@ interface ExpandedCategories {
 // Component
 // ============================================================================
 
-const CompactScoresAdmin: React.FC = () => {
+const CompactScoresAdmin: React.FC<{ firmId: string }> = ({ firmId }) => {
     const [scoresData, setScoresData] = useState<ScoresData>(initialScoresData);
+    const [loading, setLoading] = useState(true);
     const [expandedPillar, setExpandedPillar] = useState<string | null>('credibility');
     const [expandedCategories, setExpandedCategories] = useState<ExpandedCategories>({
         physical_legal_presence: true
     });
     const [editingFactor, setEditingFactor] = useState<EditingFactor | null>(null);
     const [editValue, setEditValue] = useState<string>('');
+
+    React.useEffect(() => {
+        const fetchScores = async () => {
+            try {
+                const res = await fetch('/api/admin/point-eval', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ firmId })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setScoresData(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch scores", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (firmId) {
+            fetchScores();
+        }
+    }, [firmId]);
+
+    if (loading) {
+        return <div className="min-h-screen flex items-center justify-center text-white">Loading scores...</div>;
+    }
 
     /**
      * Calculate the total and maximum possible score for a category

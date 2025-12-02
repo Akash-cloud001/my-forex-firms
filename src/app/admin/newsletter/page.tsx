@@ -108,7 +108,6 @@ export default function AdminNewsletter() {
         setStats(data.data.stats);
       }
     } catch (error) {
-      console.error("Error fetching subscriptions:", error);
     } finally {
       setLoading(false);
     }
@@ -179,7 +178,6 @@ export default function AdminNewsletter() {
         alert("Failed to delete subscriptions");
       }
     } catch (error) {
-      console.error("Error deleting subscriptions:", error);
       alert("Failed to delete subscriptions");
     } finally {
       setDeleting(false);
@@ -221,7 +219,6 @@ export default function AdminNewsletter() {
         window.URL.revokeObjectURL(url);
       }
     } catch (error) {
-      console.error("Error exporting subscriptions:", error);
       alert("Failed to export subscriptions");
     } finally {
       setExporting(false);

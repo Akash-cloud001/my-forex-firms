@@ -134,7 +134,7 @@ export async function DELETE(
       );
     }
     
-    // Clean up files from BunnyCDN
+    // Clean up files (supports both Cloudinary and legacy BunnyCDN)
     if (review.files && review.files.length > 0) {
       await cleanupReviewFiles(review.files);
     }

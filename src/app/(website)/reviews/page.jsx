@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button'
 import { MessageSquare } from 'lucide-react'
 import { getReviews, deleteReview } from '@/lib/reviewApi'
 import { useUser } from '@clerk/nextjs'
-import { ReviewCard, ReviewViewModal, ReviewDeleteModal, LoadingSkeleton } from '@/components/reviews'
+import ReviewCard from '@/components/ui/ReviewCard'
+import { ReviewViewModal, ReviewDeleteModal, LoadingSkeleton } from '@/components/reviews'
 
 const ReviewsPage = () => {
   const { user, isLoaded } = useUser()
@@ -35,7 +36,7 @@ const ReviewsPage = () => {
         sortOrder: 'desc'
       })
       setReviews(response.reviews)
-      console.log(response.reviews,'response.reviews')
+      console.log("reviews", response.reviews)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -74,7 +75,6 @@ const ReviewsPage = () => {
       setDeleteModalOpen(false);
       setReviewToDelete(null);
     } catch (err) {
-      console.error('Error deleting review:', err);
       setError(err.message || 'Failed to delete review');
     } finally {
       setLoading(false);
@@ -174,16 +174,18 @@ const ReviewsPage = () => {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {reviews.map((review) => (
               <ReviewCard
                 key={review._id}
-                review={review}
-                onView={handleViewReview}
-                onDelete={handleDeleteClick}
+                issueType={review.issueType}
+                description={review.description}
+                files={review.files}
+                userId={review.userId}
+                userName={user?.fullName || user?.firstName || undefined}
+                onClick={() => handleViewReview(review)}
+                status={review.status}
                 getStatusColor={getStatusColor}
-                getRatingColor={getRatingColor}
-                formatDate={formatDate}
               />
             ))}
           </div>
@@ -206,8 +208,8 @@ const ReviewsPage = () => {
         onClose={handleCloseViewModal}
         review={selectedReview}
         getStatusColor={getStatusColor}
-        getRatingColor={getRatingColor}
         formatDate={formatDate}
+        onDelete={handleDeleteClick}
       />
     </div>
   )

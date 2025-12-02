@@ -655,6 +655,14 @@ export default function Step1FirmDetails({
             placeholder="Enter total payout"
           />
         </div>
+        {/* max allocation */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Max Allocation</Label>
+          <Input
+            {...register("firmDetails.maxAllocation")}
+            placeholder="Enter max allocation"
+          />
+        </div>
         {/* slug */}
         <div className="space-y-2">
           <Label className="text-sm font-medium">Slug</Label>

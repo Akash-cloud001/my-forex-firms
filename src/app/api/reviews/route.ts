@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { auth } from '@clerk/nextjs/server';
 import Review from '@/models/Review';
-import { uploadFileToBunnyCDNWithRetry, handleBunnyCDNError } from '@/lib/bunnycdn';
+import { uploadToCloudinary } from '@/services/cloudinary';
 import { validateReviewFile, cleanupReviewFiles } from '@/lib/reviewFileUtils';
 
 // Type for review data
@@ -20,6 +20,7 @@ interface ReviewData {
     type: string;
     size: number;
     url: string;
+    public_id?: string;
   }>;
   status?: 'pending' | 'approved' | 'rejected';
   isVerified?: boolean;
@@ -212,51 +213,64 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Process file uploads to BunnyCDN
+    // Validate that at least one file is required
+    if (!files || files.length === 0) {
+      return NextResponse.json(
+        { error: 'At least one document/file is required' },
+        { status: 400 }
+      );
+    }
+
+    // Process file uploads to Cloudinary
     const processedFiles = [];
 
-    if (files && files.length > 0) {
-      console.log(`Processing ${files.length} files for upload to BunnyCDN`);
+    console.log(`Processing ${files.length} files for upload to Cloudinary`);
 
-      for (const file of files) {
-        try {
-          // Validate file using utility function
-          const validation = validateReviewFile(file);
-          if (!validation.isValid) {
-            throw new Error(validation.error);
-          }
-
-          // Convert file to buffer
-          const fileBuffer = Buffer.from(await file.arrayBuffer());
-
-          // Upload to BunnyCDN with retry logic
-          const bunnyFile = await uploadFileToBunnyCDNWithRetry(
-            fileBuffer,
-            file.name,
-            file.type,
-            'review-attachments', // Folder for review files
-            3 // Max retries
-          );
-
-          processedFiles.push({
-            name: bunnyFile.filename,
-            type: bunnyFile.mimeType,
-            size: bunnyFile.size,
-            url: bunnyFile.url,
-            uploadedAt: new Date()
-          });
-
-          console.log(`Successfully uploaded ${file.name} to BunnyCDN: ${bunnyFile.url}`);
-        } catch (fileError) {
-          console.error(`Failed to upload file ${file.name}:`, fileError);
-
-          // If file upload fails, we can either:
-          // 1. Continue without the file (current approach)
-          // 2. Fail the entire review submission
-          // For now, we'll continue without the problematic file
-          console.warn(`Skipping file ${file.name} due to upload error: ${fileError instanceof Error ? fileError.message : 'Unknown error'}`);
+    for (const file of files) {
+      try {
+        // Validate file using utility function
+        const validation = validateReviewFile(file);
+        if (!validation.isValid) {
+          throw new Error(validation.error);
         }
+
+        // Upload to Cloudinary
+        const uploadResult = await uploadToCloudinary(
+          file,
+          'review-attachments' // Folder for review files
+        );
+
+        if (!uploadResult.success) {
+          throw new Error(uploadResult.message || 'Failed to upload file to Cloudinary');
+        }
+
+        processedFiles.push({
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          url: uploadResult.url,
+          public_id: uploadResult.public_id, // Store public_id for deletion
+          uploadedAt: new Date()
+        });
+
+        console.log(`Successfully uploaded ${file.name} to Cloudinary: ${uploadResult.url}`);
+      } catch (fileError) {
+        console.error(`Failed to upload file ${file.name}:`, fileError);
+
+        // If file upload fails, we can either:
+        // 1. Continue without the file (current approach)
+        // 2. Fail the entire review submission
+        // For now, we'll continue without the problematic file
+        console.warn(`Skipping file ${file.name} due to upload error: ${fileError instanceof Error ? fileError.message : 'Unknown error'}`);
       }
+    }
+
+    // Ensure at least one file was successfully uploaded
+    if (processedFiles.length === 0) {
+      return NextResponse.json(
+        { error: 'Failed to upload files. Please ensure at least one valid file is provided.' },
+        { status: 400 }
+      );
     }
 
     // Create review object
@@ -300,10 +314,10 @@ export async function POST(request: NextRequest) {
           { status: 503 }
         );
       }
-      // Handle BunnyCDN errors
-      if (error.message.includes('BunnyCDN')) {
+      // Handle Cloudinary errors
+      if (error.message.includes('Cloudinary')) {
         return NextResponse.json(
-          { error: handleBunnyCDNError(error) },
+          { error: error.message || 'File upload failed. Please try again.' },
           { status: 503 }
         );
       }
@@ -346,7 +360,7 @@ export async function DELETE(request: NextRequest) {
       const allReviews = await Review.find({});
       const allFiles = allReviews.flatMap(review => review.files || []);
 
-      // Clean up files from BunnyCDN
+      // Clean up files (supports both Cloudinary and legacy BunnyCDN)
       if (allFiles.length > 0) {
         await cleanupReviewFiles(allFiles);
       }
@@ -366,7 +380,7 @@ export async function DELETE(request: NextRequest) {
         );
       }
 
-      // Clean up files from BunnyCDN
+      // Clean up files (supports both Cloudinary and legacy BunnyCDN)
       if (review.files && review.files.length > 0) {
         await cleanupReviewFiles(review.files);
       }

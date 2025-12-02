@@ -15,12 +15,13 @@ export type IssueType =
   | 'technical-problems'
   | 'platform-instability'
   | 'other-account'
-  // Trading Conditions Issues
+  // Trading Related Issues
   | 'slippage'
   | 'spreads'
   | 'execution'
   | 'rule-enforcement'
   | 'commissions-discrepancy'
+  | 'restrictions'
   | 'other-trading'
   // Rule/Policy Issues
   | 'rule-changes'
@@ -55,6 +56,7 @@ const FileSchema = new Schema({
   type: { type: String, required: true },
   size: { type: Number, required: true },
   url: { type: String, required: true },
+  public_id: { type: String }, // Optional: For Cloudinary file deletion
   uploadedAt: { type: Date, default: Date.now }
 }, { _id: false });
 
@@ -81,12 +83,13 @@ const ReviewSchema = new Schema({
       'technical-problems',
       'platform-instability',
       'other-account',
-      // Trading Conditions Issues
+      // Trading Related Issues
       'slippage',
       'spreads',
       'execution',
       'rule-enforcement',
       'commissions-discrepancy',
+      'restrictions',
       'other-trading',
       // Rule/Policy Issues
       'rule-changes',

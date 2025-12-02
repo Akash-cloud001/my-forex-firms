@@ -50,6 +50,7 @@ export interface IFundingFirm extends Document {
     brokers?: string[];
     liquidityProviders?: string[];
     totalPayout?: string;
+    maxAllocation?: string;
     slug?: string;
     brokerBackedType?: string;
     backedBrokerName?: string;
@@ -142,6 +143,7 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
       brokers: [{ type: String }],
       liquidityProviders: [{ type: String }],
       totalPayout: { type: String, trim: true },
+      maxAllocation: { type: String, trim: true },
       slug: { type: String, trim: true },
       brokerBackedType: {
         type: String,

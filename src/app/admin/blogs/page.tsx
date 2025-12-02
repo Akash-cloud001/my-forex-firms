@@ -52,7 +52,6 @@ export default function AdminBlogsPage() {
                     throw new Error('Invalid response format');
                 }
             } catch (error) {
-                console.error('Error fetching blogs:', error);
                 const errorMessage = error instanceof Error ? error.message : 'Failed to load blogs';
                 setError(errorMessage);
             } finally {

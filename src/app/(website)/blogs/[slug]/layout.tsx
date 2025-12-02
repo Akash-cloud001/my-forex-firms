@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import firmReviewsData from '@/data/firm-reviews.json';
 import { FirmReviewsData } from '@/types/firm-review';
 
 interface BlogLayoutProps {
@@ -11,65 +10,69 @@ export async function generateMetadata(
   { params }: BlogLayoutProps
 ): Promise<Metadata> {
   const { slug } = await params;
-  const blogData = (firmReviewsData as FirmReviewsData)[slug];
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://myforexfirms.com";
 
-  if (!blogData) {
+  try {
+    // ✅ Use full URL instead of relative path
+    const apiUrl = `${siteUrl}/api/public/firm-reviews/${slug}`;
+    
+    const res = await fetch(apiUrl, {
+      cache: "no-store",
+    });
+
+    // ✅ Explicitly check for errors
+    if (!res.ok) {
+      throw new Error(`API error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    
+    if (!data.success || !data.review) {
+      throw new Error("Invalid response format");
+    }
+
+    const blog = data.review;
     return {
-      title: "Blog Not Found",
-      description: "The requested blog post could not be found.",
+      title: blog.title,
+      description: blog.introduction?.substring(0, 160) || blog.subtitle,
+      keywords: blog.seoTags,
+      authors: [{ name: "My Forex Firms" }],
+      openGraph: {
+        type: "article",
+        locale: "en_US",
+        url: `${siteUrl}/blogs/${slug}`,
+        siteName: "My Forex Firms",
+        title: blog.title,
+        description: blog.introduction?.substring(0, 160) || blog.subtitle,
+        publishedTime: blog.publishedAt,
+        images: [
+          {
+            url: `${siteUrl}/website/firm/${slug}.png`,
+            width: 1200,
+            height: 630,
+            alt: `${blog.firmName} Review`,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: blog.title,
+        description: blog.introduction?.substring(0, 160) || blog.subtitle,
+        images: [`${siteUrl}/website/firm/${slug}.png`],
+        creator: "@myforexfirms",
+      },
+      alternates: {
+        canonical: `${siteUrl}/blogs/${slug}`,
+      },
+    };
+  } catch (error) {
+    return {
+      title: `${slug.replace('-review', '')} Review | My Forex Firms`,
+      description: "Honest and comprehensive prop firm review.",
     };
   }
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://myforexfirms.com";
-  const blogUrl = `${siteUrl}/blogs/${slug}`;
-  const description = blogData.introduction || `${blogData.title} - ${blogData.subtitle}`;
-  const imageUrl = blogData.overview?.data?.left?.find(item => item.label === "Firm Name:") 
-    ? `${siteUrl}/website/firm/${slug}.png` 
-    : `${siteUrl}/og-image.png`;
-
-  return {
-    title: blogData.title,
-    description: description.substring(0, 160),
-    keywords: [
-      blogData.firmName,
-      "prop trading",
-      "forex firm review",
-      "funded trading",
-      blogData.firmName + " review",
-      "trading review",
-    ],
-    authors: [{ name: "My Forex Firms" }],
-    openGraph: {
-      type: "article",
-      locale: "en_US",
-      url: blogUrl,
-      siteName: "My Forex Firms",
-      title: blogData.title,
-      description: description.substring(0, 160),
-      publishedTime: blogData.publishedAt,
-      images: [
-        {
-          url: imageUrl,
-          width: 1200,
-          height: 630,
-          alt: `${blogData.firmName} Review - ${blogData.title}`,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: blogData.title,
-      description: description.substring(0, 160),
-      images: [imageUrl],
-      creator: "@myforexfirms",
-    },
-    alternates: {
-      canonical: blogUrl,
-    },
-  };
 }
 
 export default function BlogLayout({ children }: BlogLayoutProps) {
   return <>{children}</>;
 }
-

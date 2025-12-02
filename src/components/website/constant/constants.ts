@@ -33,14 +33,19 @@ export const ISSUE_CATEGORIES: IssueCategory[] = [
     ]
   },
   {
-    id: 'trading-conditions-issue',
-    label: 'Trading Conditions Issue',
+    id: 'trading-related-issue',
+    label: 'Trading Related Issue',
     subCategories: [
       { value: 'slippage', label: 'Slippage', description: 'Trades being executed at a noticeably different price than the one placed, causing losses or unexpected results' },
       { value: 'spreads', label: 'Spreads', description: 'Spread widening beyond normal or advertised ranges, increasing trading cost unfairly' },
       { value: 'execution', label: 'Execution', description: 'Orders not executing smoothly, getting delayed, or failing despite correct market conditions' },
       { value: 'rule-enforcement', label: 'Rule enforcement', description: 'Propfirm enforcing rules inconsistently, suddenly, or without proper justification' },
       { value: 'commissions-discrepancy', label: 'Commissions discrepancy', description: 'Commission charged incorrectly, higher than stated, or differing from platform’s published rates' },
+      {
+        value: 'restrictions',
+        label: 'Restrictions',
+        description: 'Restriction on trading, withdrawal, or other activities.'
+      },
       { value: 'other-trading', label: 'Other', description: 'Any other trading-related issue affecting execution, pricing, or conditions' }
     ]
   },
