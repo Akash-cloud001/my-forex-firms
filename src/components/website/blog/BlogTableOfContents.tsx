@@ -34,7 +34,7 @@ export default function BlogTableOfContents({
                         <List className="h-4 w-4 text-primary" />
                         <span className="font-semibold text-foreground text-sm">Table of Contents</span>
                     </div>
-                    <nav className="space-y-2">
+                    <nav className="space-y-">
                         {tableOfContents.map((item) => {
                             const IconComponent = item.icon;
                             return (
@@ -58,7 +58,7 @@ export default function BlogTableOfContents({
             </div>
 
             {/* Mobile Table of Contents Button */}
-            <div className="fixed bottom-6 left-6 z-50 xl:hidden">
+            <div className="fixed bottom-16 left-6 z-50 xl:hidden">
                 <Button
                     onClick={() => setIsMobileTocOpen(!isMobileTocOpen)}
                     size="lg"

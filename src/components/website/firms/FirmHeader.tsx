@@ -2,7 +2,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Plus, Check, X, Globe } from 'lucide-react'
+import { Plus, Check, X, Globe, ChartBar, Radar, LineChart } from 'lucide-react'
 import RadarChartComponent from '@/components/ui/RadarChart'
 import { IFundingFirm } from '@/models/FirmDetails'
 import {
@@ -66,7 +66,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
             />
           </figure>
           <figure className="h-24 w-24 bg-foreground/10 rounded-[8px] relative flex flex-col items-center justify-end pb-2">
-            <figure className='absolute h-5 w-6 right-1.5 top-1.5'>
+            <figure className='absolute h-5 w-6 right-1.5 top-1.5 blur-sm'>
               <Image
                 src="/website/badge/badge1.png"
                 alt="PTI INDEX"
@@ -74,12 +74,15 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
                 className='object-contain'
               />
             </figure>
-            <span className='text-primary text-[32px] font-bold'>
+            <span className='text-primary text-[32px] font-bold blur-sm'>
               9.5<span className='text-xl font-light'>/10</span>
             </span>
-            <span className='text-base text-foreground/90 -mt-2'>
-              PTI INDEX
+            <span className='text-base text-foreground/90 text-center flex flex-col items-center justify-center absolute inset-0 z-[2]'>
+              <span className='text-primary font-bold'>PTI INDEX</span> <span className='text-foreground/90 text-[10px] -mt-1'>COMING SOON</span>
             </span>
+            {/* <span className='text-base text-foreground/90 -mt-2 text-center flex flex-col items-center justify-center'>
+              <span className='text-primary font-bold'>PTI INDEX</span> <span className='text-foreground/90 text-xs -mt-1'>COMING SOON</span>
+            </span> */}
           </figure>
 
           <div className='flex flex-col items-start justify-between h-full w-fit'>
@@ -137,9 +140,18 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
           Add Review
         </Link>
       </div>
-      <div className='flex items-start justify-between gap-4'>
-        <div className='flex items-start justify-start gap-4 opacity-80'>
-          <figure className='flex flex-col items-center justify-center'>
+      <div className='flex items-start justify-between gap-4 '>
+        <div className='flex items-start justify-start gap-4 opacity-80 relative'>
+          <div className='absolute inset-0 z-[2] flex items-center justify-center'>
+            <p className='text-foreground text-2xl font-bold text-left flex flex-row items-center justify-center gap-2'>
+              <LineChart className='w-14 h-14 text-primary' />
+              <span>
+                Visual Charts <br />Coming Soon
+              </span>
+            </p>
+
+          </div>
+          <figure className='flex flex-col items-center justify-center  blur-lg'>
             <RadarChartComponent
               data={factor1}
               width={300}
@@ -160,7 +172,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
             </figcaption>
           </figure>
 
-          <figure className='flex flex-col items-center justify-center'>
+          <figure className='flex flex-col items-center justify-center blur-lg'>
             <RadarChartComponent
               data={factor2}
               width={300}
@@ -181,7 +193,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
             </figcaption>
           </figure>
 
-          <figure className='flex flex-col items-center justify-center'>
+          <figure className='flex flex-col items-center justify-center blur-lg'>
             <RadarChartComponent
               data={factor3}
               width={300}
