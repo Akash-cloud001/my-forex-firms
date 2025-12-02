@@ -149,7 +149,6 @@ export async function POST(request: NextRequest) {
     if (contentType?.includes('multipart/form-data')) {
       // Handle FormData (with file upload)
       const formData = await request.formData();
-      console.log(formData, "formData")
       for (const [key, value] of formData.entries()) {
         if (key === 'files' && value instanceof File) {
           files.push(value);
@@ -199,7 +198,7 @@ export async function POST(request: NextRequest) {
 
 
     // Validate custom fields
-    if (reviewData.issueType === 'other' && (!reviewData.customIssueType || reviewData.customIssueType.trim().length === 0)) {
+    if (reviewData.issueType?.startsWith('other-') && (!reviewData.customIssueType || reviewData.customIssueType.trim().length === 0)) {
       return NextResponse.json(
         { error: 'Custom issue type is required when "Other" is selected' },
         { status: 400 }
@@ -224,7 +223,7 @@ export async function POST(request: NextRequest) {
     // Process file uploads to Cloudinary
     const processedFiles = [];
 
-    console.log(`Processing ${files.length} files for upload to Cloudinary`);
+    // console.log(`Processing ${files.length} files for upload to Cloudinary`);
 
     for (const file of files) {
       try {
@@ -249,11 +248,13 @@ export async function POST(request: NextRequest) {
           type: file.type,
           size: file.size,
           url: uploadResult.url,
-          public_id: uploadResult.public_id, // Store public_id for deletion
+          public_id: uploadResult.public_id,
+          thumbnail_url: uploadResult.thumbnail_url,
+          thumbnail_public_id: uploadResult.thumbnail_public_id,
           uploadedAt: new Date()
         });
 
-        console.log(`Successfully uploaded ${file.name} to Cloudinary: ${uploadResult.url}`);
+        // console.log(`Successfully uploaded ${file.name} to Cloudinary: ${uploadResult}`);
       } catch (fileError) {
         console.error(`Failed to upload file ${file.name}:`, fileError);
 

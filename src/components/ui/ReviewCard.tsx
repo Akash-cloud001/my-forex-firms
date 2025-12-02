@@ -71,13 +71,13 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
   const handleExpandClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     e.preventDefault()
-    
+
     // Prevent multiple opens
     if (isImageModalOpen) return
-    
+
     if (files.length > 0) {
       const firstFile = files[0]
-      
+
       if (isPDF(firstFile.type)) {
         // Open PDF in new tab
         window.open(firstFile.url, '_blank', 'noopener,noreferrer')
@@ -93,34 +93,34 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
   }
 
   return (
-    <div 
+    <div
       onClick={onClick}
       className=' w-full p-4 sm:p-6 card-custom-grad rounded-md cursor-pointer hover:opacity-90 transition-opacity'
     >
       {/* Image Section */}
       <figure className="relative w-full aspect-video max-h-[200px]">
         <div className='absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/80 via-black/30 to-transparent z-[1]'></div>
-          {files.length > 0 ? <Image 
-            src={files[0].url} 
-            alt="review" 
-            fill 
-            className='w-full h-full object-contain opacity-30' 
-          /> : <Image 
-            src="/website/fallback-review-img.svg" 
-            alt="review" 
-            fill 
-            className='w-full h-full object-contain opacity-30' 
-          />}
-          {files.length > 0 && (
-            <Button 
-              variant="ghost" 
-              className='absolute bottom-0 right-0 text-white/80 hover:text-white cursor-pointer z-[2]'
-              onClick={handleExpandClick}
-              type="button"
-            >
-              <Expand className='h-3 w-3 text-white/80 hover:text-white cursor-pointer' />
-            </Button>
-          )}
+        {files.length > 0 && isImage(files[0].type) ? <Image
+          src={files[0].url}
+          alt="review"
+          fill
+          className='w-full h-full object-contain opacity-30'
+        /> : <Image
+          src="/website/fallback-review-img.svg"
+          alt="review"
+          fill
+          className='w-full h-full object-contain opacity-30'
+        />}
+        {files.length > 0 && (
+          <Button
+            variant="ghost"
+            className='absolute bottom-0 right-0 text-white/80 hover:text-white cursor-pointer z-[2]'
+            onClick={handleExpandClick}
+            type="button"
+          >
+            <Expand className='h-3 w-3 text-white/80 hover:text-white cursor-pointer' />
+          </Button>
+        )}
       </figure>
 
       {/* Content Section */}
@@ -129,7 +129,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
         <div className='flex items-start gap-2 sm:gap-0 sm:items-center justify-between flex-wrap'>
           <div className='flex items-center gap-2'>
             <Badge className={cn("text-[10px] sm:text-xs font-semibold uppercase text-foreground px-4 py-1.5", statusColorClass)}>
-                {status === 'pending' ? 'In Review' : status === 'approved' ? 'Posted' : 'Rejected'}
+              {status === 'pending' ? 'In Review' : status === 'approved' ? 'Posted' : 'Rejected'}
             </Badge>
             <div className="text-[10px] sm:text-xs font-semibold uppercase text-foreground px-4 py-1.5 bg-white/10 rounded-full border border-border">
               {formatIssueType(issueType)}
@@ -160,8 +160,8 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
       </div>
 
       {/* Image View Modal */}
-      <Dialog 
-        open={isImageModalOpen} 
+      <Dialog
+        open={isImageModalOpen}
         onOpenChange={(open) => {
           setIsImageModalOpen(open)
           if (!open) {

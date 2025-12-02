@@ -63,7 +63,7 @@ const FirmsPage = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: pagination.limit.toString(),
@@ -307,7 +307,7 @@ const FirmsPage = () => {
                       >
                         Previous
                       </Button>
-                      
+
                       {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
                         .filter((page) => {
                           // Show first page, last page, current page, and pages around current
@@ -321,7 +321,7 @@ const FirmsPage = () => {
                           // Add ellipsis
                           const prevPage = array[index - 1];
                           const showEllipsisBefore = prevPage && page - prevPage > 1;
-                          
+
                           return (
                             <React.Fragment key={page}>
                               {showEllipsisBefore && (
@@ -330,18 +330,17 @@ const FirmsPage = () => {
                               <Button
                                 variant="outline"
                                 onClick={() => handlePageChange(page)}
-                                className={`border-border ${
-                                  page === currentPage
+                                className={`border-border ${page === currentPage
                                     ? 'bg-primary text-primary-foreground border-primary'
                                     : 'bg-card hover:bg-card/80 text-foreground'
-                                }`}
+                                  }`}
                               >
                                 {page}
                               </Button>
                             </React.Fragment>
                           );
                         })}
-                      
+
                       <Button
                         variant="outline"
                         disabled={!pagination.hasNextPage}

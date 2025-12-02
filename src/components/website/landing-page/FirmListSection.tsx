@@ -8,6 +8,7 @@ import {
   Loader2,
   SlidersHorizontal,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,84 +18,35 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-interface Firm {
-  id: string;
-  name: string;
-  totalPayout: number | null;
-  image: {
-    url?: string;
-    publicId?: string;
-    thumbnail?: string;
-  } | null;
-  yearFounded: number | null;
-  slug: string | null;
-}
 
-interface ApiResponse {
-  success: boolean;
-  data: Firm[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalCount: number;
-    limit: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
-  };
-}
+
+import { useFirmList } from "@/hooks/queries/useFirmList";
 
 function FirmListSection() {
-  const [firms, setFirms] = useState<Firm[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "yearFounded">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const currentPage = 1;
   const limit = 11;
-  const [pagination, setPagination] = useState<ApiResponse["pagination"]>({
-    currentPage: 1,
-    totalPages: 1,
-    totalCount: 0,
-    limit: 10,
-    hasNextPage: false,
-    hasPrevPage: false,
+
+  const { data, isLoading } = useFirmList({
+    page: currentPage,
+    limit,
+    search,
+    sortBy,
+    order: sortOrder,
   });
+
+  const firms = data?.data || [];
+  const loading = isLoading;
+
   const router = useRouter();
-  useEffect(() => {
-    const fetchFirms = async () => {
-      try {
-        setLoading(true);
-        const params = new URLSearchParams({
-          page: currentPage.toString(),
-          limit: limit.toString(),
-          ...(search && { search }),
-          sortBy: sortBy,
-          order: sortOrder,
-        });
-
-        const response = await fetch(`/api/public/firm-list?${params}`);
-        const result: ApiResponse = await response.json();
-
-        if (result.success) {
-          setFirms(result.data);
-          setPagination(result.pagination);
-        }
-      } catch (error) {
-        console.error("Error fetching firms:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFirms();
-  }, [currentPage, search, sortBy, sortOrder]);
 
   const handleSortChange = (value: string) => {
     // Parse the value: "name-asc", "name-desc", "yearFounded-asc", "yearFounded-desc"
     const [field, order] = value.split('-') as [("name" | "yearFounded"), ("asc" | "desc")];
     setSortBy(field);
     setSortOrder(order);
-    // fetchFirms will be called automatically via useEffect
   };
 
   const getCurrentSortValue = () => {
@@ -113,14 +65,14 @@ function FirmListSection() {
     <div className="min-h-screen text-white px-0 md:px-8 py-8 relative max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col items-start justify-between w-full px-4 md:px-0">
-          <div className="flex items-center justify-center mb-8 w-full  ">
-            <h1 className="font-geist-sans font-semibold text-4xl leading-[100%] tracking gradient-text text-center relative">
-                Firms
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-foreground/80 to-transparent rounded-3xl shadow-md"></div>
-            </h1>
-          </div>
+        <div className="flex items-center justify-center mb-8 w-full  ">
+          <h1 className="font-geist-sans font-semibold text-4xl leading-[100%] tracking gradient-text text-center relative">
+            Firms
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-foreground/80 to-transparent rounded-3xl shadow-md"></div>
+          </h1>
+        </div>
 
-          {/* Filter Buttons */}
+        {/* Filter Buttons */}
         <div className="flex flex-col md:flex-row gap-4 w-full mb-8">
           {/* Search Bar - Left */}
           <div className="flex-1">
@@ -149,7 +101,7 @@ function FirmListSection() {
               New
             </Button> */}
 
-            
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -193,8 +145,31 @@ function FirmListSection() {
         {/* Firms Grid */}
         <div className="">
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-10 h-10 animate-spin text-primary" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 px-4 md:px-0">
+              {Array.from({ length: 12 }).map((_, index) => (
+                <Card
+                  key={index}
+                  className="group min-w-[140px] w-full card-custom-grad duration-100 p-4 shrink-0"
+                >
+                  <div className="h-auto flex flex-col items-left gap-3 rounded-2xl">
+                    <div className="flex gap-10 w-full justify-between">
+                      <Skeleton className="w-12 h-12 rounded-[4px]" />
+                      <div className="flex flex-col items-end gap-1">
+                        <Skeleton className="h-3 w-10" />
+                        <Skeleton className="h-4 w-8" />
+                      </div>
+                    </div>
+
+                    <div className="flex items-end justify-between mt-2">
+                      <div className="flex flex-col text-left gap-2 w-full">
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                      <Skeleton className="w-4 h-4 rounded-full" />
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
           ) : firms.length === 0 ? (
             <div className="flex items-center justify-center py-12">
@@ -232,7 +207,7 @@ function FirmListSection() {
                             {firm.totalPayout}
                           </div> */}
                           <div className="text-xs text-foreground/70">
-                            0 Reviews
+                            {firm.totalReview} Reviews
                           </div>
                         </div>
 
