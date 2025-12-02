@@ -119,7 +119,7 @@ const ChallengesContent = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-foreground/20 ">
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground flex items-center relative">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground relative">
                   CHALLENGE
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-foreground ">

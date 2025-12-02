@@ -10,7 +10,7 @@ interface DiscordIconProps {
 const DiscordIcon: React.FC<DiscordIconProps> = ({
   width = 24,
   height = 24,
-  fill = '#5865F2',
+  fill = 'currentColor',
   className = '',
 }) => {
   return (

@@ -10,6 +10,7 @@ interface CustomAccordionItemProps {
   isOpen: boolean;
   onToggle: () => void;
   className?: string;
+  questionSize?: string;
 }
 
 export function CustomAccordionItem({
@@ -18,6 +19,7 @@ export function CustomAccordionItem({
   isOpen,
   onToggle,
   className,
+  questionSize,
 }: CustomAccordionItemProps) {
   const panelRef = React.useRef<HTMLDivElement>(null);
 
@@ -35,7 +37,8 @@ export function CustomAccordionItem({
     <div className={cn("mb-3 sm:mb-4 md:mb-6 lg:mb-8 last:mb-0", className)}>
       <button
         className={cn(
-          "w-full text-left cursor-pointer transition-all duration-300 flex items-center justify-between gap-1.5 sm:gap-2 md:gap-3 lg:gap-4 sm:px-3 md:px-4 lg:px-5 pt-2 sm:pt-2.5 md:pt-3 lg:pt-4 hover:no-underline text-base md:text-xl lg:text-2xl tracking-tight font-semibold text-foreground",
+          "w-full text-left cursor-pointer transition-all duration-300 flex items-center justify-between gap-1.5 sm:gap-2 md:gap-3 lg:gap-4 sm:px-3 md:px-4 lg:px-5 pt-2 sm:pt-2.5 md:pt-3 lg:pt-4 hover:no-underline tracking-tight font-semibold text-foreground",
+          questionSize || "text-base md:text-xl lg:text-2xl",
           isOpen && "rounded-b-none"
         )}
         onClick={onToggle}
@@ -69,6 +72,7 @@ interface CustomAccordionProps {
   defaultOpenIndex?: number;
   className?: string;
   allowMultiple?: boolean;
+  questionSize?: string;
 }
 
 export function CustomAccordion({
@@ -76,6 +80,7 @@ export function CustomAccordion({
   defaultOpenIndex = 0,
   className,
   allowMultiple = false,
+  questionSize,
 }: CustomAccordionProps) {
   const [openIndices, setOpenIndices] = React.useState<Set<number>>(
     new Set(defaultOpenIndex !== undefined ? [defaultOpenIndex] : [])
@@ -108,6 +113,7 @@ export function CustomAccordion({
           answer={item.answer}
           isOpen={openIndices.has(index)}
           onToggle={() => handleToggle(index)}
+          questionSize={questionSize}
         />
       ))}
     </div>
