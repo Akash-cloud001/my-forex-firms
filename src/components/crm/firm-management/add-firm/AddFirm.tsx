@@ -80,6 +80,7 @@ export default function FundingFirmForm({
       brokers: [],
       liquidityProviders: [],
       totalPayout: "",
+      maxAllocation: "",
       slug: "",
       brokerBackedType: "no",
       backedBrokerName: "",

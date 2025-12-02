@@ -494,3 +494,138 @@ export const pillarsConfig: Pillar[] = [
         ]
     }
 ];
+const sampleFirms = [
+    {
+        id: 1,
+        name: "Demo Prop Firm",
+        scores: initialScoresData.scores
+    },
+    {
+        id: 2,
+        name: "Alpha Trading Firm",
+        scores: {
+            credibility: {
+                physical_legal_presence: {
+                    registered_company: 1,
+                    physical_office: 1,
+                    dashboard_friendlyness: 1,
+                },
+                public_identity_transparency: {
+                    public_ceo_founder: 1,
+                    support_quality: 0.8,
+                    terms_clarity: 1,
+                    brocker_backed: 0.3,
+                },
+                social_community_presence: {
+                    active_social: 0.5,
+                    transparent_comm: 0.5,
+                },
+                trust_signals_history: {
+                    verified_payouts: 0.5,
+                    lifetime_payouts: 1.2,
+                    no_controversies: 0.5,
+                    consistent_ops: 0.5,
+                }
+            },
+            trading_experience: {
+                trading_conditions: {
+                    fair_spreads: 1,
+                    fair_commissions: 1,
+                    acceptable_slippage: 1,
+                    multiple_trading_platforms: 1,
+                },
+                trading_freedom: {
+                    profit_targets: 1,
+                    consistancy_rule: 1,
+                    news_trading: 1,
+                },
+                rules_fairness: {
+                    lavrage_margin_rule: 1,
+                    no_hidden_restrictions_stratgy: 1,
+                    dd_type: 1,
+                }
+            },
+            payout_payment_experience: {
+                payout_reliability: {
+                    no_payout_denial_policy: 1,
+                    payout_cycle: 1,
+                    single_highest_payout: 1,
+                },
+                payout_behavior: {
+                    payout_time: 2,
+                    flexible_payout_methods: 1,
+                    payout_denials: 1,
+                },
+                payout_payment_structure: {
+                    fair_profit_split: 1,
+                    flexible_payment_methods: 1,
+                    reasonable_minimum_payout_requiremnts: 1,
+                }
+            }
+        }
+    },
+    {
+        id: 3,
+        name: "Beta Capital Firm",
+        scores: {
+            credibility: {
+                physical_legal_presence: {
+                    registered_company: 0,
+                    physical_office: 0,
+                    dashboard_friendlyness: 0.5,
+                },
+                public_identity_transparency: {
+                    public_ceo_founder: 0,
+                    support_quality: 0.5,
+                    terms_clarity: 0.7,
+                    brocker_backed: 0,
+                },
+                social_community_presence: {
+                    active_social: 0.25,
+                    transparent_comm: 0.1,
+                },
+                trust_signals_history: {
+                    verified_payouts: 0.3,
+                    lifetime_payouts: 0.5,
+                    no_controversies: 0.25,
+                    consistent_ops: 0.2,
+                }
+            },
+            trading_experience: {
+                trading_conditions: {
+                    fair_spreads: 0.7,
+                    fair_commissions: 0.7,
+                    acceptable_slippage: 0.7,
+                    multiple_trading_platforms: 0.8,
+                },
+                trading_freedom: {
+                    profit_targets: 0.7,
+                    consistancy_rule: 0.7,
+                    news_trading: 0.5,
+                },
+                rules_fairness: {
+                    lavrage_margin_rule: 0.5,
+                    no_hidden_restrictions_stratgy: 0.7,
+                    dd_type: 0.5,
+                }
+            },
+            payout_payment_experience: {
+                payout_reliability: {
+                    no_payout_denial_policy: 0.7,
+                    payout_cycle: 0.7,
+                    single_highest_payout: 0.5,
+                },
+                payout_behavior: {
+                    payout_time: 0.5,
+                    flexible_payout_methods: 0.7,
+                    payout_denials: 0.5,
+                },
+                payout_payment_structure: {
+                    fair_profit_split: 0.8,
+                    flexible_payment_methods: 0.8,
+                    reasonable_minimum_payout_requiremnts: 0.7,
+                }
+            }
+        }
+    }
+]
