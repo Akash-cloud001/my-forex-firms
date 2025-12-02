@@ -19,6 +19,17 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
+import Link from 'next/link'
+import {
+  FacebookIcon,
+  RedditIcon,
+  TwitterIcon,
+  LinkedInIcon,
+  InstagramIcon,
+  DiscordIcon,
+  TelegramIcon,
+  YoutubeIcon
+} from '@/components/svgs'
 
 interface FirmDashboardProps {
   firmData?: IFundingFirm | null
@@ -385,6 +396,66 @@ const FirmDashboard: React.FC<FirmDashboardProps> = ({ firmData }) => {
             </div>
           </DialogContent>
         </Dialog>
+
+{/* Socials Available Section */}
+        {firmData?.socialLinks?.socialLinks && Object.entries(firmData.socialLinks.socialLinks).length > 0 && (() => {
+            const socialEntries = Object.entries(firmData.socialLinks.socialLinks).filter((entry) => {
+              const url = entry[1];
+              return url && typeof url === 'string' && url.trim();
+            });
+            
+            if (socialEntries.length === 0) return null;
+
+            // Normalize platform name for matching (lowercase, trim, handle variations)
+            const normalizePlatform = (platform: string): string => {
+              return platform.trim().toLowerCase().replace(/[\/\s]/g, '');
+            };
+
+            // Map platform names to icon components (case-insensitive)
+            const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+              'facebook': FacebookIcon,
+              'instagram': InstagramIcon,
+              'x': TwitterIcon,
+              'twitter': TwitterIcon,
+              'xtwitter': TwitterIcon,
+              'linkedin': LinkedInIcon,
+              'reddit': RedditIcon,
+              'discord': DiscordIcon,
+              'telegram': TelegramIcon,
+              'youtube': YoutubeIcon,
+              'youtubechannel': YoutubeIcon,
+            };
+
+            return (
+              <div className="">
+                <p className="text-xs text-foreground/60 mb-2">Socials Available</p>
+                <div className="flex items-start justify-start gap-4 ">
+                  {socialEntries.map(([platform, url]) => {
+                    const normalizedPlatform = normalizePlatform(platform);
+                    const IconComponent = iconMap[normalizedPlatform];
+                    
+                    if (!IconComponent) {
+                      // Log unmapped platforms for debugging
+                      console.warn(`Social icon not found for platform: "${platform}" (normalized: "${normalizedPlatform}")`);
+                      return null;
+                    }
+
+                    return (
+                      <Link
+                        key={platform}
+                        href={url as string}
+                        target='_blank'
+                        rel="noopener noreferrer"
+                        className="relative h-6 w-6 rounded flex items-center justify-center hover:opacity-80 transition-opacity"
+                      >
+                        <IconComponent className='w-5 h-5 text-foreground/50' />
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+        })()}
 
         {/* Company Description Modal */}
         <Dialog open={isDescriptionModalOpen} onOpenChange={setIsDescriptionModalOpen}>

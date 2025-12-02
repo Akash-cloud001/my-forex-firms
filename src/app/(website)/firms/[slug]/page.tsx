@@ -1,15 +1,14 @@
 "use client"
 import React, { useState } from 'react'
 import { useFirmDetails } from '@/hooks/queries/useFirmDetails'
-import { IFundingFirm } from '@/models/FirmDetails'
 import LoadingScreen from '@/components/ui/LoadingScreen'
 import { motion, AnimatePresence } from 'motion/react'
 import ReviewsContent from '@/components/website/firms/ReviewsContent'
 import ChallengesContent from '@/components/website/firms/ChallengesContent'
 import FirmDashboard from '@/components/website/firms/FirmDashboard'
 import FirmHeader from '@/components/website/firms/FirmHeader'
+import FirmRulesContent from '@/components/website/firms/FirmRulesContent'
 import { useParams } from 'next/navigation'
-
 
 const tabs = [
   {
@@ -20,9 +19,13 @@ const tabs = [
     name: 'Challenges',
     value: 'challenges'
   },
+  // {
+  //   name: 'Reviews',
+  //   value: 'reviews'
+  // }
   {
-    name: 'Reviews',
-    value: 'reviews'
+    name: 'Rules',
+    value: 'rules'
   }
 ];
 
@@ -99,9 +102,10 @@ const factor3 = [
 const FirmPage = () => {
   const params = useParams();
   const slug = params.slug as string;
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'challenges' | 'reviews'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'challenges' | 'reviews' | 'rules'>('dashboard');
 
   const { data: firmData, isLoading, isError } = useFirmDetails(slug);
+  console.log( "firmData", firmData);
   if (isLoading) {
     return <LoadingScreen title="Getting things ready..." subtitle="This will only take a moment." />
   }
@@ -111,7 +115,7 @@ const FirmPage = () => {
   }
 
   return (
-    <section className='w-full min-h-screen py-12 px-4 lg:px-0 text-foreground background-gradient'>
+    <section className='w-full min-h-screen py-12 px-4 text-foreground background-gradient overflow-hidden'>
       <FirmHeader
         firmData={firmData || null}
         firmId={firmData._id}
@@ -122,12 +126,12 @@ const FirmPage = () => {
       <section className='max-w-7xl mx-auto rounded-3xl'>
         {/* Tab Navigation */}
         <div className="mt-8 ">
-          <div className="flex gap-2">
+          <div className="flex sm:gap-2">
             {tabs.map((tab) => (
               <button
                 key={tab.value}
-                onClick={() => setActiveTab(tab.value as 'dashboard' | 'challenges' | 'reviews')}
-                className={`px-6 py-3 rounded-full text-lg font-medium font-geist-sans transition-colors ${activeTab === tab.value
+                onClick={() => setActiveTab(tab.value as 'dashboard' | 'challenges' | 'reviews' | 'rules')}
+                className={`px-4 py-2 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm md:text-lg font-medium font-geist-sans transition-colors ${activeTab === tab.value
                   ? 'bg-foreground/10 text-foreground'
                   : 'text-foreground/60 hover:text-foreground/80'
                   }`}
@@ -172,13 +176,26 @@ const FirmPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className="w-full h-full rounded-lg"
+                className="w-full h-full rounded-lg hidden"
               >
                 <ReviewsContent />
               </motion.div>
             )}
+            {activeTab === 'rules' && (
+              <motion.div
+                key="rules"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="w-full h-full rounded-lg"
+              >
+                <FirmRulesContent firmData={firmData || null} />
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
+        
       </section>
 
     </section>
