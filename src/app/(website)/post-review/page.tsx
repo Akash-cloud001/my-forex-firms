@@ -1,10 +1,10 @@
 "use client"
-import React from 'react'
+import React, { Suspense } from 'react'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { ReviewForm } from '@/components/website/post-review'
 
-const ReviewPage: React.FC = () => {
+const ReviewPageContent: React.FC = () => {
   const searchParams = useSearchParams()
   const firmId = searchParams.get('firmId')
 
@@ -29,6 +29,14 @@ const ReviewPage: React.FC = () => {
         <ReviewForm initialFirmId={firmId ?? undefined} />
       </div>
     </div>
+  )
+}
+
+const ReviewPage: React.FC = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ReviewPageContent />
+    </Suspense>
   )
 }
 
