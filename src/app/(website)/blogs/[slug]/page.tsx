@@ -216,7 +216,6 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
                             firmName={reviewData.firmName}
                             iconMap={iconMap}
                             trustScore={reviewData.trustScore}
-                            trustPilot={reviewData.supportReputation.ratings.trustpilot}
                         />
 
                         {/* FAQ's */}

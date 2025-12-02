@@ -12,10 +12,9 @@ interface BlogFinalVerdictProps {
     firmName: string;
     iconMap: Record<string, LucideIcon>;
     trustScore: number;
-    trustPilot: number;
 }
 
-export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap, trustScore, trustPilot }: BlogFinalVerdictProps) {
+export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap, trustScore }: BlogFinalVerdictProps) {
     if (!finalVerdict) return null;
 
     const IconComponent = iconMap[finalVerdict.icon] || Star;
@@ -38,12 +37,20 @@ export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap, trus
 
                         <div className="text-center mb-8">
                             <div className="inline-flex flex-col gap-1 items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-                                <figure className=" rounded-[8px] relative flex flex-col items-center justify-end ">
-                                    <span className='text-primary text-[32px] font-bold'>
-                                    {trustPilot}<span className='text-xl font-light'> / 5</span>
+                                <div className='absolute inset-0 flex flex-col items-center justify-center mb-2' >
+                                    <span className='text-primary text-base font-bold'>
+                                        PIT INDEX
                                     </span>
-                                    <span className='text-sm text-foreground/90 -mt-1'>
-                                    TrustPilot Rating
+                                    <span>
+                                        Coming Soon
+                                    </span>
+                                </div>
+                                <figure className=" rounded-[8px] relative flex flex-col items-center justify-end blur-md">
+                                    <span className='text-primary text-[32px] font-bold'>
+                                    {trustScore}<span className='text-xl font-light'>/10</span>
+                                    </span>
+                                    <span className='text-base text-foreground/90 -mt-1'>
+                                    PTI INDEX
                                     </span>
                                 </figure>
                                 <div className="flex items-center gap-2 text-xs sm:text-sm text-white/80">
