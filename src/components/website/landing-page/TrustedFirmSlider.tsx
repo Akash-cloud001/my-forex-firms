@@ -80,7 +80,7 @@ export default function TrustedFirmSlider() {
       </div>
       <div 
         ref={containerRef}
-        className="w-full py-12 overflow-hidden max-w-7xl relative mask-[linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]"
+        className="w-full py-12 overflow-hidden mx-auto max-w-7xl relative mask-[linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]"
       >
         <div
           ref={scrollerRef}

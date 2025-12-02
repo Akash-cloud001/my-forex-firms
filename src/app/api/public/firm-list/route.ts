@@ -41,6 +41,8 @@ export async function GET(request: NextRequest) {
             sort["firmDetails.name"] = order;
         } else if (sortBy === "payout") {
             sort["firmDetails.totalPayout"] = order;
+        } else if (sortBy === "yearFounded") {
+            sort["firmDetails.yearFounded"] = order;
         }
 
         const skip = (page - 1) * limit;

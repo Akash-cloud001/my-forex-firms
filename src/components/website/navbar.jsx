@@ -63,7 +63,7 @@ const Navbar = () => {
         <div 
             onClick={() => router.push('/reviews')} 
             variant="outline" 
-            className="text-primary/90 hover:text-primary font-semibold w-full sm:w-auto text-sm capitalize font-geist-sans cursor-pointer"
+            className="text-foreground font-semibold w-full sm:w-auto text-sm capitalize font-geist-sans cursor-pointer btn-grad"
           >
             My Reviews
           </div>

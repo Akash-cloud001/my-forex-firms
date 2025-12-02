@@ -27,17 +27,17 @@ export default function Page() {
     <FirmListSection/>
     </AnimatedSection>
 
-    <AnimatedSection id="reviews">
+    {/* <AnimatedSection id="reviews">
     <Reviews/>
+    </AnimatedSection> */}
+    <AnimatedSection id="blogs">
+    <Blogs/>
     </AnimatedSection>
 
     <AnimatedSection id="faq">
     <Faq/>
     </AnimatedSection>
 
-    <AnimatedSection id="blogs">
-    <Blogs/>
-    </AnimatedSection>
     
     <AnimatedSection id="subscribe">
     <Subscribe/>

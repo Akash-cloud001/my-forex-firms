@@ -7,7 +7,7 @@ import Link from "next/link";
 const Blogs = () => {
   return (
     <section className="w-full bg-background py-16 sm:py-24 max-w-7xl mx-auto">
-      <h2 className="text-3xl gradient-text font-semibold tracking-tight sm:text-4xl text-center">
+      <h2 className="text-3xl gradient-text font-semibold tracking-tight sm:text-4xl text-center mb-8">
         Firms Reviewed Blogs
       </h2>
       <div className="hidden lg:grid grid-cols-3 md:grid-cols-3 grid-rows-4 md:grid-rows-5 gap-2 md:gap-8 m-4">
