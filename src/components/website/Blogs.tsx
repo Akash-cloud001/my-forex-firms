@@ -52,7 +52,7 @@ const Blogs = () => {
             </div>
           </div>
         </Link>
-        <Link href="/blogs/ftmo-review" className="col-start-1 row-start-3 col-span-3 md:col-start-3 md:row-start-1 md:col-span-1 md:row-span-2 card-custom-grad rounded-md relative">
+        <Link href="/blogs/maven-review" className="col-start-1 row-start-3 col-span-3 md:col-start-3 md:row-start-1 md:col-span-1 md:row-span-2 card-custom-grad rounded-md relative">
           <Image src="/website/blog-2-bg.png" alt="Blog 3" fill className="absolute top-0 left-0 w-full h-full object-cover object-center" />
           <div className="relative z-[1] h-full w-full pt-6 px-6 pb-4">
             <h3 className="text-3xl md:text-6xl lg:text-7xl text-primary font-extrabold font-geist-sans tracking-tight text-left">
@@ -60,10 +60,10 @@ const Blogs = () => {
             </h3>
             <div className="mt-2">
                 <p className="text-lg md:text-2xl xl:text-3xl 2xl:text-4xl font-geist-sans font-semibold first-letter:uppercase leading-tight text-white whitespace-normal tracking-tight">
-                    FTMO Review 2025
+                    Maven Review 2025
                 </p>
                 <p className="mt-1 text-lg 2xl:text-2xl font-geist-sans font-light leading-tight text-white/80 whitespace-normal line-clamp-1">
-                    Is FTMO really a trader‑friendly prop firm, or just another hype-driven evaluation company? After researching their rules, payout structure, trader feedback, risk parameters, and comparing them with top prop firms in 2025, this is the most honest, complete, and data-based FTMO review you&apos;ll read this year.
+                Before judging whether Maven is genuinely a trader-friendly prop firm or just another hype-driven evaluation company, I took a deep look at their rules, payout system, trader feedback, and risk model. After comparing all of that with the leading prop firms of 2025, this turned into one of the most straightforward and data-driven Maven reviews you&apos;ll read this year.
                 </p>
                 <Button className="mt-0 text-primary/80 hover:text-primary duration-300 ease-in-out float-right" variant="ghost">
                     <span className="text-primary/80 hover:text-primary duration-300 ease-in-out">Read More</span>
