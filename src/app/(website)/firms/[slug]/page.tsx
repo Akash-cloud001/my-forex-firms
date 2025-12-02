@@ -10,7 +10,6 @@ import FirmHeader from '@/components/website/firms/FirmHeader'
 import FirmRulesContent from '@/components/website/firms/FirmRulesContent'
 import { useParams } from 'next/navigation'
 
-
 const tabs = [
   {
     name: 'Firm Dashboard',
@@ -132,7 +131,7 @@ const FirmPage = () => {
               <button
                 key={tab.value}
                 onClick={() => setActiveTab(tab.value as 'dashboard' | 'challenges' | 'reviews' | 'rules')}
-                className={`px-6 py-3 rounded-full text-xs sm:text-sm md:text-lg font-medium font-geist-sans transition-colors ${activeTab === tab.value
+                className={`px-4 py-2 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm md:text-lg font-medium font-geist-sans transition-colors ${activeTab === tab.value
                   ? 'bg-foreground/10 text-foreground'
                   : 'text-foreground/60 hover:text-foreground/80'
                   }`}
@@ -196,6 +195,7 @@ const FirmPage = () => {
             )}
           </AnimatePresence>
         </div>
+        
       </section>
 
     </section>
