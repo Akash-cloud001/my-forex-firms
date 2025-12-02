@@ -6,4 +6,5 @@ export { default as InstagramIcon } from './InstagramIcon';
 export { default as TikTokIcon } from './TikTokIcon';
 export { default as WhatsAppIcon } from './WhatsAppIcon';
 export { default as DiscordIcon } from './DiscordIcon';
-
+export { default as TelegramIcon } from './TelegramIcon';
+export { default as YoutubeIcon } from './YoutubeIcon';

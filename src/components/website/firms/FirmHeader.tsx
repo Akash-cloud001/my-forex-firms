@@ -11,7 +11,9 @@ import {
   TwitterIcon,
   LinkedInIcon,
   InstagramIcon,
-  DiscordIcon
+  DiscordIcon,
+  TelegramIcon,
+  YoutubeIcon
 } from '@/components/svgs'
 import * as Flags from 'country-flag-icons/react/3x2'
 import countries from 'i18n-iso-countries'
@@ -300,41 +302,64 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
           </div>
 
           {/* Socials Available Section */}
-          {firmData?.socialLinks?.socialLinks && Object.entries(firmData.socialLinks.socialLinks).length > 0 && (
-            <div className="sm:border sm:border-border rounded-lg sm:px-6 sm:py-3 md:px-6 md:py-4 w-max">
-              <h3 className="text-foreground/80 text-sm mb-2 text-center font-medium">Socials Available</h3>
-              <div className="flex items-start justify-start gap-3">
-                {Object.entries(firmData.socialLinks.socialLinks).map(([platform, url]) => {
-                  if (!url) return null;
+          {firmData?.socialLinks?.socialLinks && Object.entries(firmData.socialLinks.socialLinks).length > 0 && (() => {
+            const socialEntries = Object.entries(firmData.socialLinks.socialLinks).filter((entry) => {
+              const url = entry[1];
+              return url && typeof url === 'string' && url.trim();
+            });
+            
+            if (socialEntries.length === 0) return null;
 
-                  // Map platform names to icon components
-                  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-                    'Facebook': FacebookIcon,
-                    'Instagram': InstagramIcon,
-                    'X': TwitterIcon,
-                    'Twitter': TwitterIcon,
-                    'LinkedIn': LinkedInIcon,
-                    'Reddit': RedditIcon,
-                    'Discord': DiscordIcon,
-                  };
+            // Normalize platform name for matching (lowercase, trim, handle variations)
+            const normalizePlatform = (platform: string): string => {
+              return platform.trim().toLowerCase().replace(/[\/\s]/g, '');
+            };
 
-                  const IconComponent = iconMap[platform];
-                  if (!IconComponent) return null;
+            // Map platform names to icon components (case-insensitive)
+            const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+              'facebook': FacebookIcon,
+              'instagram': InstagramIcon,
+              'x': TwitterIcon,
+              'twitter': TwitterIcon,
+              'xtwitter': TwitterIcon,
+              'linkedin': LinkedInIcon,
+              'reddit': RedditIcon,
+              'discord': DiscordIcon,
+              'telegram': TelegramIcon,
+              'youtube': YoutubeIcon,
+              'youtubechannel': YoutubeIcon,
+            };
 
-                  return (
-                    <Link
-                      key={platform}
-                      href={url as string}
-                      target='_blank'
-                      className="relative h-6 w-6 rounded flex items-center justify-center hover:opacity-80 transition-opacity"
-                    >
-                      <IconComponent className='w-5 h-5 text-foreground/50' />
-                    </Link>
-                  );
-                })}
+            return (
+              <div className="sm:border sm:border-border rounded-lg sm:px-6 sm:py-3 md:px-6 md:py-4 w-max">
+                <h3 className="text-foreground/80 text-sm mb-2 text-center font-medium">Socials Available</h3>
+                <div className="flex items-start justify-start gap-3">
+                  {socialEntries.map(([platform, url]) => {
+                    const normalizedPlatform = normalizePlatform(platform);
+                    const IconComponent = iconMap[normalizedPlatform];
+                    
+                    if (!IconComponent) {
+                      // Log unmapped platforms for debugging
+                      console.warn(`Social icon not found for platform: "${platform}" (normalized: "${normalizedPlatform}")`);
+                      return null;
+                    }
+
+                    return (
+                      <Link
+                        key={platform}
+                        href={url as string}
+                        target='_blank'
+                        rel="noopener noreferrer"
+                        className="relative h-6 w-6 rounded flex items-center justify-center hover:opacity-80 transition-opacity"
+                      >
+                        <IconComponent className='w-5 h-5 text-foreground/50' />
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       </div>
     </section>
