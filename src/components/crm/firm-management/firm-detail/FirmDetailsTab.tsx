@@ -96,6 +96,14 @@ function FirmDetailsTab({ firmData }: any) {
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground">
+                Max Allocation
+              </label>
+              <p className="text-base">
+                {firmData.firmDetails.maxAllocation}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">
                 Broker Backed Type
               </label>
               <p className="text-base">

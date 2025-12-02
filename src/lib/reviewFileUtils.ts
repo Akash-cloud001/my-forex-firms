@@ -1,20 +1,34 @@
 import { deleteFileFromBunnyCDN } from './bunnycdn';
+import { deleteFromCloudinary } from '@/services/cloudinary';
 
 /**
  * Clean up files associated with a review
- * @param files - Array of file objects with URL property
+ * Supports both Cloudinary (with public_id) and legacy BunnyCDN (with url only)
+ * @param files - Array of file objects with URL and optional public_id property
  */
-export const cleanupReviewFiles = async (files: Array<{ url: string }>): Promise<void> => {
+export const cleanupReviewFiles = async (files: Array<{ url: string; public_id?: string }>): Promise<void> => {
   if (!files || files.length === 0) return;
   
   console.log(`Cleaning up ${files.length} files for review`);
   
   const deletePromises = files.map(async (file) => {
     try {
-      await deleteFileFromBunnyCDN(file.url);
-      console.log(`Successfully deleted file: ${file.url}`);
+      // Check if file has public_id (Cloudinary) or just url (BunnyCDN legacy)
+      if (file.public_id) {
+        // Cloudinary file - delete using public_id
+        const deleteResult = await deleteFromCloudinary(file.public_id);
+        if (deleteResult.success) {
+          console.log(`Successfully deleted Cloudinary file: ${file.public_id}`);
+        } else {
+          console.warn(`Failed to delete Cloudinary file ${file.public_id}: ${deleteResult.message}`);
+        }
+      } else {
+        // Legacy BunnyCDN file - delete using URL
+        await deleteFileFromBunnyCDN(file.url);
+        console.log(`Successfully deleted BunnyCDN file: ${file.url}`);
+      }
     } catch (error) {
-      console.warn(`Failed to delete file ${file.url}:`, error);
+      console.warn(`Failed to delete file ${file.public_id || file.url}:`, error);
       // Don't throw error to prevent blocking the main operation
     }
   });

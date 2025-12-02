@@ -68,7 +68,6 @@ export default function AdminBlogEditorPage({ params }: AdminBlogPageProps) {
                     throw new Error('Invalid response format');
                 }
             } catch (error) {
-                console.error('Error fetching review:', error);
                 const errorMessage = error instanceof Error ? error.message : 'Failed to load review';
                 toast.error(errorMessage);
                 router.push('/admin/blogs');
@@ -116,7 +115,6 @@ export default function AdminBlogEditorPage({ params }: AdminBlogPageProps) {
             setOriginalData(JSON.parse(JSON.stringify(reviewData)));
             toast.success('Review updated successfully!');
         } catch (error) {
-            console.error('Error saving review:', error);
             const errorMessage = error instanceof Error ? error.message : 'Failed to save review. Please try again.';
             toast.error(errorMessage);
         } finally {

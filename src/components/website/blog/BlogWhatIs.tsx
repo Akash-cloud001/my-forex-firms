@@ -18,12 +18,12 @@ export default function BlogWhatIs({ whatIs, iconMap }: BlogWhatIsProps) {
     return (
         <AnimatedSection id="blog-what-is">
             <section id={whatIs.id} className="mb-12">
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 flex items-center gap-3 capitalize">
                     <IconComponent className="h-6 sm:h-8 w-6 sm:w-8 text-primary" />
                     {whatIs.title}
                 </h2>
                 <div className="prose prose-lg max-w-none text-muted-foreground">
-                    <p className="mb-4">
+                    <p className="mb-4 first-letter:uppercase">
                         {whatIs.content}
                     </p>
 

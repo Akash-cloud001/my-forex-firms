@@ -5,14 +5,16 @@ import { Star, CheckCircle, XCircle, LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import AnimatedSection from '@/components/website/AnimatedSection';
 import { FinalVerdictSection } from '@/types/firm-review';
+import Image from 'next/image';
 
 interface BlogFinalVerdictProps {
     finalVerdict: FinalVerdictSection;
     firmName: string;
     iconMap: Record<string, LucideIcon>;
+    trustScore: number;
 }
 
-export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap }: BlogFinalVerdictProps) {
+export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap, trustScore }: BlogFinalVerdictProps) {
     if (!finalVerdict) return null;
 
     const IconComponent = iconMap[finalVerdict.icon] || Star;
@@ -34,25 +36,15 @@ export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap }: Bl
                         </div>
 
                         <div className="text-center mb-8">
-                            <div className="inline-flex flex-col items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <span className="text-4xl sm:text-4xl md:text-5xl font-bold gradient-text">{finalVerdict.rating}</span>
-                                    <div className="text-left">
-                                        <div className="flex mb-1">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <Star 
-                                                    key={star} 
-                                                    className={`h-4 sm:h-5 md:h-6 w-4 sm:w-5 md:w-6 ${
-                                                        star <= Math.round(finalVerdict.rating) 
-                                                            ? 'text-yellow-400 fill-current' 
-                                                            : 'text-white/30'
-                                                    }`} 
-                                                />
-                                            ))}
-                                        </div>
-                                        <p className="text-white/60 text-xs sm:text-sm">out of 5.0</p>
-                                    </div>
-                                </div>
+                            <div className="inline-flex flex-col gap-1 items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+                                <figure className=" rounded-[8px] relative flex flex-col items-center justify-end ">
+                                    <span className='text-primary text-[32px] font-bold'>
+                                    {trustScore}<span className='text-xl font-light'>/10</span>
+                                    </span>
+                                    <span className='text-base text-foreground/90 -mt-1'>
+                                    PTI INDEX
+                                    </span>
+                                </figure>
                                 <div className="flex items-center gap-2 text-xs sm:text-sm text-white/80">
                                     <div className="w-2 h-2 bg-success rounded-full"></div>
                                     <span>{finalVerdict.ratingLabel}</span>
@@ -62,7 +54,7 @@ export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap }: Bl
 
                         {finalVerdict.strengths && finalVerdict.strengths.length > 0 && (
                             <div className="mb-8">
-                                <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 text-center">Why {firmName} Stands Out</h3>
+                                <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 text-center">Why <span className='uppercase text-primary'>{firmName} </span> Stands Out</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {finalVerdict.strengths.map((strength, index) => (
                                         <div key={index} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4">

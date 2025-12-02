@@ -129,7 +129,6 @@ function AddBlogPageContent() {
             // After successful save, redirect to edit page
             router.push(`/admin/blogs/${reviewData.slug}`);
         } catch (error) {
-            console.error('Error saving blog:', error);
             const errorMessage = error instanceof Error ? error.message : 'Failed to save blog. Please try again.';
             toast.error(errorMessage);
         } finally {

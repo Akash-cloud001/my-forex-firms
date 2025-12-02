@@ -69,7 +69,7 @@ export default function BlogsPage() {
                                     <div className="relative z-10 flex h-full flex-col justify-between bg-black/30 backdrop-blur-[2px] p-6 sm:p-8">
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-2 flex-wrap">
-                                                <Badge variant="outline" className="text-xs">
+                                                <Badge variant="outline" className="text-xs capitalize">
                                                     {blog.firmName}
                                                 </Badge>
                                                 <div className="flex items-center gap-1">
@@ -77,10 +77,10 @@ export default function BlogsPage() {
                                                     <span className="text-xs text-white/60">{blog.rating.toFixed(1)}</span>
                                                 </div>
                                             </div>
-                                            <h3 className="text-2xl font-semibold text-white font-geist-sans leading-tight">
+                                            <h3 className="text-2xl font-semibold text-white font-geist-sans leading-tight capitalize">
                                                 {blog.title}
                                             </h3>
-                                            <p className="text-white/80 text-sm sm:text-base font-light line-clamp-2">
+                                            <p className="text-white/80 text-sm sm:text-base font-light line-clamp-1 capitalize">
                                                 {blog.subtitle}
                                             </p>
                                             <div className="flex items-center gap-4 text-xs text-white/60">

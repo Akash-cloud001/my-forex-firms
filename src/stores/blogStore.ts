@@ -34,7 +34,6 @@ export const useBlogStore = create<BlogState>((set) => ({
     set({ isLoading: true, error: null });
     
     try {
-      // Note: baseURL is already '/api', so we don't include it in the path
       const data = await apiGet<{ success: boolean; reviews: FirmReview[]; pagination?: unknown }>('/public/firm-reviews');
       
       if (data.success && data.reviews) {
@@ -61,7 +60,6 @@ export const useBlogStore = create<BlogState>((set) => ({
     set({ isLoadingBlog: true, error: null });
     
     try {
-      // Note: baseURL is already '/api', so we don't include it in the path
       const data = await apiGet<{ success: boolean; review: FirmReview }>(`/public/firm-reviews/${slug}`);
       
       if (data.success && data.review) {
@@ -119,4 +117,3 @@ export const useBlog = () => {
     clearBlog: clearCurrentBlog,
   };
 };
-

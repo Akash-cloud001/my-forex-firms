@@ -22,15 +22,15 @@ export default function BlogOverview({ overview, iconMap }: BlogOverviewProps) {
                 <CardContent className="p-8">
                     <div className="flex items-center gap-3 mb-6">
                         <IconComponent className="h-6 w-6 text-primary" />
-                        <h2 className="text-2xl font-bold text-foreground">{overview.title}</h2>
+                        <h2 className="text-2xl font-bold text-foreground capitalize">{overview.title}</h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-4">
                             {overview.data.left.map((item, index) => (
                                 <div key={index} className="flex justify-between items-center py-2 border-b border-border/50">
-                                    <span className="text-muted-foreground">{item.label}</span>
-                                    <span className={`text-right font-semibold ${item.highlight ? 'text-primary' : 'text-foreground'}`}>
+                                    <span className="text-muted-foreground capitalize">{item.label}</span>
+                                    <span className={`text-right font-semibold capitalize ${item.highlight ? 'text-primary' : 'text-foreground'}`}>
                                         {item.value}
                                     </span>
                                 </div>
@@ -40,8 +40,8 @@ export default function BlogOverview({ overview, iconMap }: BlogOverviewProps) {
                         <div className="space-y-4">
                             {overview.data.right.map((item, index) => (
                                 <div key={index} className="flex justify-between items-center py-2 border-b border-border/50">
-                                    <span className="text-muted-foreground">{item.label}</span>
-                                    <span className={`text-right font-semibold ${
+                                    <span className="text-muted-foreground capitalize">{item.label}</span>
+                                    <span className={`text-right font-semibold capitalize ${
                                         item.highlight === 'success' ? 'text-green-400' : 
                                         item.highlight ? 'text-primary' : 
                                         'text-foreground'
