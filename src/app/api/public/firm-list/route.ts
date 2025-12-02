@@ -8,6 +8,13 @@ interface FirmDBType {
     firmDetails?: {
         name?: string;
         totalPayout?: number;
+        image?: {
+            url?: string;
+            publicId?: string;
+            thumbnail?: string;
+        };
+        yearFounded?: number;
+        slug?: string;
     };
 }
 
@@ -56,6 +63,9 @@ export async function GET(request: NextRequest) {
                     id: firm._id.toString(),
                     name: firm.firmDetails?.name ?? "Unknown",
                     totalPayout: firm.firmDetails?.totalPayout ?? null,
+                    image: firm.firmDetails?.image ?? null,
+                    yearFounded: firm.firmDetails?.yearFounded ?? null,
+                    slug: firm.firmDetails?.slug ?? null,
                 })),
                 pagination: {
                     currentPage: page,
