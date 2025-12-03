@@ -65,10 +65,10 @@ function FirmListSection() {
     <div className="min-h-screen text-white px-0 md:px-8 py-8 relative max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col items-start justify-between w-full px-4 md:px-0">
-        <div className="flex items-center justify-center mb-8 w-full  ">
+        <div className="flex items-center justify-center mb-10 w-full  ">
           <h1 className="font-geist-sans font-semibold text-4xl leading-[100%] tracking gradient-text text-center relative">
             Firms
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-foreground/80 to-transparent rounded-3xl shadow-md"></div>
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-foreground/80 to-transparent rounded-3xl shadow-md"></div>
           </h1>
         </div>
 
