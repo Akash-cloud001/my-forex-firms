@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock, Star, Share2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import AnimatedSection from '@/components/website/AnimatedSection';
@@ -40,15 +40,15 @@ export default function BlogHero({ reviewData }: BlogHeroProps) {
                                 Back to Blogs
                             </Link>
                         </Button>
-                            <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={handleShare}
-                                className="text-primary/90 font-medium hover:text-primary transition-all duration-300"
-                            >
-                                <Share2 className="h-4 w-4" />
-                                <span className="hidden sm:inline">Share</span>
-                            </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleShare}
+                            className="text-primary/90 font-medium hover:text-primary transition-all duration-300"
+                        >
+                            <Share2 className="h-4 w-4" />
+                            <span className="hidden sm:inline">Share</span>
+                        </Button>
                     </div>
                     <div className="">
                         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight capitalize">

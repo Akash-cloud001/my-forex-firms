@@ -4,6 +4,7 @@ import connectDB from "@/lib/mongodb";
 import Program from "@/models/FirmProgram";
 import AuditLog from "@/models/AuditLog";
 import { currentUser } from "@clerk/nextjs/server";
+
 type ChangeEntry<T> = {
   field: keyof T;
   oldValue: T[keyof T] | null;
@@ -13,70 +14,78 @@ type ChangeEntry<T> = {
 type ChangeLog<T> = Record<string, ChangeEntry<T>[]>;
 
 export async function POST(req: NextRequest) {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     await connectDB();
-    const user = await currentUser();
 
-    if (!user) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
-    }
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    const body = await req.json();
+    try {
+      const user = await currentUser();
 
-    if (!body.propFirmId || !body.name || !body.type) {
-      return NextResponse.json(
-        { success: false, message: "Missing required fields" },
-        { status: 400 }
+      if (!user) {
+        await session.abortTransaction();
+        session.endSession();
+        return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+      }
+
+      const body = await req.json();
+
+      if (!body.propFirmId || !body.name || !body.type) {
+        await session.abortTransaction();
+        session.endSession();
+        return NextResponse.json(
+          { success: false, message: "Missing required fields" },
+          { status: 400 }
+        );
+      }
+
+      const userId = user.id;
+      const userName =
+        user.fullName || `${user.firstName || ""} ${user.lastName || ""}`.trim();
+      const userRole = user.publicMetadata?.role || "User";
+
+      const [program] = await Program.create([body], { session });
+
+      const changes: ChangeLog<typeof body> = {
+        program: Object.entries(body).map(([field, newValue]) => ({
+          field,
+          oldValue: null,
+          newValue,
+        })),
+      };
+
+      await AuditLog.create(
+        [
+          {
+            userId,
+            userName,
+            userRole,
+            entity: "Program",
+            entityId: program._id,
+            action: "CREATE",
+            changes,
+          },
+        ],
+        { session }
       );
-    }
 
-    const userId = user.id;
-    const userName =
-      user.fullName || `${user.firstName || ""} ${user.lastName || ""}`.trim();
-    const userRole = user.publicMetadata?.role || "User";
+      await session.commitTransaction(); session.endSession();
 
-    // Create the program
-    const [program] = await Program.create([body], { session });
-
-    // Build audit log changes
-   const changes: ChangeLog<typeof body> = {
-      program: Object.entries(body).map(([field, newValue]) => ({
-        field,
-        oldValue: null,
-        newValue,
-      })),
-    };
-
-    await AuditLog.create(
-      [
+      return NextResponse.json(
         {
-          userId,
-          userName,
-          userRole,
-          entity: "Program",
-          entityId: program._id,
-          action: "CREATE",
-          changes,
+          success: true,
+          message: "Program created successfully",
+          data: program,
         },
-      ],
-      { session }
-    );
-
-    await session.commitTransaction();
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Program created successfully",
-        data: program,
-      },
-      { status: 201 }
-    );
+        { status: 201 }
+      );
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   } catch (error) {
-    await session.abortTransaction();
     console.error("Error creating program:", error);
 
     const err = error instanceof Error ? error : new Error(String(error));
@@ -88,8 +97,6 @@ export async function POST(req: NextRequest) {
       },
       { status: 500 }
     );
-  } finally {
-    session.endSession();
   }
 }
 

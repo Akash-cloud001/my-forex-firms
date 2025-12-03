@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { ReviewFormData } from "../types/types";
 import { reviewFormSchema } from "../schema/schema";
 import { ISSUE_CATEGORIES, DESCRIPTION_CONFIG } from "../constant/constants";
-import { StarRating } from "./StarRating";
+// import { StarRating } from "./StarRating";
 import { FileUpload } from "./FileUpload";
 import { IssueTypeSelector } from "./IssueTypeSelector";
 import { SuccessModal, ErrorModal } from "./ReviewModals";

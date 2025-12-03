@@ -3,7 +3,7 @@
 import React from 'react';
 import { Dot, List, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { TableOfContentsItem } from '@/types/firm-review';
+// import { TableOfContentsItem } from '@/types/firm-review';
 import { LucideIcon } from 'lucide-react';
 
 interface BlogTableOfContentsProps {
@@ -36,7 +36,7 @@ export default function BlogTableOfContents({
                     </div>
                     <nav className="space-y-">
                         {tableOfContents.map((item) => {
-                            const IconComponent = item.icon;
+                            // const IconComponent = item.icon;
                             return (
                                 <button
                                     key={item.id}
@@ -79,7 +79,7 @@ export default function BlogTableOfContents({
                         </div>
                         <nav className="space-y-2">
                             {tableOfContents.map((item) => {
-                                const IconComponent = item.icon;
+                                // const IconComponent = item.icon;
                                 return (
                                     <button
                                         key={item.id}

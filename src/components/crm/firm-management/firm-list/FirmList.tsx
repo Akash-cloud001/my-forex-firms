@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Edit, Search, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,6 +62,7 @@ export default function FirmsList() {
     total: 0,
     totalPages: 1,
   });
+  const [updatingFirmId, setUpdatingFirmId] = useState<string | null>(null);
 
   const fetchFirms = useCallback(async (page: number, searchTerm: string) => {
     try {
@@ -74,7 +76,7 @@ export default function FirmsList() {
       const res = await fetch(`/api/admin/firm?${params.toString()}`, {
         cache: "no-store",
       });
-      
+
       if (!res.ok) throw new Error("Failed to fetch firms");
 
       const data = await res.json();
@@ -115,6 +117,40 @@ export default function FirmsList() {
   const handleRefresh = () => {
     setCurrentPage(1);
     fetchFirms(1, search);
+  };
+
+  const handleStatusChange = async (firmId: string, newStatus: string) => {
+    setUpdatingFirmId(firmId);
+    try {
+      const res = await fetch(`/api/admin/firm/${firmId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to update status");
+      }
+
+      // Update local state
+      setFirms((prevFirms) =>
+        prevFirms.map((firm) =>
+          firm._id === firmId
+            ? { ...firm, firmDetails: { ...firm.firmDetails, status: newStatus } }
+            : firm
+        )
+      );
+
+      toast.success("Status updated successfully");
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to update status");
+    } finally {
+      setUpdatingFirmId(null);
+    }
   };
 
   return (
@@ -242,15 +278,35 @@ export default function FirmsList() {
                         <td className="p-3">
                           {firm.firmDetails.yearFounded || "N/A"}
                         </td>
-                        <td className="p-3">
-                          {firm.firmDetails.status ? (
-                            <Badge variant="outline">
-                              {firm.firmDetails.status.charAt(0).toUpperCase() +
-                                firm.firmDetails.status.slice(1)}
-                            </Badge>
-                          ) : (
-                            "N/A"
-                          )}
+                        <td className="p-3" onClick={(e) => e.stopPropagation()}>
+                          <Select
+                            value={firm.firmDetails.status}
+                            onValueChange={(value) =>
+                              handleStatusChange(firm._id, value)
+                            }
+                            disabled={updatingFirmId === firm._id}
+                          >
+                            <SelectTrigger
+                              className={`w-[140px] h-8 ${firm.firmDetails.status === "Active"
+                                ? "text-green-600 border-green-200 bg-green-50"
+                                : firm.firmDetails.status === "Suspended"
+                                  ? "text-red-600 border-red-200 bg-red-50"
+                                  : "text-muted-foreground"
+                                } ${updatingFirmId === firm._id ? "opacity-50 cursor-not-allowed" : ""}`}
+                            >
+                              <SelectValue placeholder={updatingFirmId === firm._id ? "Updating..." : "Status"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {["Active", "Inactive", "Under Review", "Suspended"].map((status) => (
+                                <SelectItem key={status} value={status}>
+                                  <div className={`flex items-center ${status === "Active" ? "text-green-600" : status === "Suspended" ? "text-red-600" : "text-muted-foreground"}`}>
+                                    <span className={`h-2 w-2 rounded-full mr-2 ${status === "Active" ? "bg-green-500" : status === "Suspended" ? "bg-red-500" : "bg-gray-300"}`} />
+                                    {status}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </td>
                         <td className="p-3">
                           {firm.firmDetails.yearFounded || "N/A"}

@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import {
   Search,
   ArrowRight,
-  Loader2,
+
   SlidersHorizontal,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";

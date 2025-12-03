@@ -15,7 +15,7 @@ const ChallengesContent = () => {
 
   const [selectedSteps, setSelectedSteps] = useState<string>('all')
   const [selectedSize, setSelectedSize] = useState<string>('all')
-  const [selectedAssets, setSelectedAssets] = useState<string>('all')
+  // const [selectedAssets, setSelectedAssets] = useState<string>('all')
   const [selectedChallenge, setSelectedChallenge] = useState<IProgram | null>(null)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [page, setPage] = useState(1)
@@ -67,33 +67,33 @@ const ChallengesContent = () => {
         <div className="flex items-center gap-2">
           <p className="text-sm text-foreground/60">Steps:</p>
           <Select value={selectedSteps} onValueChange={(val) => { setSelectedSteps(val); setPage(1); }}>
-          <SelectTrigger className="w-[100px] !bg-white/10 !text-white">
-            <SelectValue placeholder="Steps: Select" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="1-Step">1-Step</SelectItem>
-            <SelectItem value="2-Step">2-Step</SelectItem>
-            <SelectItem value="3-Step">3-Step</SelectItem>
-            <SelectItem value="Instant">Instant</SelectItem>
-          </SelectContent>
-        </Select>
+            <SelectTrigger className="w-[100px] !bg-white/10 !text-white">
+              <SelectValue placeholder="Steps: Select" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="1-Step">1-Step</SelectItem>
+              <SelectItem value="2-Step">2-Step</SelectItem>
+              <SelectItem value="3-Step">3-Step</SelectItem>
+              <SelectItem value="Instant">Instant</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex items-center gap-2">
           <p className="text-sm text-foreground/60">Size:</p>
           <Select value={selectedSize} onValueChange={(val) => { setSelectedSize(val); setPage(1); }}>
-          <SelectTrigger className="w-[120px] !bg-white/10 !text-white">
-            <SelectValue placeholder=" Select" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="5000">$5,000</SelectItem>
-            <SelectItem value="10000">$10,000</SelectItem>
-            <SelectItem value="25000">$25,000</SelectItem>
-            <SelectItem value="50000">$50,000</SelectItem>
-            <SelectItem value="100000">$100,000</SelectItem>
-          </SelectContent>
-        </Select>
+            <SelectTrigger className="w-[120px] !bg-white/10 !text-white">
+              <SelectValue placeholder=" Select" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="5000">$5,000</SelectItem>
+              <SelectItem value="10000">$10,000</SelectItem>
+              <SelectItem value="25000">$25,000</SelectItem>
+              <SelectItem value="50000">$50,000</SelectItem>
+              <SelectItem value="100000">$100,000</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* <div className="flex items-center gap-2">
@@ -280,10 +280,10 @@ const ChallengesContent = () => {
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">Account Size</p>
                         <div className="space-y-2">
-                      {selectedChallenge.accountSizes.map((size, idx) => (
-                          <span key={idx} className="text-2xl font-bold text-success/80">${size.size.toLocaleString()}</span>
-                      ))}
-                    </div>
+                          {selectedChallenge.accountSizes.map((size, idx) => (
+                            <span key={idx} className="text-2xl font-bold text-success/80">${size.size.toLocaleString()}</span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -295,7 +295,7 @@ const ChallengesContent = () => {
                       ))}
                     </div>
                   </div>
-                  
+
 
                   {/* Daily Loss Card */}
                   <div className="bg-card border border-border rounded-lg p-4">
@@ -317,7 +317,7 @@ const ChallengesContent = () => {
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">Profit Split</p>
                       <p className="text-lg font-bold text-success/80">
-                      {selectedChallenge.profitSplit}%
+                        {selectedChallenge.profitSplit}%
                       </p>
                     </div>
                   </div>
@@ -396,7 +396,7 @@ const ChallengesContent = () => {
                   </div>
                 </div>
 
-                
+
 
               </div>
             </div>

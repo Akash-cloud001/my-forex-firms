@@ -5,16 +5,6 @@ import Link from 'next/link'
 import { Plus, Check, X, Globe, LineChart } from 'lucide-react'
 import RadarChartComponent from '@/components/ui/RadarChart'
 import { IFundingFirm } from '@/models/FirmDetails'
-import {
-  FacebookIcon,
-  RedditIcon,
-  TwitterIcon,
-  LinkedInIcon,
-  InstagramIcon,
-  DiscordIcon,
-  TelegramIcon,
-  YoutubeIcon
-} from '@/components/svgs'
 import * as Flags from 'country-flag-icons/react/3x2'
 import countries from 'i18n-iso-countries'
 import enLocale from 'i18n-iso-countries/langs/en.json'
@@ -57,7 +47,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
     return <Globe className="w-4 h-4 text-foreground/60" />
   }
   console.log(firmData);
-  
+
   // Responsive chart dimensions
   const chartWidth = isMobile ? 250 : 300
   const chartHeight = isMobile ? 250 : 300
@@ -106,7 +96,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
               {firmData?.firmDetails.name}
               <Image src={"/website/link.svg"} alt="link" width={20} height={20} className="sm:w-6 sm:h-6" />
             </Link>
-            
+
             {/* Stats - Grid on mobile, horizontal on desktop */}
             <div className='font-geist-sans grid grid-cols-2 md:flex md:items-start md:justify-center gap-3 md:gap-4 w-full md:w-auto mt-2 md:mt-0'>
               {firmData?.firmDetails?.jurisdiction && <div className='flex flex-col items-start'>
@@ -114,7 +104,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
                   Jurisdiction
                 </span>
                 <span className='text-sm md:text-base text-foreground font-medium flex items-center gap-1'>
-                  { renderFlag(firmData.firmDetails.jurisdiction)} {firmData?.firmDetails?.jurisdiction || 'N/A'}
+                  {renderFlag(firmData.firmDetails.jurisdiction)} {firmData?.firmDetails?.jurisdiction || 'N/A'}
                 </span>
               </div>}
 
@@ -168,7 +158,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
               </span>
             </p>
           </div>
-          
+
           {/* Factor 1 - Hidden below md */}
           <figure className='hidden md:flex flex-col items-center justify-center blur-lg'>
             <RadarChartComponent
