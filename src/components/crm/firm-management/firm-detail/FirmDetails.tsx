@@ -15,6 +15,9 @@ import {
   CreditCard,
   Edit,
   Trash2,
+  Gauge,
+  DollarSign,
+  Monitor,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -146,7 +149,9 @@ function FirmDetails({ id }: { id: string }) {
     // Open edit modal or navigate to edit page
     router.push(`/admin/firm-management/${id}/edit-program/${program._id}`);
   };
-  console.log(firmData)
+  const leverageSteps = ['Instant', '1-Step', '2-Step', '3-Step'];
+
+  // console.log(firmData)
   return (
     <div className="min-h-screen bg-background p-6">
       {/* Header */}
@@ -188,7 +193,7 @@ function FirmDetails({ id }: { id: string }) {
 
       {/* Tabs */}
       <Tabs defaultValue="firm" className="space-y-4">
-        <TabsList className="grid grid-cols-4 lg:grid-cols-9 gap-2">
+        <TabsList className=" gap-2">
           <TabsTrigger value="firm">Firm Details</TabsTrigger>
           {/* <TabsTrigger value="leadership">Leadership</TabsTrigger> */}
           <TabsTrigger value="ratings">Ratings</TabsTrigger>
@@ -217,58 +222,47 @@ function FirmDetails({ id }: { id: string }) {
         <TransparencyTab firmData={firmData} />
 
         {/* Trading Tab */}
-        <TabsContent value="trading">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
+        <TabsContent value="trading" className="mt-0">
+          <Card className="border-none shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <TrendingUp className="h-5 w-5 text-primary" />
                 Trading Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground mb-3 block">
-                  Leverage Matrix
-                </label>
-                <div className="space-y-4">
+            <CardContent className="space-y-6">
+              {/* Leverage Matrix Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Gauge className="h-4 w-4 text-muted-foreground" />
+                  <label className="text-sm font-semibold text-foreground">
+                    Leverage Matrix
+                  </label>
+                </div>
+                <div className="space-y-3">
                   {Object.entries(firmData.trading.leverageMatrix).map(
                     ([asset, leverage]: [string, any]) => (
-                      <Card key={asset}>
-                        <CardHeader>
-                          <CardTitle className="text-base">{asset}</CardTitle>
+                      <Card key={asset} className="border border-border/50 shadow-none">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base font-semibold flex items-center gap-2">
+                            <span className="text-primary">{asset}</span>
+                          </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <div className="grid grid-cols-3 gap-4">
-                            <div>
-                              <label className="text-xs text-muted-foreground">
-                                Instant
-                              </label>
-                              <p className="font-medium">{leverage.Instant}</p>
-                            </div>
-                            <div>
-                              <label className="text-xs text-muted-foreground">
-                                1-Step
-                              </label>
-                              <p className="font-medium">
-                                {leverage["1-Step"]}
-                              </p>
-                            </div>
-                            <div>
-                              <label className="text-xs text-muted-foreground">
-                                2-Step
-                              </label>
-                              <p className="font-medium">
-                                {leverage["2-Step"]}
-                              </p>
-                            </div>
-                            <div>
-                              <label className="text-xs text-muted-foreground">
-                                3-Step
-                              </label>
-                              <p className="font-medium">
-                                {leverage["3-Step"]}
-                              </p>
-                            </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {leverageSteps.map((step) => (
+                              <div
+                                key={step}
+                                className="p-3 bg-gradient-to-br from-muted/50 to-muted/30 rounded-lg border border-border/50"
+                              >
+                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block mb-1.5">
+                                  {step}
+                                </label>
+                                <p className="text-lg font-bold text-foreground">
+                                  {leverage[step] || 'N/A'}
+                                </p>
+                              </div>
+                            ))}
                           </div>
                         </CardContent>
                       </Card>
@@ -276,32 +270,62 @@ function FirmDetails({ id }: { id: string }) {
                   )}
                 </div>
               </div>
+
               <Separator />
-              <div>
-                <label className="text-sm font-medium text-muted-foreground mb-3 block">
-                  Commissions
-                </label>
-                <div className="space-y-2">
+
+              {/* Commissions Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <label className="text-sm font-semibold text-foreground">
+                    Commissions Structure
+                  </label>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {Object.entries(firmData.trading.commissions).map(
                     ([type, commission]: [string, any]) => (
-                      <div key={type} className="p-3 bg-muted rounded-lg">
-                        <span className="font-medium">{type}:</span>
-                        <p className="text-sm mt-1">{commission}</p>
+                      <div
+                        key={type}
+                        className="p-4 bg-muted/50 rounded-lg border border-border/50 hover:bg-muted/70 transition-colors"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="font-semibold text-sm text-foreground capitalize">
+                            {type.replace(/([A-Z])/g, ' $1').trim()}
+                          </span>
+                          <Badge variant="outline" className="text-xs">
+                            Commission
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                          {commission}
+                        </p>
                       </div>
                     )
                   )}
                 </div>
               </div>
+
               <Separator />
-              <div>
-                <label className="text-sm font-medium text-muted-foreground mb-3 block">
-                  Trading platform
-                </label>
-                {firmData?.trading?.tradingPlatforms?.map((platform, index) => (
-                  <p className="font-medium text-white" key={index}>
-                    {platform}
-                  </p>
-                ))}
+
+              {/* Trading Platforms Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Monitor className="h-4 w-4 text-muted-foreground" />
+                  <label className="text-sm font-semibold text-foreground">
+                    Trading Platforms
+                  </label>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {firmData?.trading?.tradingPlatforms?.map((platform: string, index: number) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="px-4 py-2 text-sm font-medium"
+                    >
+                      {platform}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             </CardContent>
           </Card>

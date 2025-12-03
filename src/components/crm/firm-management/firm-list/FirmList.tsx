@@ -232,8 +232,8 @@ export default function FirmsList() {
                       <th className="p-3 text-left">Jurisdiction</th>
                       <th className="p-3 text-left">Founded</th>
                       <th className="p-3 text-left">Status</th>
-                      <th className="p-3 text-left">Published</th>
-                      <th className="p-3 text-left">Total Challenges</th>
+                      {/* <th className="p-3 text-left">Published</th> */}
+                      {/* <th className="p-3 text-left">Total Challenges</th> */}
                       <th className="p-3 text-left">Actions</th>
                     </tr>
                   </thead>
@@ -308,12 +308,12 @@ export default function FirmsList() {
                             </SelectContent>
                           </Select>
                         </td>
-                        <td className="p-3">
+                        {/* <td className="p-3">
                           {firm.firmDetails.yearFounded || "N/A"}
-                        </td>
-                        <td className="p-3 text-muted-foreground">
+                        </td> */}
+                        {/* <td className="p-3 text-muted-foreground">
                           {firm.firmDetails.challenges?.length || 0}
-                        </td>
+                        </td> */}
                         <td className="p-3">
                           <div className="flex items-center space-x-2">
                             <Button
