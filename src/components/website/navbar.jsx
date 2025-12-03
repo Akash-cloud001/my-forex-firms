@@ -24,9 +24,9 @@ const Navbar = () => {
   //   return null;
   // }
   
-  if (!isLoaded) {
-    return null;
-  }
+  // if (!isLoaded) {
+  //   return null;
+  // }
   return (
     <nav className="w-full mx-auto flex items-center justify-between font-geist-sans py-4 fixed top-0 left-0 right-0 z-50 bg-background px-4 md:px-6 lg:px-10">
       <Link href={"/"} className="flex items-center justify-center ">
