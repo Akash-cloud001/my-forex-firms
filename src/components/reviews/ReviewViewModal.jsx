@@ -62,7 +62,7 @@ const ReviewViewModal = ({
           </div>
 
           {/* Content Section */}
-          <div className="p-6 space-y-6 mt-6">
+          <div className="p-4 sm:p-6 space-y-6 mt-6">
             {/* All Fields in One Div */}
             <div className="flex flex-col gap-4">
               {/* Firm Name */}
@@ -114,12 +114,9 @@ const ReviewViewModal = ({
               </div>
             </div>
             {/* Additional Info and Actions */}
-            <div className="pt-4 border-t border-white/10">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex flex-col gap-1 text-xs text-white/50">
-                  <span>Last updated: {formatDate(review.updatedAt)}</span>
-                  <span>Review ID: {review._id?.slice(-8)}</span>
-                </div>
+            <div className="">
+              <div className="flex items-end justify-end mb-4">
+                
                 {onDelete && (
                   <Button
                     onClick={() => {

@@ -1,5 +1,5 @@
-import { Paperclip, Expand } from 'lucide-react'
-import React, { useState } from 'react'
+import { Paperclip, Expand, Download } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Badge } from './badge'
@@ -10,6 +10,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from '@/components/ui/carousel'
 
 interface ReviewCardProps {
   issueType: string
@@ -39,8 +47,12 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
   status,
   getStatusColor
 }) => {
-  const [isImageModalOpen, setIsImageModalOpen] = useState(false)
-  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<{ name: string; type: string; url: string } | null>(null)
+  
+  // Card carousel state
+  const [cardApi, setCardApi] = useState<CarouselApi>()
+  const [cardCurrent, setCardCurrent] = useState(0)
 
   // Format issue type for display
   const formatIssueType = (type: string) => {
@@ -67,50 +79,121 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
     return fileType.startsWith('image/')
   }
 
-  // Handle expand button click
+  // Handle expand button click - opens the currently visible file in card carousel
   const handleExpandClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     e.preventDefault()
 
     // Prevent multiple opens
-    if (isImageModalOpen) return
+    if (isModalOpen) return
 
-    if (files.length > 0) {
-      const firstFile = files[0]
-
-      if (isPDF(firstFile.type)) {
-        // Open PDF in new tab
-        window.open(firstFile.url, '_blank', 'noopener,noreferrer')
-      } else if (isImage(firstFile.type)) {
-        // Open image in modal
-        setSelectedImageUrl(firstFile.url)
-        setIsImageModalOpen(true)
-      } else {
-        // Fallback: try to open in new tab
-        window.open(firstFile.url, '_blank', 'noopener,noreferrer')
-      }
+    // Get files that can be previewed (images or PDFs)
+    const previewableFiles = files.filter(file => isImage(file.type) || isPDF(file.type))
+    
+    if (previewableFiles.length > 0) {
+      // Get the currently visible file from the card carousel
+      const currentFile = previewableFiles[cardCurrent]
+      setSelectedFile({
+        name: currentFile.name,
+        type: currentFile.type,
+        url: currentFile.url
+      })
+      setIsModalOpen(true)
+    } else if (files.length > 0) {
+      // If no previewable files, just open first file
+      setSelectedFile({
+        name: files[0].name,
+        type: files[0].type,
+        url: files[0].url
+      })
+      setIsModalOpen(true)
     }
   }
 
+  // Update card carousel current index
+  useEffect(() => {
+    if (!cardApi) return
+
+    setCardCurrent(cardApi.selectedScrollSnap())
+
+    cardApi.on('select', () => {
+      setCardCurrent(cardApi.selectedScrollSnap())
+    })
+  }, [cardApi])
+
   return (
     <div
-      onClick={onClick}
       className=' w-full p-4 sm:p-6 card-custom-grad rounded-md cursor-pointer hover:opacity-90 transition-opacity'
     >
-      {/* Image Section */}
+      {/* Preview Section with Carousel */}
       <figure className="relative w-full aspect-video max-h-[200px]">
-        <div className='absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/80 via-black/30 to-transparent z-[1]'></div>
-        {files.length > 0 && isImage(files[0].type) ? <Image
-          src={files[0].url}
-          alt="review"
-          fill
-          className='w-full h-full object-contain opacity-30'
-        /> : <Image
-          src="/website/fallback-review-img.svg"
-          alt="review"
-          fill
-          className='w-full h-full object-contain opacity-30'
-        />}
+        {(() => {
+          // Filter files to only images and PDFs for preview
+          const previewableFiles = files.filter(file => isImage(file.type) || isPDF(file.type))
+          
+          if (previewableFiles.length > 0) {
+            return (
+              <>
+                <Carousel
+                  setApi={setCardApi}
+                  className="w-full h-full relative"
+                  opts={{
+                    loop: previewableFiles.length > 1,
+                    align: 'start',
+                    dragFree: false,
+                  }}
+                >
+                  <CarouselContent className="ml-0 h-full">
+                    {previewableFiles.map((file, index) => (
+                      <CarouselItem key={index} className="pl-0 basis-full h-full">
+                        <div className="relative w-full aspect-video">
+                          {isImage(file.type) ? (
+                            <Image
+                              src={file.url}
+                              alt="review"
+                              fill
+                              className='w-full h-full object-contain opacity-30'
+                            />
+                          ) : isPDF(file.type) ? (
+                            <iframe
+                              src={`${file.url}#toolbar=0&navpanes=0&scrollbar=0&zoom=page-fit`}
+                              className='w-full h-full opacity-30 pointer-events-none'
+                              title="PDF preview"
+                            />
+                          ) : null}
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  {previewableFiles.length > 1 && (
+                    <>
+                      <CarouselPrevious 
+                        className="left-1 sm:left-2 h-6 w-6 sm:h-8 sm:w-8 bg-black/50 hover:bg-black/70 border-none text-white z-10"
+                      />
+                      <CarouselNext 
+                        className="right-1 sm:right-2 h-6 w-6 sm:h-8 sm:w-8 bg-black/50 hover:bg-black/70 border-none text-white z-10"
+                      />
+                    </>
+                  )}
+                </Carousel>
+                <div className='absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/80 via-black/30 to-transparent z-[1] pointer-events-none'></div>
+              </>
+            )
+          }
+          
+          // Fallback: only show when no images or PDFs exist
+          return (
+            <>
+              <Image
+                src="/website/fallback-review-img.svg"
+                alt="review"
+                fill
+                className='w-full h-full object-contain opacity-30'
+              />
+              <div className='absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/80 via-black/30 to-transparent z-[1]'></div>
+            </>
+          )
+        })()}
         {files.length > 0 && (
           <Button
             variant="ghost"
@@ -124,14 +207,14 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
       </figure>
 
       {/* Content Section */}
-      <div className='mt-8'>
+      <div className='mt-6'>
         {/* Header - Issue Type and Username */}
         <div className='flex items-start gap-2 sm:gap-0 sm:items-center justify-between flex-wrap'>
           <div className='flex items-center gap-2'>
-            <Badge className={cn("text-[10px] sm:text-xs font-semibold uppercase text-foreground px-4 py-1.5", statusColorClass)}>
+            <Badge className={cn("text-[8px] sm:text-[10px] font-semibold uppercase text-foreground px-4 py-1.5", statusColorClass)}>
               {status === 'pending' ? 'In Review' : status === 'approved' ? 'Posted' : 'Rejected'}
             </Badge>
-            <div className="text-[10px] sm:text-xs font-semibold uppercase text-foreground px-4 py-1.5 bg-white/10 rounded-full border border-border">
+            <div className="text-[8px] sm:text-[10px] font-semibold uppercase text-foreground px-4 py-1.5 bg-white/10 rounded-full border border-border">
               {formatIssueType(issueType)}
             </div>
           </div>
@@ -145,44 +228,77 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
           {description}
         </p>
 
-        {/* Attachments */}
-        {attachmentCount > 0 ? (
-          <div className='flex items-center justify-end gap-1 text-primary'>
-            <Paperclip className='h-3 w-3 text-primary' />
-            <p className='text-xs font-medium text-primary'>{attachmentText}</p>
-          </div>
-        ) : (
-          <div className='flex items-center justify-end gap-1 text-primary'>
-            <Paperclip className='h-3 w-3 text-primary' />
-            <p className='text-xs font-medium text-primary'>0 attachments</p>
-          </div>
-        )}
+        <div className='flex items-center justify-between gap-1 text-primary'>
+          {/* Attachments */}
+          {attachmentCount > 0 ? (
+            <div className='flex items-center gap-1 text-secondary'>
+              <Paperclip className='h-3 w-3 text-secondary' />
+              <p className='text-xs font-medium text-secondary'>{attachmentText}</p>
+            </div>
+          ) : (
+            <div className='flex items-center gap-1 text-secondary'>
+              <Paperclip className='h-3 w-3 text-secondary' />
+              <p className='text-xs font-medium text-secondary'>0 attachments</p>
+            </div>
+          )}
+
+          <Button variant="outline" size="sm" className="text-primary hover:text-primary/80" onClick={onClick}>
+            Read Review
+          </Button>
+        </div>
       </div>
 
-      {/* Image View Modal */}
+      {/* Attachment View Modal - Single File */}
       <Dialog
-        open={isImageModalOpen}
+        open={isModalOpen}
         onOpenChange={(open) => {
-          setIsImageModalOpen(open)
+          setIsModalOpen(open)
           if (!open) {
-            // Clear selected image when modal closes
-            setSelectedImageUrl(null)
+            setSelectedFile(null)
           }
         }}
       >
         <DialogContent className="max-w-xs sm:max-w-4xl max-h-[90vh] p-0 border-none bg-background">
-          <DialogHeader className="sr-only">
-            <DialogTitle>View Image</DialogTitle>
+          <DialogHeader className="px-4 pt-4 pb-2">
+            <DialogTitle className="text-sm font-medium text-foreground/80">
+              {selectedFile && <span>{selectedFile.name}</span>}
+            </DialogTitle>
           </DialogHeader>
-          {selectedImageUrl && (
-            <div className="relative w-full h-[80vh] flex items-center justify-center bg-black/50">
-              <Image
-                src={selectedImageUrl}
-                alt="Review attachment"
-                fill
-                className="object-contain"
-                unoptimized
-              />
+          {selectedFile && (
+            <div className="relative w-full">
+              <div className="relative w-full h-[70vh] sm:h-[80vh] flex items-center justify-center bg-black/50">
+                {isPDF(selectedFile.type) ? (
+                  <div className="w-full h-full flex flex-col">
+                    <iframe
+                      src={`${selectedFile.url}#toolbar=0`}
+                      className="w-full h-full border-none"
+                      title={selectedFile.name}
+                    />
+                  </div>
+                ) : isImage(selectedFile.type) ? (
+                  <Image
+                    src={selectedFile.url}
+                    alt={selectedFile.name || 'Review attachment'}
+                    fill
+                    className="object-contain"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center gap-4 p-8">
+                    <p className="text-foreground/60 text-sm">Preview not available</p>
+                    <Button
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        window.open(selectedFile.url, '_blank', 'noopener,noreferrer')
+                      }}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download File
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </DialogContent>
