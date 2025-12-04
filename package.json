@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "npm rebuild sharp || npm install --include=optional sharp"
+    "postinstall": "npm rebuild sharp --update-binary || npm install --include=optional sharp"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.5",
