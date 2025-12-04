@@ -24,9 +24,9 @@ const Navbar = () => {
   //   return null;
   // }
   
-  if (!isLoaded) {
-    return null;
-  }
+  // if (!isLoaded) {
+  //   return null;
+  // }
   return (
     <nav className="w-full mx-auto flex items-center justify-between font-geist-sans py-4 fixed top-0 left-0 right-0 z-50 bg-background px-4 md:px-6 lg:px-10">
       <Link href={"/"} className="flex items-center justify-center ">
@@ -63,7 +63,7 @@ const Navbar = () => {
         <div 
             onClick={() => router.push('/reviews')} 
             variant="outline" 
-            className="text-primary/90 hover:text-primary font-semibold w-full sm:w-auto text-sm capitalize font-geist-sans cursor-pointer"
+            className="text-foreground font-semibold w-full sm:w-auto text-sm capitalize font-geist-sans cursor-pointer btn-grad"
           >
             My Reviews
           </div>

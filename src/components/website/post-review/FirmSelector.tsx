@@ -16,12 +16,14 @@ interface FirmSelectorProps {
   value?: string;
   onChange: (name: string, id?: string) => void;
   error?: string;
+  isLoading?: boolean;
 }
 
 export const FirmSelector: React.FC<FirmSelectorProps> = ({
   value,
   onChange,
   error,
+  isLoading = false,
 }) => {
   const [search, setSearch] = useState(value ?? "");
   const [firms, setFirms] = useState<Firm[]>([]);
@@ -173,14 +175,21 @@ export const FirmSelector: React.FC<FirmSelectorProps> = ({
       <div className="relative" ref={dropdownRef}>
         <Input
           id="firmName"
-          placeholder="Search for a prop firm..."
+          placeholder={isLoading ? "Loading firm..." : "Search for a prop firm..."}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onFocus={() => setShowDropdown(true)}
           className={cn("pr-10", error && "border-destructive")}
+          disabled={isLoading}
         />
 
-        {search && (
+        {isLoading && (
+          <div className="absolute right-2 top-1/2 -translate-y-1/2">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          </div>
+        )}
+
+        {search && !isLoading && (
           <Button
             type="button"
             variant="ghost"
@@ -192,7 +201,7 @@ export const FirmSelector: React.FC<FirmSelectorProps> = ({
           </Button>
         )}
 
-        {showDropdown && (
+        {showDropdown && !isLoading && (
           <div className="absolute z-10 w-full mt-1 bg-background border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
             {!loading && firms.length === 0 && (
               <button

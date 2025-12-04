@@ -7,9 +7,12 @@ import Link from "next/link";
 const Blogs = () => {
   return (
     <section className="w-full bg-background py-16 sm:py-24 max-w-7xl mx-auto">
-      <h2 className="text-3xl gradient-text font-semibold tracking-tight sm:text-4xl text-center">
-        Firms Reviewed Blogs
-      </h2>
+      <div className="flex items-center justify-center mb-10 w-full  ">
+          <h1 className="font-geist-sans font-semibold text-4xl leading-[100%] tracking gradient-text text-center relative">
+            Firms Reviewed Blogs
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-foreground/80 to-transparent rounded-3xl shadow-md"></div>
+          </h1>
+        </div>
       <div className="hidden lg:grid grid-cols-3 md:grid-cols-3 grid-rows-4 md:grid-rows-5 gap-2 md:gap-8 m-4">
         <Link href="/blogs/funding-pips-review" className="col-start-1 row-start-1 col-span-3 md:col-start-1 md:row-start-1 md:col-span-2 md:row-span-3 card-custom-grad rounded-md  relative overflow-hidden">
           <Image src="/website/blog-1-bg.png" alt="Blog 1" fill className="absolute top-0 left-0 w-full h-full object-cover object-center" />

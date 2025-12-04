@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle } from "lucide-react";
@@ -18,18 +18,23 @@ import { cn } from "@/lib/utils";
 import { ReviewFormData } from "../types/types";
 import { reviewFormSchema } from "../schema/schema";
 import { ISSUE_CATEGORIES, DESCRIPTION_CONFIG } from "../constant/constants";
-import { StarRating } from "./StarRating";
+// import { StarRating } from "./StarRating";
 import { FileUpload } from "./FileUpload";
 import { IssueTypeSelector } from "./IssueTypeSelector";
 import { SuccessModal, ErrorModal } from "./ReviewModals";
 import { FirmSelector } from "./FirmSelector";
 
-export const ReviewForm: React.FC = () => {
+interface ReviewFormProps {
+  initialFirmId?: string;
+}
+
+export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [showThankYouModal, setShowThankYouModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoadingFirm, setIsLoadingFirm] = useState(false);
   type FirmInfo = { name: string; id?: string };
 
   const [selectedFirm, setSelectedFirm] = useState<FirmInfo>({ name: "" });
@@ -64,6 +69,36 @@ export const ReviewForm: React.FC = () => {
   const watchedIssueSubCategory = watch("issueSubCategory");
   const watchedFirmName = watch("firmName");
 
+  // Auto-select firm if initialFirmId is provided
+  useEffect(() => {
+    const fetchAndSelectFirm = async () => {
+      if (!initialFirmId) return;
+
+      setIsLoadingFirm(true);
+      try {
+        const response = await fetch(`/api/website/firm/${initialFirmId}`);
+        if (!response.ok) {
+          console.error("Failed to fetch firm details");
+          return;
+        }
+
+        const data = await response.json();
+        if (data.success && data.data) {
+          const firm = data.data;
+          setSelectedFirm({ name: firm.name, id: firm.id });
+          setValue("firmName", firm.name);
+          setValue("firmId", firm.id);
+        }
+      } catch (error) {
+        console.error("Error fetching firm details:", error);
+      } finally {
+        setIsLoadingFirm(false);
+      }
+    };
+
+    fetchAndSelectFirm();
+  }, [initialFirmId, setValue]);
+
   const onSubmit = async (data: ReviewFormData) => {
     setIsSubmittingForm(true);
     try {
@@ -85,7 +120,7 @@ export const ReviewForm: React.FC = () => {
       selectedFiles.forEach((file) => {
         formData.append('files', file);
       });
-      console.log(formData, "formData")
+
       const response = await fetch('/api/reviews', {
         method: 'POST',
         body: formData,
@@ -131,6 +166,7 @@ export const ReviewForm: React.FC = () => {
                 setValue("firmId", id ?? "");
               }}
               error={errors.firmName?.message}
+              isLoading={isLoadingFirm}
             />
 
             {/* Custom Firm Name Input */}
@@ -254,7 +290,7 @@ export const ReviewForm: React.FC = () => {
             {/* File Upload */}
             <div className="space-y-3">
               <Label className="text-base font-semibold">
-                Upload Proof Documents <small>(upload atleast One)</small> 
+                Upload Proof Documents <small>(upload atleast One)</small>
               </Label>
               <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-start gap-2">
