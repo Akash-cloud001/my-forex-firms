@@ -37,7 +37,7 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 opacity-70">
                 <li>
-                  <Link href="/" className="text-white hover:text-[#F66435] transition-colors font-geist-sans text-sm sm:text-base">
+                  <Link href="/firms" className="text-white hover:text-[#F66435] transition-colors font-geist-sans text-sm sm:text-base">
                     All Prop Firms
                   </Link>
                 </li>
@@ -65,11 +65,11 @@ const Footer = () => {
                     About Us
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link href="/how-it-works" className="text-white hover:text-[#F66435] transition-colors font-geist-sans text-sm sm:text-base">
                     How it works
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   <Link href="/site-map" className="text-white hover:text-[#F66435] transition-colors font-geist-sans text-sm sm:text-base">
                     Sitemap

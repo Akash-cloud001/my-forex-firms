@@ -57,6 +57,8 @@ const FileSchema = new Schema({
   size: { type: Number, required: true },
   url: { type: String, required: true },
   public_id: { type: String }, // Optional: For Cloudinary file deletion
+  thumbnail_url: { type: String },
+  thumbnail_public_id: { type: String },
   uploadedAt: { type: Date, default: Date.now }
 }, { _id: false });
 
@@ -67,7 +69,7 @@ const FileSchema = new Schema({
 
 const ReviewSchema = new Schema({
   userId: String,
-  firmId: String,
+  firmId: { type: Schema.Types.ObjectId, ref: 'FundingFirm' },
   firmName: String,
   customFirmName: String,
   issueCategory: { type: String, required: true }, // Added to match Zod schema
@@ -294,7 +296,7 @@ ReviewSchema.post('save', async function (doc) {
 
 export interface IReview extends Document {
   userId: string;
-  firmId?: string;
+  firmId?: mongoose.Types.ObjectId;
   firmName: string;
   customFirmName?: string;
   issueCategory: string; // Added
@@ -306,6 +308,9 @@ export interface IReview extends Document {
     type: string;
     size: number;
     url: string;
+    public_id: string;
+    thumbnail_url: string;
+    thumbnail_public_id: string;
     uploadedAt: Date;
   }>;
   status: ReviewStatus;

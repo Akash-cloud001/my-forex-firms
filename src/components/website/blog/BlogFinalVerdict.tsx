@@ -37,7 +37,15 @@ export default function BlogFinalVerdict({ finalVerdict, firmName, iconMap, trus
 
                         <div className="text-center mb-8">
                             <div className="inline-flex flex-col gap-1 items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-                                <figure className=" rounded-[8px] relative flex flex-col items-center justify-end ">
+                                <div className='absolute inset-0 flex flex-col items-center justify-center mb-2' >
+                                    <span className='text-primary text-base font-bold'>
+                                        PIT INDEX
+                                    </span>
+                                    <span>
+                                        Coming Soon
+                                    </span>
+                                </div>
+                                <figure className=" rounded-[8px] relative flex flex-col items-center justify-end blur-md">
                                     <span className='text-primary text-[32px] font-bold'>
                                     {trustScore}<span className='text-xl font-light'>/10</span>
                                     </span>

@@ -13,7 +13,7 @@ interface BlogTraderFeedbackProps {
 export default function BlogTraderFeedback({ traderFeedback, iconMap }: BlogTraderFeedbackProps) {
     if (!traderFeedback) return null;
 
-    const IconComponent = iconMap[traderFeedback.icon] || MessageCircle;
+    // const IconComponent = iconMap[traderFeedback.icon] || MessageCircle;
 
     return (
         <AnimatedSection id="blog-trader-feedback">
@@ -28,7 +28,7 @@ export default function BlogTraderFeedback({ traderFeedback, iconMap }: BlogTrad
                     {traderFeedback.praised && traderFeedback.praised.length > 0 && (
                         <div className="rounded-lg border border-border p-8 bg-accent/5">
                             <div className="flex items-center gap-3 mb-6">
-                                    <ThumbsUp className="h-6 w-6 text-muted-foreground" />
+                                <ThumbsUp className="h-6 w-6 text-muted-foreground" />
                                 <h3 className="font-semibold text-foreground text-lg">What Traders Praise</h3>
                             </div>
                             <ul className="space-y-3">

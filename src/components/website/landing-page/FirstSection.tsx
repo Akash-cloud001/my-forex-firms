@@ -1,8 +1,6 @@
 "use client";
 import Image from "next/image";
-import React from "react";
-import TrustedFirmSlider from "./TrustedFirmSlider";
-import FirmListSection from "./FirmListSection";
+import React from "react"
 
 function FirstSection() {
   const gradientTextStyle = {
