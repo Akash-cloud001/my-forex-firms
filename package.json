@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "add-firm-review": "node scripts/add-firm-review.js"
+    "postinstall": "npm rebuild sharp --update-binary || npm install --include=optional sharp"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.5",
@@ -47,14 +47,14 @@
     "lucide-react": "^0.545.0",
     "mongoose": "^8.19.1",
     "motion": "^12.23.24",
-    "next": "15.5.4",
+    "next": "^15.5.7",
     "postcss": "^8.5.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "7.64.0",
     "react-intersection-observer": "^10.0.0",
     "recharts": "^3.4.1",
-    "sharp": "^0.34.5",
+    "sharp": "^0.32.6",
     "sonner": "^2.0.7",
     "svix": "^1.80.0",
     "tailwind-merge": "^3.3.1",

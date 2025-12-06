@@ -63,7 +63,7 @@ const ChallengesContent = () => {
   return (
     <div className="w-full border border-border p-8 rounded-lg card-custom-grad">
       {/* Filter Section */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex gap-4 mb-6 flex-wrap">
         <div className="flex items-center gap-2">
           <p className="text-sm text-foreground/60">Steps:</p>
           <Select value={selectedSteps} onValueChange={(val) => { setSelectedSteps(val); setPage(1); }}>

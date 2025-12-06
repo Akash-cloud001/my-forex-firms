@@ -7,6 +7,7 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)',
   '/api/users/webhook',
   '/api/public(.*)',
+  '/api/coming-soon',
   '/blogs(.*)',
   '/firms(.*)',
   '/privacy-policy(.*)',
@@ -33,6 +34,9 @@ const isEditorRestrictedRoute = createRouteMatcher([
 
 
 export default clerkMiddleware(async (auth, req) => {
+  if (req.nextUrl.pathname === '/api/users/webhook') {
+    return NextResponse.next();
+  }
   if (!isPublicRoute(req)) {
     await auth.protect()
     

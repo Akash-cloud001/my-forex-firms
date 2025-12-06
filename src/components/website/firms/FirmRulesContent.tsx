@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react'
 import { CustomAccordionItem } from '@/components/ui/custom-accordion'
 import { IFundingFirm } from '@/models/FirmDetails'
 import { IFirmRule } from '@/models/firmRule'
+import { Divide } from 'lucide-react'
 
 interface FirmWithRules extends IFundingFirm {
   firmRules?: IFirmRule[]
@@ -82,7 +83,11 @@ const FirmRulesContent: React.FC<FirmRulesContentProps> = ({ firmData }) => {
           <div key={index} className="w-full">
             <div className="card-custom-grad rounded-3xl overflow-hidden pt-2 pb-3 px-4">
               <CustomAccordionItem
-                question={category.name}
+                question={
+                  <div className="mb-1 -mt-2">
+                    {category.name}
+                  </div>
+                }
                 answer={
                   <div className="space-y-4 sm:space-y-6 pt-2 px-2">
                     {category.questions.map((qa, qaIndex) => (
@@ -99,7 +104,7 @@ const FirmRulesContent: React.FC<FirmRulesContentProps> = ({ firmData }) => {
                 }
                 isOpen={openCategories.has(index)}
                 onToggle={() => toggleCategory(index)}
-                questionSize="text-xl sm:text-2xl md:text-3xl"
+                questionSize="text-base"
               />
             </div>
           </div>
