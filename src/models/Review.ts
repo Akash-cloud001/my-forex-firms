@@ -1,10 +1,25 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
 // ============================================================================
 // TYPE DEFINITIONS (Best Practice: Define types first)
 // ============================================================================
 
-export type ReviewStatus = 'pending' | 'approved' | 'rejected';
+export type ReviewStatus = 'pending' | 'approved' | 'rejected' | 'info-requested';
+
+export type AdminMessageType = 'info-request' | 'follow-up' | 'internal-note' | 'final-decision';
+
+export interface IAdminMessage {
+  _id?: string;
+  senderId: string;
+  senderRole: 'admin' | 'moderator';
+  senderName?: string;
+  messageType: AdminMessageType;
+  subject?: string;
+  message: string;
+  sentAt: Date;
+  emailSent: boolean;
+  emailSentAt?: Date;
+}
 export type IssueType =
   // Payout Issues
   | 'payout-delays'
@@ -61,6 +76,27 @@ const FileSchema = new Schema({
   thumbnail_public_id: { type: String },
   uploadedAt: { type: Date, default: Date.now }
 }, { _id: false });
+
+// Admin/Moderator Message Sub-Schema for tracking info requests
+const AdminMessageSchema = new Schema({
+  senderId: { type: String, required: true },
+  senderRole: {
+    type: String,
+    enum: ['admin', 'moderator', 'user'],
+    required: true
+  },
+  senderName: { type: String },
+  messageType: {
+    type: String,
+    enum: ['info-request', 'follow-up', 'internal-note', 'final-decision'],
+    default: 'info-request'
+  },
+  subject: { type: String },
+  message: { type: String, required: true },
+  sentAt: { type: Date, default: Date.now },
+  emailSent: { type: Boolean, default: false },
+  emailSentAt: { type: Date }
+}, { _id: true });
 
 // ============================================================================
 // MAIN REVIEW SCHEMA
@@ -127,6 +163,11 @@ const ReviewSchema = new Schema({
   reviewedBy: String,
   reviewedAt: Date,
   analytics: Object,           // simplify nested ReviewAnalyticsSchema
+
+  // Admin/Moderator Message Tracking
+  adminMessages: [AdminMessageSchema],              // Array of all admin messages
+  infoRequestCount: { type: Number, default: 0 },   // Quick count of info requests
+
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   createdBy: String,
@@ -146,6 +187,9 @@ ReviewSchema.index({ userId: 1, createdAt: -1 });
 ReviewSchema.index({ status: 1, isVerified: 1, createdAt: -1 });
 ReviewSchema.index({ issueType: 1, status: 1 });
 ReviewSchema.index({ issueCategory: 1, status: 1 }); // Index for new field
+
+// Index for admin messages queries
+ReviewSchema.index({ 'adminMessages.senderId': 1, createdAt: -1 });
 
 // Text search index for description and firm name
 ReviewSchema.index({
@@ -220,6 +264,44 @@ ReviewSchema.methods.incrementViews = function () {
   this.analytics.views += 1;
   this.analytics.lastViewedAt = new Date();
   return this.save();
+};
+
+// Method to request more information from user
+ReviewSchema.methods.requestMoreInfo = function (
+  senderId: string,
+  senderRole: 'admin' | 'moderator',
+  message: string,
+  options?: {
+    senderName?: string;
+    subject?: string;
+    emailSent?: boolean;
+  }
+) {
+  this.status = 'info-requested';
+  this.adminMessages.push({
+    senderId,
+    senderRole,
+    senderName: options?.senderName,
+    messageType: this.infoRequestCount > 0 ? 'follow-up' : 'info-request',
+    subject: options?.subject,
+    message,
+    sentAt: new Date(),
+    emailSent: options?.emailSent || false,
+    emailSentAt: options?.emailSent ? new Date() : undefined
+  });
+  this.infoRequestCount += 1;
+  return this.save();
+};
+
+// Method to mark email as sent for a specific admin message
+ReviewSchema.methods.markEmailSent = function (messageId: string) {
+  const message = this.adminMessages.id(messageId);
+  if (message) {
+    message.emailSent = true;
+    message.emailSentAt = new Date();
+    return this.save();
+  }
+  return Promise.resolve(this);
 };
 
 // ============================================================================
@@ -325,6 +407,11 @@ export interface IReview extends Document {
     shares: number;
     lastViewedAt?: Date;
   };
+
+  // Admin/Moderator Message Tracking
+  adminMessages: IAdminMessage[];
+  infoRequestCount: number;
+
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
@@ -342,13 +429,29 @@ export interface IReview extends Document {
   markHelpful(): Promise<IReview>;
   markNotHelpful(): Promise<IReview>;
   incrementViews(): Promise<IReview>;
+  requestMoreInfo(
+    senderId: string,
+    senderRole: 'admin' | 'moderator',
+    message: string,
+    options?: {
+      senderName?: string;
+      subject?: string;
+      emailSent?: boolean;
+    }
+  ): Promise<IReview>;
+  markEmailSent(messageId: string): Promise<IReview>;
 }
 
 // ============================================================================
 // EXPORT MODEL (Best Practice: Export both schema and model)
 // ============================================================================
 
-const Review = mongoose.models.Review || mongoose.model<IReview>('Review', ReviewSchema);
+// Delete the cached model to ensure methods are properly attached during HMR
+if (mongoose.models?.Review) {
+  delete mongoose.models.Review;
+}
+
+const Review: Model<IReview> = mongoose.model<IReview>('Review', ReviewSchema);
 
 export default Review;
 export { ReviewSchema };
