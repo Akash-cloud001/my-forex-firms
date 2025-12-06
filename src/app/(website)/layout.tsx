@@ -1,6 +1,8 @@
 import React from "react";
 import Navbar from "@/components/website/navbar";
 import BottomBar from "@/components/website/bottombar";
+import Footer from "@/components/website/footer";
+import TradingViewTicker from "@/components/website/TradingViewTicker";
 const WebsiteLayout = ({
   children,
 }: Readonly<{
@@ -11,7 +13,9 @@ const WebsiteLayout = ({
        {/* pt-14 */}
       <Navbar />
       {children}
+      <Footer />
       <BottomBar />
+      <TradingViewTicker />
     </section>
   );
 };
