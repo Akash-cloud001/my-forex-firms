@@ -1,6 +1,5 @@
-import { apiGet } from "@/lib/api/apiWrapper";
-import { useQuery } from "@tanstack/react-query";
-import { IFundingFirm } from "@/models/FirmDetails";
+import { apiGet, apiPost } from "@/lib/api/apiWrapper";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface ApiResponse<T> {
     success: boolean;
@@ -11,6 +10,8 @@ interface ApiResponse<T> {
 export interface IEvalFirm {
     id: string;
     name: string;
+    isEvaluated: boolean;
+    evaluatedAt?: string;
 }
 
 export const useEvalFirmDetails = () => {
@@ -29,5 +30,18 @@ export const useEvalFirmDetails = () => {
             return [];
         },
         staleTime: 1000 * 60 * 5,
+    });
+};
+
+export const useEvaluateFirm = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (firmId: string) => {
+            return apiPost(`/admin/point-eval`, { firmId });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["eval-firm-details"] });
+        },
     });
 };

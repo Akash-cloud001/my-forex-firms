@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { MultiSelect } from '@/components/ui/multi-select';
 import { FirmFormData } from '../schema/schema';
 
 interface Step9PaymentsProps {
@@ -21,7 +22,7 @@ interface Step9PaymentsProps {
 }
 
 export function Step9Payments({ onPrevious, onSubmit, onNext, isLastStep }: Step9PaymentsProps) {
-  const { register, watch, setValue, formState: { errors,isSubmitting } } = useFormContext<FirmFormData>();
+  const { register, watch, setValue, formState: { errors, isSubmitting } } = useFormContext<FirmFormData>();
 
   // Local input states
   const [methodInput, setMethodInput] = useState('');
@@ -178,9 +179,7 @@ export function Step9Payments({ onPrevious, onSubmit, onNext, isLastStep }: Step
           </Label>
           <Input
             id="minWithdrawal"
-            type="number"
-            step="0.01"
-            {...register('payments.minWithdrawal', { valueAsNumber: true })}
+            {...register('payments.minWithdrawal')}
             placeholder="e.g., 100"
             className={errors.payments?.minWithdrawal ? 'border-red-500' : ''}
           />
@@ -198,27 +197,66 @@ export function Step9Payments({ onPrevious, onSubmit, onNext, isLastStep }: Step
       {/* Processing Time & Payout Schedule */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="processingTime" className="text-sm font-medium">
-            Processing Time
-          </Label>
-          <Input
-            id="processingTime"
-            {...register('payments.processingTime')}
-            placeholder="e.g., 1-3 business days"
-          />
-          <p className="text-xs text-gray-500">
-            Expected time to process withdrawals
-          </p>
+          <Label className="text-sm font-medium">Processing Time</Label>
+
+          <div className="flex gap-2">
+            {/* Value field */}
+            <Input
+              type="number"
+              min="1"
+              className="w-24"
+              placeholder="1"
+              {...register("payments.processingTime.value", { valueAsNumber: true })}
+            />
+
+            {/* Unit Dropdown */}
+            <select
+              className="border border-input bg-background rounded-md px-3 py-2 text-sm"
+              {...register("payments.processingTime.unit")}
+            >
+              <option value="">Select</option>
+              <option value="hours">Hours</option>
+              <option value="days">Days</option>
+              <option value="weeks">Weeks</option>
+
+            </select>
+          </div>
+
+          <p className="text-xs text-gray-500">Expected time to process withdrawals</p>
         </div>
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Processing Time Policy</Label>
+          <select
+            className="border border-input bg-background rounded-md px-3 py-2 text-sm"
+            {...register("payments.processingTimePolicy")}
+          >
+            <option value="">Select</option>
+            <option value="after-approval">After Approval</option>
+            <option value="after-request">After Request</option>
+            <option value="no">No</option>
+          </select>
+          <p className="text-xs text-gray-500">Policy for processing time</p>
+        </div>
+
 
         <div className="space-y-2">
           <Label htmlFor="payoutSchedule" className="text-sm font-medium">
             Payout Schedule
           </Label>
-          <Input
-            id="payoutSchedule"
-            {...register('payments.payoutSchedule')}
-            placeholder="e.g., Bi-weekly, On-demand"
+          <MultiSelect
+            options={[
+              { label: "On Demand", value: "ondemand" },
+              { label: "Weekly", value: "weekly" },
+              { label: "Bi-weekly", value: "biweekly" },
+              { label: "Monthly", value: "monthly" },
+            ]}
+            onValueChange={(value) => {
+              setValue('payments.payoutSchedule', value, { shouldValidate: true });
+            }}
+            defaultValue={Array.isArray(watch('payments.payoutSchedule')) ? watch('payments.payoutSchedule') : []}
+            placeholder="Select payout schedule"
+            variant="inverted"
+            maxCount={3}
           />
           <p className="text-xs text-gray-500">
             How often payouts are processed

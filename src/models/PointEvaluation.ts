@@ -1,8 +1,10 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IPointEvaluation extends Document {
-    company_id: mongoose.Types.ObjectId;
-    company_name: string;
+    firmId: mongoose.Types.ObjectId;
+    firmName: string;
+    isEvaluated: boolean;
+    evaluatedAt: Date;
     scores: {
         credibility: {
             physical_legal_presence: {
@@ -69,8 +71,10 @@ export interface IPointEvaluation extends Document {
 
 const PointEvaluationSchema = new Schema<IPointEvaluation>(
     {
-        company_id: { type: Schema.Types.ObjectId, ref: "FundingFirm", required: true },
-        company_name: { type: String, required: true },
+        firmId: { type: Schema.Types.ObjectId, ref: "FundingFirm", required: true },
+        firmName: { type: String, required: true },
+        isEvaluated: { type: Boolean, default: false },
+        evaluatedAt: { type: Date, default: Date.now },
         scores: {
             credibility: {
                 physical_legal_presence: {

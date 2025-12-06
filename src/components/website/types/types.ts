@@ -25,7 +25,7 @@ export interface ReviewFormData {
   customIssueType?: string
   description: string
   // rating: number
-  files?: File[]
+  files: File[]
 }
 
 export interface FileUploadProps {

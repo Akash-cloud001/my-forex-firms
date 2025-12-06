@@ -46,10 +46,11 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
     setValue,
     watch,
     reset,
+    clearErrors,
   } = useForm<ReviewFormData>({
     resolver: zodResolver(reviewFormSchema),
     mode: "onChange",
-    reValidateMode: "onChange",
+    reValidateMode: "onBlur",
     defaultValues: {
       firmName: "",
       firmId: "",
@@ -164,6 +165,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
                 setSelectedFirm({ name, id });
                 setValue("firmName", name);
                 setValue("firmId", id ?? "");
+                clearErrors("firmName");
               }}
               error={errors.firmName?.message}
               isLoading={isLoadingFirm}
@@ -179,7 +181,9 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
                   id="customFirmName"
                   placeholder="Enter the firm name..."
                   className={cn(errors.customFirmName && "border-destructive")}
-                  {...register("customFirmName")}
+                  {...register("customFirmName", {
+                    onChange: () => clearErrors("customFirmName"),
+                  })}
                 />
                 {errors.customFirmName && (
                   <p className="text-sm text-destructive flex items-center gap-1">
@@ -199,8 +203,12 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
               onCategoryChange={(val) => {
                 setValue("issueCategory", val);
                 setValue("issueSubCategory", ""); // Reset sub-category when category changes
+                clearErrors("issueCategory");
               }}
-              onSubCategoryChange={(val) => setValue("issueSubCategory", val)}
+              onSubCategoryChange={(val) => {
+                setValue("issueSubCategory", val);
+                clearErrors("issueSubCategory");
+              }}
               error={errors.issueCategory?.message || errors.issueSubCategory?.message}
             />
 
@@ -217,7 +225,9 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
                   id="customIssueType"
                   placeholder="Enter the specific issue type..."
                   className={cn(errors.customIssueType && "border-destructive")}
-                  {...register("customIssueType")}
+                  {...register("customIssueType", {
+                    onChange: () => clearErrors("customIssueType"),
+                  })}
                 />
                 {errors.customIssueType && (
                   <p className="text-sm text-destructive flex items-center gap-1">
@@ -251,7 +261,9 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
                   "min-h-32 resize-none",
                   errors.description && "border-destructive"
                 )}
-                {...register("description")}
+                {...register("description", {
+                  onChange: () => clearErrors("description"),
+                })}
               />
               <div className="flex justify-between items-center text-sm">
                 <span
@@ -306,7 +318,11 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
               </div>
               <FileUpload
                 files={selectedFiles}
-                onFilesChange={setSelectedFiles}
+                onFilesChange={(files) => {
+                  setSelectedFiles(files);
+                  setValue("files", files);
+                  clearErrors("files");
+                }}
                 error={errors.files?.message}
               />
             </div>

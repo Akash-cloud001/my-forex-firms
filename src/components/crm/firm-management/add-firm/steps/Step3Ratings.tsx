@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export function Step3Ratings({ onNext, onPrevious }: StepProps) {
-  const { register,  control } = useFormContext();
+  const { register, control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "ratings.otherRatings",
@@ -27,14 +27,13 @@ export function Step3Ratings({ onNext, onPrevious }: StepProps) {
         <Label htmlFor="trustPilotRating">TrustPilot Rating (0–5)</Label>
         <Input
           id="trustPilotRating"
-          type="number"
           step="0.1"
           min="0"
           max="5"
           placeholder="Enter rating"
           {...register("ratings.trustPilotRating", { valueAsNumber: true })}
-       className="max-w-20"
-       />
+          className="max-w-20"
+        />
       </Card>
 
       <div>

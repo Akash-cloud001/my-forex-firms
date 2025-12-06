@@ -1,6 +1,8 @@
 export const initialScoresData = {
-    company_id: 1,
-    company_name: "Demo Prop Firm",
+    firmId: 1,
+    firmName: "Demo Prop Firm",
+    evaluatedAt: new Date(),
+    isEvaluated: true,
     scores: {
         credibility: {
             physical_legal_presence: {

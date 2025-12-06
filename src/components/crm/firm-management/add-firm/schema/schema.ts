@@ -5,9 +5,9 @@ export const firmDetailsSchema = z.object({
   imageFile: z.instanceof(File).optional(),
   image: z
     .object({
-      url: z.string().url(),
+      url: z.url(),
       publicId: z.string(),
-      thumbnail: z.string().url(),
+      thumbnail: z.url(),
     })
     .optional().nullable(),
   legalEntityName: z.string().optional(),
@@ -39,11 +39,11 @@ export const leadershipMemberSchema = z.object({
   verified: z.boolean(),
   links: z
     .object({
-      twitter: z.string().url().optional().or(z.literal("")),
-      instagram: z.string().url().optional().or(z.literal("")),
-      telegram: z.string().url().optional().or(z.literal("")),
-      linkedin: z.string().url().optional().or(z.literal("")),
-      website: z.string().url().optional().or(z.literal("")),
+      twitter: z.url().optional().or(z.literal("")),
+      instagram: z.url().optional().or(z.literal("")),
+      telegram: z.url().optional().or(z.literal("")),
+      linkedin: z.url().optional().or(z.literal("")),
+      website: z.url().optional().or(z.literal("")),
     })
     .optional(),
 });
@@ -89,7 +89,7 @@ export const complianceSchema = z.object({
   kycProvider: z.string().optional(),
   restrictedCountries: z.array(z.string()).optional(),
   regulationsComplied: z.array(z.string()).optional(),
-  amlLink: z.string().url("Invalid URL").optional().or(z.literal("")),
+  amlLink: z.url("Invalid URL").optional().or(z.literal("")),
 });
 
 export const transparencySchema = z.object({
@@ -99,6 +99,7 @@ export const transparencySchema = z.object({
   payoutProofPublic: z.boolean().default(false),
   thirdPartyAudit: z.boolean().default(false),
   notes: z.string().optional(),
+  faqLink: z.url("Invalid URL").optional().or(z.literal("")),
 });
 
 export const leverageMatrixSchema = z.record(
@@ -120,9 +121,15 @@ export const paymentsSchema = z.object({
   methods: z.array(z.string()).optional(),
   payoutMethods: z.array(z.string()).optional(),
   baseCurrency: z.string().optional(),
-  minWithdrawal: z.number().optional(),
-  processingTime: z.string().optional(),
-  payoutSchedule: z.string().optional(),
+  minWithdrawal: z.any().optional(),
+  processingTime: z
+    .object({
+      value: z.number().min(1, "Value must be greater than 0"),
+      unit: z.enum(["hours", "days"]),
+    })
+    .optional(),
+  processingTimePolicy: z.enum(["after-approval", "after-request", "no"]).optional(),
+  payoutSchedule: z.array(z.string()).optional(),
   refundPolicy: z.string().optional(),
 });
 

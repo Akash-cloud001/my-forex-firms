@@ -12,7 +12,7 @@ export const reviewFormSchema = z.object({
     .min(DESCRIPTION_CONFIG.minLength, `Description must be at least ${DESCRIPTION_CONFIG.minLength} characters`)
     .max(DESCRIPTION_CONFIG.maxLength, `Description must be less than ${DESCRIPTION_CONFIG.maxLength} characters`),
   // rating: z.number().min(1, 'Please provide a rating').max(5),
-  files: z.array(z.any()).optional()
+  files: z.array(z.any()).min(1, "Please attach at least one file")
 }).refine((data) => {
   if (data.issueSubCategory.startsWith('other-') && (!data.customIssueType || data.customIssueType.trim().length === 0)) {
     return false

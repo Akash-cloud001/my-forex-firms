@@ -90,6 +90,7 @@ export interface IFundingFirm extends Document {
     payoutProofPublic: boolean;
     thirdPartyAudit: boolean;
     notes?: string;
+    faqLink?: string;
   };
 
   trading: {
@@ -110,9 +111,13 @@ export interface IFundingFirm extends Document {
     methods?: string[];
     payoutMethods?: string[];
     baseCurrency?: string;
-    minWithdrawal?: number;
-    processingTime?: string;
-    payoutSchedule?: string;
+    minWithdrawal?: string;
+    processingTime?: {
+      value: number;
+      unit: "hours" | "days";
+    };
+    processingTimePolicy?: "after-approval" | "after-request" | 'no';
+    payoutSchedule?: string[];
     refundPolicy?: string;
   };
 
@@ -219,6 +224,7 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
       payoutProofPublic: { type: Boolean, default: false },
       thirdPartyAudit: { type: Boolean, default: false },
       notes: String,
+      faqLink: String,
     },
 
     trading: {
@@ -239,9 +245,24 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
       methods: [String],
       payoutMethods: [String],
       baseCurrency: String,
-      minWithdrawal: Number,
-      processingTime: String,
-      payoutSchedule: String,
+      minWithdrawal: String,
+      processingTime: {
+        value: {
+          type: Number,
+          required: true,
+        },
+        unit: {
+          type: String,
+          enum: ["hours", "days"],
+          required: true,
+        }
+      },
+      processingTimePolicy: {
+        type: String,
+        enum: ["after-approval", "after-request", "no"],
+        default: "after-request"
+      },
+      payoutSchedule: [String],
       refundPolicy: String,
     },
   },
@@ -254,6 +275,12 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
 FundingFirmSchema.index({ "firmDetails.name": 1 });
 FundingFirmSchema.index({ "firmDetails.status": 1 });
 FundingFirmSchema.index({ createdAt: -1 });
+
+// Prevent Mongoose OverwriteModelError by deleting the model if it exists
+// This ensures that schema changes are picked up in development
+if (mongoose.models.FundingFirm) {
+  delete mongoose.models.FundingFirm;
+}
 
 const FundingFirm: Model<IFundingFirm> =
   mongoose.models.FundingFirm ||

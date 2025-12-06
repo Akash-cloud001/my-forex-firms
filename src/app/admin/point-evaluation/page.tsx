@@ -12,13 +12,28 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useEvalFirmDetails } from '@/hooks/admin/query/useEvalFirm'
+import { useEvalFirmDetails, useEvaluateFirm } from '@/hooks/admin/query/useEvalFirm'
 import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 function PointEvaluationPage() {
     const { data: firmList, isLoading, isError, error } = useEvalFirmDetails()
+    const { mutate: evaluateFirm, isPending: isEvaluating } = useEvaluateFirm();
 
     console.log("🚀 ~ PointEvaluationPage ~ firmList:", firmList)
+
+    const handleEvaluateClick = (firmId: string) => {
+        evaluateFirm(firmId, {
+            onSuccess: (data) => {
+                toast("Evaluation successful!");
+                console.log("Evaluation result:", data);
+            },
+            onError: (error) => {
+                console.error("Error evaluating firm:", error);
+                toast("Evaluation failed: " + (error instanceof Error ? error.message : "Unknown error"));
+            }
+        });
+    }
 
     if (isLoading) {
         return (
@@ -63,23 +78,48 @@ function PointEvaluationPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Prop Firm Name</TableHead>
+                                    <TableHead>Evaluated at</TableHead>
                                     <TableHead className="text-center">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {firmList?.map((firm: { id: string, name: string }) => (
+                                {firmList?.map((firm) => (
                                     <TableRow key={firm.id}>
                                         <TableCell className="font-medium">{firm.name}</TableCell>
+
+                                        <TableCell>
+                                            {firm.evaluatedAt
+                                                ? new Date(firm.evaluatedAt).toLocaleString("en-IN", {
+                                                    day: "2-digit",
+                                                    month: "short",
+                                                    year: "numeric",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                })
+                                                : "-"}
+                                        </TableCell>
+
                                         <TableCell className="text-center">
-                                            <Link href={`/admin/point-evaluation/${firm.id}`}>
-                                                <Button variant="outline" size="sm">
-                                                    View More
-                                                </Button>
-                                            </Link>
+                                            <div className="flex items-center justify-center gap-2">
+                                                {!firm.isEvaluated && (
+                                                    <Button size="sm" onClick={() => handleEvaluateClick(firm.id)} disabled={isEvaluating}>
+                                                        {isEvaluating ? "Evaluating..." : "Evaluate Point"}
+                                                    </Button>
+                                                )}
+
+                                                {firm.isEvaluated && (
+                                                    <Link href={`/admin/point-evaluation/${firm.id}`}>
+                                                        <Button variant="outline" size="sm">
+                                                            View More
+                                                        </Button>
+                                                    </Link>
+                                                )}
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
+
                         </Table>
                     )}
                 </CardContent>

@@ -66,9 +66,11 @@ export async function POST(req: Request) {
             { $match: { propFirmId: new Types.ObjectId(firmId) } },
             {
                 $addFields: {
-                    isTwoStep: { $eq: [{ $toLower: "$type" }, "2-step"] },
+                    isTwoStep: { $eq: [{ $toLower: "$type" }, "2-Step"] },
                     phase1: { $toInt: { $arrayElemAt: ["$evaluationSteps.profitTarget", 0] } },
-                    phase2: { $toInt: { $arrayElemAt: ["$evaluationSteps.profitTarget", 1] } }
+                    phase2: { $toInt: { $arrayElemAt: ["$evaluationSteps.profitTarget", 1] } },
+                    profitSplitNumber: { $toInt: "$profitSplit" }
+
                 }
             },
             {
@@ -92,20 +94,35 @@ export async function POST(req: Request) {
                     }
                 }
             },
-            { $project: { evaluationScore: 1 } }
+            {
+                $addFields: {
+                    profitSplitScore: {
+                        $switch: {
+                            branches: [
+                                { case: { $gte: ["$profitSplitNumber", 80] }, then: 1.0 }, // 80% or above
+                                { case: { $gte: ["$profitSplitNumber", 60] }, then: 0.8 }   // 60% to 79%
+                            ],
+                            default: 0.5 // below 60%
+                        }
+                    }
+                }
+            },
+            { $project: { evaluationScore: 1, profitSplitScore: 1 } }
         ]);
 
         const profitTargetScore = profitTargetPrograms.length > 0
             ? Math.max(...profitTargetPrograms.map(p => p.evaluationScore || 0))
             : 0;
 
-        const payoutSchedule = (firm.payments?.payoutSchedule || "").toLowerCase();
+        const payoutScheduleArray = firm.payments?.payoutSchedule || [];
+
         const payoutCycleScore =
-            payoutSchedule.includes("weekly") ||
-                payoutSchedule.includes("bi-weekly") ||
-                payoutSchedule.includes("biweekly")
+            payoutScheduleArray.includes("weekly") ||
+                payoutScheduleArray.includes("biweekly") ||
+                payoutScheduleArray.includes("ondemand")
                 ? 1
                 : 0.7;
+
 
         const methods = firm.payments?.payoutMethods?.map(m => m.toLowerCase()) || [];
         const hasBank = methods.includes("bank") || methods.includes("bank transfer");
@@ -125,72 +142,103 @@ export async function POST(req: Request) {
         const hasPaymentCrypto = paymentmethods.includes("crypto");
         const hasUPI = paymentmethods.includes("upi");
 
-        let paymentMethodsScore = 0.7;
+        let paymentMethodsScore = 0;
         if (hasCards && hasPaymentCrypto && hasUPI) paymentMethodsScore = 1.0;
         else if (hasCards && !hasPaymentCrypto && !hasUPI) paymentMethodsScore = 0.6;
         else if ((hasCards && !hasPaymentCrypto) || (hasPaymentCrypto && !hasCards)) paymentMethodsScore = 0.8;
 
+
+        const processingTime = firm.payments?.processingTime;
+        const policy = firm.payments?.processingTimePolicy || "no";
+        let processingTimeScore = 0.5; // default: No Policy
+
+        if (processingTime) {
+            const { value, unit } = processingTime;
+
+            // Convert to hours (hours stays same, days => hours * 24)
+            const hours = unit === "days" ? value * 24 : value;
+
+            // Same Day / Within 24 Hours (After Request)
+            if (policy === "after-request" && hours <= 24) {
+                processingTimeScore = 2;
+            }
+
+            // 24H Policy (After Approval)
+            if (policy === "after-approval" && hours <= 24) {
+                processingTimeScore = 1;
+            }
+
+            // Otherwise score remains 0.5
+        }
+
+        const profitSplitScore = profitTargetPrograms.length > 0
+            ? Math.max(...profitTargetPrograms.map(p => p.profitSplitScore || 0))
+            : 0.5;
+
         /** ------- SCORES OBJECT ------- **/
         const scoreData = {
-            company_id: firm._id,
-            company_name: firm.firmDetails.name,
+            firmId: firm._id,
+            firmName: firm.firmDetails.name,
+            evaluatedAt: new Date(),
+            isEvaluated: true,
             scores: {
                 credibility: {
                     physical_legal_presence: {
-                        registered_company: isRegisteredLegalCompany,
-                        physical_office: isPhysicalOfficeAddressVisible,
-                        dashboard_friendlyness: 0,
+
+                        registered_company: isRegisteredLegalCompany,//total ==1
+                        physical_office: isPhysicalOfficeAddressVisible,//total ==1
+                        dashboard_friendlyness: 0,//total ==1
                     },
                     public_identity_transparency: {
-                        public_ceo_founder: publicCeoScore,
-                        support_quality: supportScore,
-                        terms_clarity: 0,
-                        brocker_backed: brokerBackedScore,
+                        public_ceo_founder: publicCeoScore,//total ==1
+                        support_quality: supportScore,//total ==1
+                        terms_clarity: 0,//total ==1
+                        brocker_backed: brokerBackedScore,//total ==0.3
                     },
                     social_community_presence: {
-                        active_social: 0,
-                        transparent_comm: 0,
+                        active_social: 0,//total ==0.5
+                        transparent_comm: 0,//total ==0.5
                     },
                     trust_signals_history: {
-                        verified_payouts: 0,
-                        lifetime_payouts: isLifeTimePayouts,
-                        no_controversies: 0,
-                        consistent_ops: isConsistentOperations,
+                        verified_payouts: 0,//total ==0.5
+                        lifetime_payouts: isLifeTimePayouts,//total ==1.2
+                        no_controversies: 0,//total ==0.5
+                        consistent_ops: isConsistentOperations,//total ==0.5
                     },
                 },
                 trading_experience: {
                     trading_conditions: {
-                        fair_spreads: 0,
-                        fair_commissions: 0,
-                        acceptable_slippage: 0,
-                        multiple_trading_platforms: multiPlatformScore,
+                        fair_spreads: 0, //total ==1
+                        fair_commissions: 0, //total ==1
+                        acceptable_slippage: 0, //total ==1
+                        multiple_trading_platforms: multiPlatformScore, //total ==1
                     },
                     trading_freedom: {
-                        profit_targets: profitTargetScore,
-                        consistancy_rule: 0,
-                        news_trading: 0,
+                        profit_targets: profitTargetScore, //total ==1
+                        consistancy_rule: 0,//total ==1
+                        news_trading: 0,//total ==1
                     },
                     rules_fairness: {
-                        lavrage_margin_rule: 0,
-                        no_hidden_restrictions_stratgy: 0,
-                        dd_type: 0,
+                        lavrage_margin_rule: 0,//total ==1
+                        no_hidden_restrictions_stratgy: 0,//total ==1
+                        dd_type: 0,//total ==1
                     },
                 },
                 payout_payment_experience: {
                     payout_reliability: {
-                        no_payout_denial_policy: payoutDenialScore,
-                        payout_cycle: payoutCycleScore,
-                        single_highest_payout: 0,
+                        no_payout_denial_policy: 0,//total ==1
+                        payout_cycle: payoutCycleScore,//total ==1
+                        single_highest_payout: 0,//total ==1
                     },
                     payout_behavior: {
-                        payout_time: 0,
-                        flexible_payout_methods: payoutMethodScore,
-                        payout_denials: payoutDenialScore,
+                        payout_time: processingTimeScore,//total ==2
+                        flexible_payout_methods: payoutMethodScore,//total ==1
+                        payout_denials: payoutDenialScore,//total ==1
                     },
                     payout_payment_structure: {
-                        fair_profit_split: 0,
-                        flexible_payment_methods: paymentMethodsScore,
-                        reasonable_minimum_payout_requiremnts: 0,
+                        fair_profit_split: profitSplitScore, //total==1
+                        flexible_payment_methods: paymentMethodsScore, //total==1
+                        reasonable_minimum_payout_requiremnts: 0, //total==1
                     },
                 },
             },
@@ -198,8 +246,8 @@ export async function POST(req: Request) {
 
         /** 🔥 Save or Update in DB */
         const evaluation = await PointEvaluation.findOneAndUpdate(
-            { company_id: firm._id },
-            scoreData,
+            { firmId: firm._id },
+            { $set: scoreData },
             { upsert: true, new: true }
         );
 
@@ -207,6 +255,29 @@ export async function POST(req: Request) {
             message: "Evaluation saved successfully",
             evaluation,
         });
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+}
+
+export async function GET(req: Request) {
+    try {
+        await connectDB();
+        const { searchParams } = new URL(req.url);
+        const firmId = searchParams.get('firmId');
+
+        if (!firmId) {
+            return NextResponse.json({ error: "Firm ID is required" }, { status: 400 });
+        }
+
+        const evaluation = await PointEvaluation.findOne({ firmId });
+
+        if (!evaluation) {
+            return NextResponse.json({ error: "Evaluation not found" }, { status: 404 });
+        }
+
+        return NextResponse.json({ evaluation });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

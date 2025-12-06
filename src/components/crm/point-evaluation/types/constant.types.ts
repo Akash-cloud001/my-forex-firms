@@ -38,9 +38,33 @@ export interface PillarScores {
 }
 
 export interface ScoresData {
-    company_id: number;
-    company_name: string;
+    firmId: string;
+    firmName: string;
+    evaluatedAt: Date;
+    isEvaluated: boolean;
     scores: {
         [pillarId: string]: PillarScores;
     };
 }
+
+// ============================================================================
+// TypeScript Type Definitions for Point Evaluation Constants
+// ============================================================================
+
+
+export interface EditingFactor {
+    pillarId: string;
+    categoryId: string;
+    factorKey: string;
+    maxValue: number;
+}
+
+export interface ScoreResult {
+    total: number;
+    maxTotal: number;
+}
+
+export interface ExpandedCategories {
+    [categoryId: string]: boolean;
+}
+

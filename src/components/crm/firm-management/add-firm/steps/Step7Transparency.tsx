@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export function Step7Transparency({ onNext, onPrevious }: StepProps) {
   const { register, watch, setValue } = useFormContext();
@@ -48,6 +49,13 @@ export function Step7Transparency({ onNext, onPrevious }: StepProps) {
           {...register('transparency.notes')}
           placeholder="Additional transparency notes..."
           rows={4}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>FAQ Link</Label>
+        <Input
+          {...register('transparency.faqLink')}
+          placeholder="FAQ Link"
         />
       </div>
 
