@@ -12,52 +12,39 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { pillarsConfig, initialScoresData } from '@/components/crm/point-evaluation/types/constant'
-import type { PillarScores, Pillar, Category, FactorConfig } from '@/components/crm/point-evaluation/types/constant.types'
 import { useEvalFirmDetails } from '@/hooks/admin/query/useEvalFirm'
-
-const sampleFirms = [
-    {
-        id: 1,
-        name: "Demo Prop Firm",
-        scores: initialScoresData.scores
-    },
-    {
-        id: 2,
-        name: "Alpha Trading Firm",
-        scores: {
-
-        }
-    },
-    {
-        id: 3,
-        name: "Beta Capital Firm",
-        scores: {
-
-        }
-    }
-]
-
-// Calculate pillar score based on the pillar configuration
-const calculatePillarScore = (scores: PillarScores, pillarConfig: Pillar) => {
-    let total = 0
-    let maxTotal = 0
-
-    pillarConfig.categories.forEach((category: Category) => {
-        const categoryData = scores[category.id] || {}
-
-        Object.entries(category.factors).forEach(([key, config]: [string, FactorConfig]) => {
-            total += categoryData[key] || 0
-            maxTotal += config.max
-        })
-    })
-
-    return { total, maxTotal }
-}
+import { Loader2 } from 'lucide-react'
 
 function PointEvaluationPage() {
+    const { data: firmList, isLoading, isError, error } = useEvalFirmDetails()
 
-    const { data: firms } = useEvalFirmDetails()
+    if (isLoading) {
+        return (
+            <div className="container mx-auto p-6">
+                <Card>
+                    <CardContent className="flex items-center justify-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading firms...</span>
+                    </CardContent>
+                </Card>
+            </div>
+        )
+    }
+
+    if (isError) {
+        return (
+            <div className="container mx-auto p-6">
+                <Card>
+                    <CardContent className="py-12 text-center">
+                        <p className="text-destructive">
+                            Error loading firms: {error instanceof Error ? error.message : 'Unknown error'}
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+        )
+    }
+
     return (
         <div className="container mx-auto p-6">
             <Card>
@@ -65,22 +52,22 @@ function PointEvaluationPage() {
                     <CardTitle>Prop Firm Point Evaluation</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Prop Firm Name</TableHead>
-
-                                <TableHead className="text-center">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {sampleFirms.map((firm) => {
-
-                                return (
+                    {!firmList || firmList.length === 0 ? (
+                        <div className="py-8 text-center text-muted-foreground">
+                            No firms available
+                        </div>
+                    ) : (
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Prop Firm Name</TableHead>
+                                    <TableHead className="text-center">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {firmList?.map((firm: { id: string, name: string }) => (
                                     <TableRow key={firm.id}>
                                         <TableCell className="font-medium">{firm.name}</TableCell>
-
-
                                         <TableCell className="text-center">
                                             <Link href={`/admin/point-evaluation/${firm.id}`}>
                                                 <Button variant="outline" size="sm">
@@ -89,10 +76,10 @@ function PointEvaluationPage() {
                                             </Link>
                                         </TableCell>
                                     </TableRow>
-                                )
-                            })}
-                        </TableBody>
-                    </Table>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    )}
                 </CardContent>
             </Card>
         </div>

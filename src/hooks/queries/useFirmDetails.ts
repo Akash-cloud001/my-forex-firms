@@ -19,3 +19,8 @@ export const useFirmDetails = (id: string) => {
         staleTime: 1000 * 60 * 5,
     });
 };
+
+
+// export cont useFirmsReviews = (id: string) =>{
+//     return useQuer
+// }

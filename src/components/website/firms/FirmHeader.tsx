@@ -46,7 +46,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
     }
     return <Globe className="w-4 h-4 text-foreground/60" />
   }
-  console.log(firmData);
+  
 
   // Responsive chart dimensions
   const chartWidth = isMobile ? 250 : 300

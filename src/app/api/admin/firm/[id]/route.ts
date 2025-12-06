@@ -123,7 +123,6 @@ export async function PUT(
 
     // ---------- 1. Parse multipart/form-data ----------
     const formData = await request.formData();
-    // console.log("🚀 ~ PUT ~ formData:", formData);
 
     const parseJSON = (key: string) => {
       const raw = formData.get(key);

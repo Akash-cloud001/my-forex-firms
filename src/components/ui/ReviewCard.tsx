@@ -123,10 +123,10 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
 
   return (
     <div
-      className=' w-full p-4 sm:p-6 card-custom-grad rounded-md cursor-pointer hover:opacity-90 transition-opacity'
+      className=' w-full p-4 sm:p-6 card-custom-grad rounded-md hover:opacity-90 transition-opacity relative'
     >
       {/* Preview Section with Carousel */}
-      <figure className="relative w-full aspect-video max-h-[200px]">
+      <figure className="relative w-full aspect-video max-h-[230px] lg:max-h-[200px] overflow-hidden">
         {(() => {
           // Filter files to only images and PDFs for preview
           const previewableFiles = files.filter(file => isImage(file.type) || isPDF(file.type))
@@ -205,20 +205,20 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
           </Button>
         )}
       </figure>
-
+      {status && <Badge className={cn("text-[8px] sm:text-[10px] font-semibold uppercase text-foreground px-4 py-1.5 absolute top-2 right-2 animate-pulse", statusColorClass)}>
+        {status === 'pending' ? 'In Review' : status === 'approved' ? 'Posted' : 'Rejected'}
+      </Badge>}
       {/* Content Section */}
       <div className='mt-6'>
         {/* Header - Issue Type and Username */}
         <div className='flex items-start gap-2 sm:gap-0 sm:items-center justify-between flex-wrap'>
           <div className='flex items-center gap-2'>
-            <Badge className={cn("text-[8px] sm:text-[10px] font-semibold uppercase text-foreground px-4 py-1.5", statusColorClass)}>
-              {status === 'pending' ? 'In Review' : status === 'approved' ? 'Posted' : 'Rejected'}
-            </Badge>
+           
             <div className="text-[8px] sm:text-[10px] font-semibold uppercase text-foreground px-4 py-1.5 bg-white/10 rounded-full border border-border">
-              {formatIssueType(issueType)}
+              ISSUE: {formatIssueType(issueType)}
             </div>
           </div>
-          <div className="text-xs font-semibold text-primary">
+          <div className="text-xs font-semibold text-primary py-1.5">
             @{displayName}
           </div>
         </div>
@@ -242,7 +242,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
             </div>
           )}
 
-          <Button variant="outline" size="sm" className="text-primary hover:text-primary/80" onClick={onClick}>
+          <Button variant="outline" size="sm" className="text-primary font-semibold text-xs cursor-pointer" onClick={onClick}>
             Read Review
           </Button>
         </div>

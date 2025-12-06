@@ -8,12 +8,25 @@ interface ApiResponse<T> {
     data: T;
 }
 
+export interface IEvalFirm {
+    id: string;
+    name: string;
+}
+
 export const useEvalFirmDetails = () => {
-    return useQuery<IFundingFirm>({
+    return useQuery<IEvalFirm[]>({
         queryKey: ["eval-firm-details"],
         queryFn: async () => {
-            const response = await apiGet<ApiResponse<IFundingFirm>>(`/admin/point-eval/firms-list`);
-            return response.data;
+            const response = await apiGet<ApiResponse<IEvalFirm[]>>(`/admin/point-eval/firms-list`);
+            // console.log("🚀 ~ useEvalFirmDetails ~ full response:", response);
+
+
+            if (Array.isArray(response)) {
+                return response;
+            }
+
+            console.warn("Unexpected API response structure:", response);
+            return [];
         },
         staleTime: 1000 * 60 * 5,
     });

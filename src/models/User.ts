@@ -1,4 +1,4 @@
-import mongoose, { Schema, models } from 'mongoose';
+import mongoose, { Schema, models, Model } from 'mongoose';
 import {
   IUser,
   IUserAnalytics,
@@ -49,7 +49,7 @@ const UserSchema = new Schema({
     lowercase: true,
     trim: true,
     validate: {
-      validator: function(v: string) {
+      validator: function (v: string) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
       },
       message: 'Please provide a valid email address'
@@ -75,7 +75,7 @@ const UserSchema = new Schema({
     type: String,
     trim: true,
     validate: {
-      validator: function(v: string) {
+      validator: function (v: string) {
         if (!v) return true; // Allow empty
         return /^https?:\/\/.+/.test(v);
       },
@@ -86,14 +86,14 @@ const UserSchema = new Schema({
     type: String,
     trim: true,
     validate: {
-      validator: function(v: string) {
+      validator: function (v: string) {
         if (!v) return true; // Allow empty
         return /^\+?[\d\s\-\(\)]+$/.test(v);
       },
       message: 'Please provide a valid phone number'
     }
   },
-  
+
   // Role & Permissions
   role: {
     type: String,
@@ -113,10 +113,10 @@ const UserSchema = new Schema({
     },
     default: 'active'
   },
-  
+
   // Profile Information
   address: { type: UserAddressSchema },
-  
+
   // Timestamps
   createdAt: {
     type: Date,
@@ -129,10 +129,10 @@ const UserSchema = new Schema({
   lastLoginAt: {
     type: Date
   },
-  
+
   // External Service Metadata
   clerkMetadata: { type: ClerkMetadataSchema },
-  
+
   // Analytics
   analytics: {
     type: UserAnalyticsSchema,
@@ -153,18 +153,18 @@ const UserSchema = new Schema({
 // VIRTUAL FIELDS (Best Practice: Use virtuals for computed properties)
 // ============================================================================
 
-UserSchema.virtual('displayName').get(function() {
+UserSchema.virtual('displayName').get(function () {
   if (this.lastName) {
     return `${this.firstName} ${this.lastName}`;
   }
   return this.firstName;
 });
 
-UserSchema.virtual('isActive').get(function() {
+UserSchema.virtual('isActive').get(function () {
   return this.status === 'active';
 });
 
-UserSchema.virtual('isAdmin').get(function() {
+UserSchema.virtual('isAdmin').get(function () {
   return this.role === 'admin';
 });
 
@@ -234,14 +234,14 @@ UserSchema.index({ createdAt: -1, role: 1, status: 1 });
 // INSTANCE METHODS (Best Practice: Add business logic methods)
 // ============================================================================
 
-UserSchema.methods.updateLastLogin = function() {
+UserSchema.methods.updateLastLogin = function () {
   this.lastLoginAt = new Date();
   this.analytics.loginCount += 1;
   this.analytics.lastActivity = new Date();
   return this.save();
 };
 
-UserSchema.methods.updateAnalytics = function(updates: Partial<IUserAnalytics>) {
+UserSchema.methods.updateAnalytics = function (updates: Partial<IUserAnalytics>) {
   Object.assign(this.analytics, updates);
   this.analytics.lastActivity = new Date();
   return this.save();
@@ -251,19 +251,19 @@ UserSchema.methods.updateAnalytics = function(updates: Partial<IUserAnalytics>) 
 // STATIC METHODS (Best Practice: Add utility methods)
 // ============================================================================
 
-UserSchema.statics.findByEmail = function(email: string) {
+UserSchema.statics.findByEmail = function (email: string) {
   return this.findOne({ email: email.toLowerCase() });
 };
 
-UserSchema.statics.findByRole = function(role: UserRole) {
+UserSchema.statics.findByRole = function (role: UserRole) {
   return this.find({ role, status: 'active' });
 };
 
-UserSchema.statics.findActiveUsers = function() {
+UserSchema.statics.findActiveUsers = function () {
   return this.find({ status: 'active' });
 };
 
-UserSchema.statics.searchUsers = function(searchTerm: string) {
+UserSchema.statics.searchUsers = function (searchTerm: string) {
   return this.find({
     $text: { $search: searchTerm }
   }, {
@@ -275,17 +275,17 @@ UserSchema.statics.searchUsers = function(searchTerm: string) {
 // PRE-SAVE MIDDLEWARE (Best Practice: Auto-generate computed fields)
 // ============================================================================
 
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function (next) {
   // Auto-generate fullName
   if (this.firstName && this.lastName) {
     this.fullName = `${this.firstName} ${this.lastName}`;
   } else if (this.firstName) {
     this.fullName = this.firstName;
   }
-  
+
   // Update updatedAt timestamp
   this.updatedAt = new Date();
-  
+
   next();
 });
 
@@ -293,9 +293,7 @@ UserSchema.pre('save', function(next) {
 // MODEL EXPORT (Best Practice: Check if model exists before creating)
 // ============================================================================
 
-const User = (models && models.User) 
-  ? models.User 
-  : mongoose.model<IUser>('User', UserSchema);
+const User: Model<IUser> = (models?.User as Model<IUser>) || mongoose.model<IUser>('User', UserSchema);
 
 export default User;
 
