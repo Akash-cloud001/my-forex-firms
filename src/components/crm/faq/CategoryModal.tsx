@@ -49,7 +49,6 @@ export const CategoryModal = ({
   };
 
   const onFormSubmit = async (data: CategoryFormData) => {
-    console.log('Category Form Data:', data);
     await onSubmit(data);
     reset();
     onClose();

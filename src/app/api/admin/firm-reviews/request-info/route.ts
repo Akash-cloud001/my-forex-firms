@@ -10,7 +10,6 @@ export async function POST(request: NextRequest) {
 
         // Fix: auth() is synchronous
         const { userId } = await auth();
-        console.log("🚀 ~ POST ~ userId:", userId)
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }

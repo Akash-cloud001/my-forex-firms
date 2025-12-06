@@ -18,8 +18,6 @@ import { Loader2 } from 'lucide-react'
 function PointEvaluationPage() {
     const { data: firmList, isLoading, isError, error } = useEvalFirmDetails()
 
-    console.log("🚀 ~ PointEvaluationPage ~ firmList:", firmList)
-
     if (isLoading) {
         return (
             <div className="container mx-auto p-6">

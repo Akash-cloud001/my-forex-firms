@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import { useFirmDetails } from '@/hooks/queries/useFirmDetails'
+import { useFirmReviews } from '@/hooks/queries/useFirmReviews'
 import LoadingScreen from '@/components/ui/LoadingScreen'
 import { motion, AnimatePresence } from 'motion/react'
 import ReviewsContent from '@/components/website/firms/ReviewsContent'
@@ -19,10 +20,10 @@ const tabs = [
     name: 'Challenges',
     value: 'challenges'
   },
-  // {
-  //   name: 'Reviews',
-  //   value: 'reviews'
-  // }
+  {
+    name: 'Reviews',
+    value: 'reviews'
+  },
   {
     name: 'Rules',
     value: 'rules'
@@ -105,7 +106,8 @@ const FirmPage = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'challenges' | 'reviews' | 'rules'>('dashboard');
 
   const { data: firmData, isLoading, isError } = useFirmDetails(slug);
-  console.log( "firmData", firmData);
+  const firmId = firmData?._id ? String(firmData._id) : '';
+  const { data: reviews, isLoading: isLoadingReviews } = useFirmReviews(firmId);
   if (isLoading) {
     return <LoadingScreen title="Getting things ready..." subtitle="This will only take a moment." />
   }
@@ -126,12 +128,12 @@ const FirmPage = () => {
       <section className='max-w-7xl mx-auto rounded-3xl'>
         {/* Tab Navigation */}
         <div className="mt-8 ">
-          <div className="flex sm:gap-2">
+          <div className="flex sm:gap-2 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.value}
                 onClick={() => setActiveTab(tab.value as 'dashboard' | 'challenges' | 'reviews' | 'rules')}
-                className={`px-4 py-2 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm md:text-lg font-medium font-geist-sans transition-colors ${activeTab === tab.value
+                className={`px-4 py-2 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm md:text-lg font-medium font-geist-sans transition-colors whitespace-nowrap ${activeTab === tab.value
                   ? 'bg-foreground/10 text-foreground'
                   : 'text-foreground/60 hover:text-foreground/80'
                   }`}
@@ -176,9 +178,9 @@ const FirmPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className="w-full h-full rounded-lg hidden"
+                className="w-full h-full rounded-lg"
               >
-                <ReviewsContent />
+                <ReviewsContent reviews={reviews} isLoading={isLoadingReviews} />
               </motion.div>
             )}
             {activeTab === 'rules' && (

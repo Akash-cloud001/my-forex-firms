@@ -36,7 +36,6 @@ const ReviewsPage = () => {
         sortOrder: 'desc'
       })
       setReviews(response.reviews)
-      console.log("reviews", response.reviews)
     } catch (err) {
       setError(err.message)
     } finally {
