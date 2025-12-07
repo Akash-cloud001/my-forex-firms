@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IProgram extends Document {
   propFirmId: mongoose.Types.ObjectId;
-  type: string; // "1-Step" | "2-Step"
+  type: string;
   name: string;
   evaluationPhases: number;
   evaluationSteps: {
@@ -11,6 +11,7 @@ export interface IProgram extends Document {
     maxLoss: string;
     dailyLoss: string;
     minTradingDays: number;
+    maxLossType: string;
   }[];
   accountSizes: {
     size: number;
@@ -22,44 +23,48 @@ export interface IProgram extends Document {
     percentage: string;
   }[];
   leverage: string;
-  stopLossRequired: boolean;
-  eaAllowed: boolean;
-  weekendHolding: boolean;
-  overnightHolding: boolean;
-  newsTrading: boolean;
-  copyTrading: boolean;
-  refundFee: boolean;
+
+  evaluationRule: {
+    stopLoss: { required: boolean; note: string };
+    eaAllowed: { required: boolean; note: string };
+    weekendHolding: { required: boolean; note: string };
+    overnightHolding: { required: boolean; note: string };
+    newsTrading: { required: boolean; note: string };
+    copyTrading: { required: boolean; note: string };
+    consistency: { required: boolean; note: string };
+  };
+
+  fundedRule: {
+    stopLoss: { required: boolean; note: string };
+    eaAllowed: { required: boolean; note: string };
+    weekendHolding: { required: boolean; note: string };
+    overnightHolding: { required: boolean; note: string };
+    newsTrading: { required: boolean; note: string };
+    copyTrading: { required: boolean; note: string };
+    consistency: { required: boolean; note: string };
+  };
+
   payoutMethods: string[];
-  profitTarget: string;
-  dailyLoss: string;
-  maxLoss: string;
-  maxLossType: string;
   timeLimit: string;
   drawdownResetType: string;
-  minTradingDays: number;
 }
+
+const RuleSchema = {
+  required: { type: Boolean, default: false },
+  note: { type: String, default: "" },
+};
 
 const ProgramSchema = new Schema<IProgram>(
   {
     propFirmId: {
       type: Schema.Types.ObjectId,
-      ref: 'FundingFirm',
+      ref: "FundingFirm",
       required: true,
     },
-    type: {
-      type: String,
-      // enum: ['1-Step', '2-Step'],
-      required: true,
-    },
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    evaluationPhases: {
-      type: Number,
-      // required: true,
-    },
+    type: { type: String, required: true },
+    name: { type: String, required: true, trim: true },
+    evaluationPhases: { type: Number },
+
     evaluationSteps: [
       {
         stepNumber: { type: Number, required: true },
@@ -67,42 +72,56 @@ const ProgramSchema = new Schema<IProgram>(
         maxLoss: { type: String, required: true },
         dailyLoss: { type: String, required: true },
         minTradingDays: { type: Number, required: true },
+        maxLossType: { type: String, required: true },
       },
     ],
+
     accountSizes: [
       {
         size: { type: Number, required: true },
         price: { type: Number, required: true },
       },
     ],
+
     profitSplit: { type: String, required: true },
+
     payoutFrequency: [
       {
         label: { type: String, required: true },
         percentage: { type: String, required: true },
       },
     ],
+
     leverage: { type: String, required: true },
-    stopLossRequired: { type: Boolean, default: false },
-    eaAllowed: { type: Boolean, default: false },
-    weekendHolding: { type: Boolean, default: false },
-    overnightHolding: { type: Boolean, default: false },
-    newsTrading: { type: Boolean, default: false },
-    copyTrading: { type: Boolean, default: false },
-    refundFee: { type: Boolean, default: false },
+
+    evaluationRule: {
+      stopLoss: RuleSchema,
+      eaAllowed: RuleSchema,
+      weekendHolding: RuleSchema,
+      overnightHolding: RuleSchema,
+      newsTrading: RuleSchema,
+      copyTrading: RuleSchema,
+      consistency: RuleSchema,
+    },
+
+    fundedRule: {
+      stopLoss: RuleSchema,
+      eaAllowed: RuleSchema,
+      weekendHolding: RuleSchema,
+      overnightHolding: RuleSchema,
+      newsTrading: RuleSchema,
+      copyTrading: RuleSchema,
+      consistency: RuleSchema,
+    },
+
     payoutMethods: [{ type: String }],
-    profitTarget: { type: String },
-    dailyLoss: { type: String },
-    maxLoss: { type: String },
-    maxLossType: { type: String },
     timeLimit: { type: String },
     drawdownResetType: { type: String },
-    minTradingDays: { type: Number },
   },
   { timestamps: true }
 );
 
 const Program: Model<IProgram> =
-  mongoose.models.Program || mongoose.model<IProgram>('Program', ProgramSchema);
+  mongoose.models.Program || mongoose.model<IProgram>("Program", ProgramSchema);
 
 export default Program;

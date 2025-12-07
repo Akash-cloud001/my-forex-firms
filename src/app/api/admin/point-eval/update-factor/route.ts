@@ -40,23 +40,65 @@ export async function PATCH(req: Request) {
             }, { status: 400 });
         }
 
-        // 2. Update the specific field in MongoDB
-        // The path in the document is scores.<pillarId>.<categoryId>.<factorKey>
-        const updatePath = `scores.${pillarId}.${categoryId}.${factorKey}`;
+        // 2. Fetch the current document to calculate full scores
+        const evaluation = await PointEvaluation.findOne({ firmId: new Types.ObjectId(firmId) });
 
-        const updatedEvaluation = await PointEvaluation.findOneAndUpdate(
-            { firmId: new Types.ObjectId(firmId) },
-            { $set: { [updatePath]: numericValue } },
-            { new: true }
-        );
-
-        if (!updatedEvaluation) {
+        if (!evaluation) {
             return NextResponse.json({ error: "Evaluation not found" }, { status: 404 });
         }
 
+        // 3. Update the specific value in the retrieved object
+        // 3. Update the specific value in the retrieved object
+        const scores = evaluation.scores as unknown as Record<string, Record<string, Record<string, number>>>;
+        if (!scores[pillarId]) scores[pillarId] = {};
+        if (!scores[pillarId][categoryId]) scores[pillarId][categoryId] = {};
+
+        scores[pillarId][categoryId][factorKey] = numericValue;
+
+        // 4. Calculate PTI Score
+        // Formula: PTI = (C * 0.35) + (T * 0.30) + (P * 0.35)
+
+        const calculateCategoryTotal = (pillarName: string) => {
+            let total = 0;
+            const p = scores[pillarName];
+            if (!p) return 0;
+
+            const pObj = p;
+
+            for (const catKey in pObj) {
+                const cat = pObj[catKey];
+                // Check if cat is an object and not null (skip internal keys if any slip through)
+                if (typeof cat !== 'object' || cat === null) continue;
+
+                for (const factKey in cat) {
+                    const val = cat[factKey];
+                    // STRICT CHECK: Only add if it is a number
+                    if (typeof val === 'number' && !isNaN(val)) {
+                        total += val;
+                    }
+                }
+            }
+            return total;
+        };
+
+        const C = calculateCategoryTotal("credibility");
+        const T = calculateCategoryTotal("trading_experience");
+        const P = calculateCategoryTotal("payout_payment_experience");
+
+        const ptiRaw = (C * 0.35) + (T * 0.30) + (P * 0.35);
+        const ptiScore = isNaN(ptiRaw) ? 0 : ptiRaw;
+
+        evaluation.ptiScore = parseFloat(ptiScore.toFixed(2));
+
+        // 5. Save the document
+        // Mark the modified path as modified to ensure mongoose saves it
+        evaluation.markModified(`scores.${pillarId}.${categoryId}.${factorKey}`);
+        await evaluation.save();
+
+        // Return the updated evaluation including the new ptiScore
         return NextResponse.json({
             message: "Factor updated successfully",
-            evaluation: updatedEvaluation
+            evaluation: evaluation
         });
 
     } catch (error) {

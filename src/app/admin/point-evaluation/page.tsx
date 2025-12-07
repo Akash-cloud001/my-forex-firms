@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,18 +19,22 @@ import { toast } from 'sonner'
 function PointEvaluationPage() {
     const { data: firmList, isLoading, isError, error } = useEvalFirmDetails()
     const { mutate: evaluateFirm, isPending: isEvaluating } = useEvaluateFirm();
+    const [evaluatingFirmId, setEvaluatingFirmId] = useState<string | null>(null);
 
     console.log("🚀 ~ PointEvaluationPage ~ firmList:", firmList)
 
     const handleEvaluateClick = (firmId: string) => {
+        setEvaluatingFirmId(firmId);
         evaluateFirm(firmId, {
             onSuccess: (data) => {
                 toast("Evaluation successful!");
                 console.log("Evaluation result:", data);
+                setEvaluatingFirmId(null);
             },
             onError: (error) => {
                 console.error("Error evaluating firm:", error);
                 toast("Evaluation failed: " + (error instanceof Error ? error.message : "Unknown error"));
+                setEvaluatingFirmId(null);
             }
         });
     }
@@ -102,8 +106,12 @@ function PointEvaluationPage() {
                                         <TableCell className="text-center">
                                             <div className="flex items-center justify-center gap-2">
                                                 {!firm.isEvaluated && (
-                                                    <Button size="sm" onClick={() => handleEvaluateClick(firm.id)} disabled={isEvaluating}>
-                                                        {isEvaluating ? "Evaluating..." : "Evaluate Point"}
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={() => handleEvaluateClick(firm.id)}
+                                                        disabled={isEvaluating}
+                                                    >
+                                                        {isEvaluating && evaluatingFirmId === firm.id ? "Evaluating..." : "Evaluate Point"}
                                                     </Button>
                                                 )}
 

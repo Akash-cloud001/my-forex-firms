@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit2, Check, X } from 'lucide-react';
+import { Edit2, Check, X, Loader2, RefreshCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { FactorConfig, Criterion } from '@/components/crm/point-evaluation/types/constant.types';
@@ -13,6 +13,7 @@ interface FactorItemProps {
     saveEdit: () => void;
     cancelEdit: () => void;
     onEditClick: (e: React.MouseEvent) => void;
+    isSaving: boolean;
 }
 
 const FactorItem: React.FC<FactorItemProps> = ({
@@ -23,7 +24,8 @@ const FactorItem: React.FC<FactorItemProps> = ({
     setEditValue,
     saveEdit,
     cancelEdit,
-    onEditClick
+    onEditClick,
+    isSaving
 }) => {
     return (
         <div className="py-2 border-b last:border-b-0">
@@ -42,27 +44,41 @@ const FactorItem: React.FC<FactorItemProps> = ({
                                 onChange={(e) => setEditValue(e.target.value)}
                                 className="w-16 h-7 text-xs"
                                 autoFocus
+                                disabled={isSaving}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') saveEdit();
                                     if (e.key === 'Escape') cancelEdit();
                                 }}
                             />
-                            <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-7 w-7 p-0"
-                                onClick={saveEdit}
-                            >
-                                <Check size={14} className="text-green-600" />
-                            </Button>
-                            <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-7 w-7 p-0"
-                                onClick={cancelEdit}
-                            >
-                                <X size={14} className="text-red-600" />
-                            </Button>
+                            {isSaving ? (
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-7 w-7 p-0"
+                                    disabled
+                                >
+                                    <Loader2 size={14} className="animate-spin text-primary" />
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-7 w-7 p-0"
+                                        onClick={saveEdit}
+                                    >
+                                        <Check size={14} className="text-green-600" />
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-7 w-7 p-0"
+                                        onClick={cancelEdit}
+                                    >
+                                        <X size={14} className="text-red-600" />
+                                    </Button>
+                                </>
+                            )}
                         </>
                     ) : (
                         <>
@@ -74,8 +90,18 @@ const FactorItem: React.FC<FactorItemProps> = ({
                                 variant="ghost"
                                 className="h-7 w-7 p-0"
                                 onClick={onEditClick}
+                                disabled={isSaving}
                             >
                                 <Edit2 size={12} />
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 w-7 p-0"
+                                // onClick={onEditClick}
+                                disabled={isSaving}
+                            >
+                                <RefreshCcw size={12} />
                             </Button>
                         </>
                     )}

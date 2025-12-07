@@ -90,6 +90,20 @@ function TransparencyTab({ firmData }: any) {
               </div>
             </div>
           )}
+          {firmData.transparency.faqLink && (
+            <div className="space-y-3">
+              <Separator />
+
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-muted-foreground">
+                  FAQ Links
+                </label>
+                <p className="text-sm text-muted-foreground leading-relaxed break-all">
+                  {firmData.transparency.faqLink}
+                </p>
+              </div>
+            </div>
+          )}
 
         </CardContent>
       </Card>

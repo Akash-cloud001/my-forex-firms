@@ -7,7 +7,7 @@ export const useScoreEditing = (
 ) => {
     const [editingFactor, setEditingFactor] = useState<EditingFactor | null>(null);
     const [editValue, setEditValue] = useState<string>('');
-
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     /**
      * Update a specific score value
      */
@@ -50,6 +50,7 @@ export const useScoreEditing = (
         }
 
         try {
+            setIsSaving(true);
             const response = await fetch('/api/admin/point-eval/update-factor', {
                 method: 'PATCH',
                 headers: {
@@ -70,13 +71,16 @@ export const useScoreEditing = (
                 return;
             }
 
-            // Only update local state if API call was successful
-            updateScore(pillarId, categoryId, factorKey, newValue);
+            const data = await response.json();
+
+            setScoresData(data.evaluation);
             setEditingFactor(null);
             setEditValue('');
         } catch (error) {
             console.error('Error updating score:', error);
             alert('An error occurred while saving the score');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -95,6 +99,7 @@ export const useScoreEditing = (
         editValue,
         setEditValue,
         saveEdit,
+        isSaving,
         cancelEdit
     };
 };

@@ -21,12 +21,20 @@ function PaymentTab({ firmData }: any) {
     },
     {
       label: 'Processing Time',
-      value: `${firmData.payments.processingTime} days`,
+      value: `${firmData.payments.processingTime?.value} ${firmData.payments.processingTime?.unit}`,
       icon: Clock,
     },
     {
+      label: 'Processing Policy',
+      value: firmData.payments.processingTimePolicy === "no" ? "No Policy" : firmData.payments.processingTimePolicy?.replace('-', ' '),
+      icon: Clock,
+      capitalize: true,
+    },
+    {
       label: 'Payout Schedule',
-      value: firmData.payments.payoutSchedule,
+      value: Array.isArray(firmData.payments.payoutSchedule)
+        ? firmData.payments.payoutSchedule.join(', ')
+        : firmData.payments.payoutSchedule,
       icon: Calendar,
       capitalize: true,
     },

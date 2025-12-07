@@ -8,7 +8,7 @@ import { validateReviewFile, cleanupReviewFiles } from '@/lib/reviewFileUtils';
 // Type for review data
 interface ReviewData {
   userId?: string;
-  firmId?: string;
+  firmId?: string | "other";
   firmName?: string;
   customFirmName?: string;
   issueCategory?: string; // Added
@@ -277,7 +277,7 @@ export async function POST(request: NextRequest) {
     // Create review object
     const newReview = new Review({
       userId,
-      firmId: reviewData.firmId || null,
+      firmId: reviewData.firmId === "other" ? null : reviewData.firmId,
       firmName: reviewData.firmName === 'Other' ? reviewData.customFirmName : reviewData.firmName,
       customFirmName: reviewData.firmName === 'Other' ? reviewData.customFirmName : undefined,
       issueCategory: reviewData.issueCategory, // Added
@@ -290,7 +290,7 @@ export async function POST(request: NextRequest) {
       createdBy: userId,
       lastModifiedBy: userId
     });
-    // console.log(newReview, "newReview")
+    console.log(newReview, "newReview")
     // Save to MongoDB
     const savedReview = await newReview.save();
 
