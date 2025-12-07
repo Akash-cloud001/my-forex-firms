@@ -95,7 +95,7 @@ function FirstSection() {
       className="relative flex flex-col-reverse md:flex-row justify-center md:justify-evenly items-center min-h-screen px-4 md:px-8 lg:px-0 mt-24 md:mt-0 overflow-hidden"
     >
       {/* LEFT SECTION - TEXT */}
-      <div className="relative z-10 max-w-[320px] md:max-w-[350px] lg:max-w-[470px] h-auto whitespace-nowrap w-full">
+      <div className="relative z-10 max-w-[320px] sm:max-w-[400px] lg:max-w-[470px] h-auto  w-full">
         <div className="text-left">
           <h1
             className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight whitespace-nowrap gradient-text"

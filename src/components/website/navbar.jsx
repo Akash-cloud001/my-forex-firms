@@ -43,10 +43,10 @@ const Navbar = () => {
         </h1>
       </Link>
 
-      <div className="text-xl flex items-center gap-0 sm:gap-4">
+      <div className="text-xl flex items-center gap-2 sm:gap-4">
         <SignedOut>
           <SignInButton>
-            <Button variant="outline" className="btn-grad hover:text-white">
+            <Button variant="outline" className="btn-grad hover:text-white border-none">
               Sign In
             </Button>
           </SignInButton>
