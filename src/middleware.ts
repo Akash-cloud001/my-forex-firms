@@ -14,6 +14,7 @@ const isPublicRoute = createRouteMatcher([
   '/terms-conditions(.*)',
   '/about(.*)',
   '/reviews(.*)',
+  '/model(.*)',
 ])
 
 const isDashboardRoute = createRouteMatcher([

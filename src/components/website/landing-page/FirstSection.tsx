@@ -1,21 +1,56 @@
 "use client";
 import Image from "next/image";
-import React, { Suspense } from "react"
-import Scene from "./Scene"
-import { Canvas } from "@react-three/fiber"
+import React, { useState, useEffect, useRef } from "react";
+import Canvas3D from "./Canvas3D";
+
+// Hook to detect if device is desktop (not touch)
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    // Check if device has touch capability
+    const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+    // Also check for pointer media query (more reliable)
+    const hasPointer = window.matchMedia("(pointer: fine)").matches;
+
+    // Desktop = has fine pointer (mouse) and no touch, or has both but prefers fine pointer
+    const prefersPointer = window.matchMedia(
+      "(pointer: fine) and (hover: hover)"
+    ).matches;
+
+    setIsDesktop((hasPointer && !hasTouch) || prefersPointer);
+
+    // Listen for changes
+    const mediaQuery = window.matchMedia(
+      "(pointer: fine) and (hover: hover)"
+    );
+    const handleChange = () => {
+      setIsDesktop(mediaQuery.matches && !hasTouch);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  return isDesktop;
+}
+
 function FirstSection() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  const isDesktop = useIsDesktop();
+
   const gradientTextStyle = {
     background: "linear-gradient(180deg, #FFFFFF 0%, #999999 100%)",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
     textShadow: "0px 4px 4px rgba(255, 255, 255, 0.25)",
-  };
+  } as React.CSSProperties;
+
   const stats = [
-    // {
-    //   value: "100+",
-    //   label: "Verified Brokers",
-    //   src: "/website/verified-broker.png",
-    // },
     {
       value: "1000+",
       label: "Real Trader Complaints",
@@ -23,51 +58,95 @@ function FirstSection() {
     },
     { value: "1M+", label: "Monthly Views", src: "/website/monthly-views.png" },
   ];
-  return (
-    <div className="flex flex-row justify-evenly items-center min-h-screen">
 
-      <div className="max-w-[470px] h-auto">
-        <div className="text-left relative z-10">
+  // Handle mouse movement for camera rotation (desktop only)
+  useEffect(() => {
+    if (!isDesktop || !canvasRef.current) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      // Calculate normalized mouse position (-1 to 1)
+      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+
+      setMousePosition({ x, y });
+    };
+
+    const handleMouseLeave = () => {
+      // Smoothly return to center
+      setMousePosition({ x: 0, y: 0 });
+    };
+
+    const canvasContainer = canvasRef.current;
+    canvasContainer.addEventListener("mousemove", handleMouseMove);
+    canvasContainer.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      canvasContainer.removeEventListener("mousemove", handleMouseMove);
+      canvasContainer.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, [isDesktop]);
+
+  return (
+    <div
+      ref={canvasRef}
+      className="relative flex flex-col-reverse md:flex-row justify-center md:justify-evenly items-center min-h-screen px-4 md:px-8 lg:px-0 mt-24 md:mt-0 overflow-hidden"
+    >
+      {/* LEFT SECTION - TEXT */}
+      <div className="relative z-10 max-w-[320px] md:max-w-[350px] lg:max-w-[470px] h-auto whitespace-nowrap w-full">
+        <div className="text-left">
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl  font-semibold leading-tight whitespace-nowrap gradient-text"
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight whitespace-nowrap gradient-text"
+            style={gradientTextStyle}
           >
             Transparency,
           </h1>
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl  font-semibold leading-tight whitespace-nowrap gradient-text"
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight whitespace-nowrap w-full gradient-text"
+            style={gradientTextStyle}
           >
-             Verified Ratings,
+            Verified Ratings,
           </h1>
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl  font-semibold leading-none gradient-text mt-2"
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-none gradient-text mt-2"
+            style={gradientTextStyle}
           >
             Traders Trust.
           </h1>
         </div>
-       <div>
-        <div className="flex flex-row items-center mt-4">
-            {Array.from({length:3}).map((_,index)=>(
-              <div key={index} className={`${index !== 0 ? '-ml-4':''}`}>
-                <Image src={'/website/hero/trader'+(index+1)+'.png'} alt="verify-badge" height={48} width={48} />
+
+        <div>
+          <div className="flex flex-row items-center mt-4">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className={index !== 0 ? "-ml-4" : ""}>
+                <Image
+                  src={"/website/hero/trader" + (index + 1) + ".png"}
+                  alt="verify-badge"
+                  height={48}
+                  width={48}
+                />
               </div>
             ))}
             <div className="flex flex-col items-start text-white/60 ml-2 !mt-3">
-                <p className="font-bold text-base md:text-[20px] leading-[100%]">
-                  100+
-                </p>
-                <p className="text-base md:text-[20px] font-light tracking-[-0.05em]">
-                  Verified Brokers
-                </p>
-              </div>
+              <p className="font-bold text-base md:text-[20px] leading-[100%]">
+                100+
+              </p>
+              <p className="text-base md:text-[20px] font-light tracking-[-0.05em]">
+                Verified Brokers
+              </p>
+            </div>
           </div>
-       </div>
-        <div className="flex flex-col mt-2 md:flex-row justify-start gap-8 w-full text-white relative z-10">
+        </div>
+
+        <div className="flex flex-col mt-2 lg:flex-row justify-start lg:gap-8 w-full text-white relative z-10">
           {stats.map((item, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 justify-center  py-2  "
+              className="flex items-start gap-2 justify-start py-2"
             >
-              <div className=" w-6 h-6 2xl:w-8 2xl:h-8 rounded flex flex-col relative">
+              <div className="w-6 h-6 2xl:w-8 2xl:h-8 rounded flex flex-col relative">
                 <Image src={item.src} alt="verify-badge" fill />
               </div>
               <div className="flex gap-2 items-center text-white/60">
@@ -83,63 +162,14 @@ function FirstSection() {
         </div>
       </div>
 
-      <div className="relative">
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 h-[300px] w-[700px] bg-[url('/website/hero-bg.png')] bg-no-repeat bg-center bg-cover z-0" />
-        {/* <div className="absolute -top-10 left-1/2 -translate-x-1/2 h-[539px] w-[950px] bg-[url('/website/hero-bg.png')] bg-no-repeat bg-center bg-cover z-0" /> */}
-        <div className="w-full h-[539px] flex items-center justify-center text-white -mt-20">
-          <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-white">Loading 3D Model...</div>}>
-            <Canvas
-              camera={{ position: [0, 0, 25], fov: 50 }}
-              style={{ width: '500px', height: '539px' }}
-              className="relative z-10"
-              gl={{ antialias: true, alpha: true, toneMappingExposure: 1.3 }}
-            >
-              <Scene />
-            </Canvas>
-          </Suspense>
+      {/* RIGHT SECTION - 3D CANVAS */}
+      <div className="relative z-0 pointer-events-none">
+        <div className="absolute -bottom-20 lg:bottom-10 left-1/2 -translate-x-1/2 h-[300px] w-[700px] bg-[url('/website/hero-bg.png')] bg-no-repeat bg-center bg-cover z-0" />
 
+        <div className="w-[400px] h-[400px] lg:w-[500px] lg:h-[539px] flex items-center justify-center text-white -mt-20 relative z-0">
+          <Canvas3D mousePosition={mousePosition} isDesktop={isDesktop} />
         </div>
       </div>
-
-      {/* <div
-        className="flex flex-col items-center bg-cover bg-center px-6 relative"
-      >
-        <div className="absolute -top-10 left-1/2 -translate-x-1/2 h-[539px] w-[950px] bg-[url('/website/hero-bg.png')] bg-no-repeat bg-center bg-cover z-0" />
-        <div className="text-center relative z-10">
-          <h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl font-semibold leading-normal gradient-text"
-          >
-            Transparency, Verified Ratings,
-          </h1>
-          <h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl font-semibold leading-none gradient-text mt-2"
-          >
-            Traders Trust.
-          </h1>
-        </div> */}
-
-      {/* Stats Section */}
-      {/* <div className="max-w-7xl mx-auto flex flex-col  md:flex-row justify-between w-full mt-8 md:mt-10 xl:mt-14 text-white relative z-10">
-          {stats.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-3 justify-center  py-2  "
-            >
-              <div className=" w-6 h-6 2xl:w-8 2xl:h-8 rounded flex flex-col relative">
-                <Image src={item.src} alt="verify-badge" fill />
-              </div>
-              <div className="flex gap-2 items-center text-white/60">
-                <p className="font-bold text-base md:text-[20px] leading-[100%]">
-                  {item.value}
-                </p>
-                <p className="text-base md:text-[20px] font-light tracking-[-0.05em]">
-                  {item.label}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div> */}
-      {/* </div> */}
     </div>
   );
 }

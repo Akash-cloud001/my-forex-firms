@@ -3,7 +3,7 @@ import { useGLTF } from '@react-three/drei'
 import { MeshStandardMaterial, MeshPhysicalMaterial, Color } from 'three'
 
 export function Model(props) {
-  const { nodes, materials } = useGLTF('/model/model.gltf')
+  const { nodes, materials } = useGLTF('/model/model.glb')
   
   // Enhance material with metallic properties and golden-orange color
   const enhancedMaterial = useMemo(() => {
@@ -40,4 +40,4 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/model/model.gltf')
+useGLTF.preload('/model/model.glb')
