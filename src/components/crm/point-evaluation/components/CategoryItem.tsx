@@ -17,6 +17,7 @@ interface CategoryItemProps {
     saveEdit: () => void;
     cancelEdit: () => void;
     setEditingFactor: React.Dispatch<React.SetStateAction<EditingFactor | null>>;
+    isSaving: boolean;
 }
 
 const CategoryItem: React.FC<CategoryItemProps> = ({
@@ -31,7 +32,8 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
     setEditValue,
     saveEdit,
     cancelEdit,
-    setEditingFactor
+    setEditingFactor,
+    isSaving
 }) => {
     const { total: catTotal, maxTotal: catMax } = calculateCategoryScore(pillarId, category.id, category.factors);
     const categoryData = scoresData.scores[pillarId]?.[category.id] || {};
@@ -87,6 +89,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                                     });
                                     setEditValue(score.toString());
                                 }}
+                                isSaving={isSaving}
                             />
                         );
                     })}

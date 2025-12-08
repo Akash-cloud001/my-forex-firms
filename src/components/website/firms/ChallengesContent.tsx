@@ -212,19 +212,19 @@ const ChallengesContent = () => {
                       {fee}
                     </td>
                     <td className="px-4 py-4 text-sm text-success">
-                      {program.profitTarget ? program.profitTarget + '%' : '-'}
+                      {/* {program.profitTarget ? program.profitTarget + '%' : '-'} */}
                     </td>
                     <td className="px-4 py-4 text-sm text-success">
-                      {program.profitSplit ? program.profitSplit + '%' : '-'}
+                      {/* {program.profitSplit ? program.profitSplit + '%' : '-'} */}
                     </td>
                     <td className="px-4 py-4 text-sm text-foreground">
-                      {program.leverage}
+                      {/* {program.leverage} */}
                     </td>
                     <td className="px-4 py-4 text-sm text-red-500">
-                      {program.maxLoss ? program.maxLoss + '%' : '-'}
+                      {/* {program.maxLoss ? program.maxLoss + '%' : '-'} */}
                     </td>
                     <td className="px-4 py-4 text-sm text-red-500">
-                      {program.dailyLoss ? program.dailyLoss + '%' : '-'}
+                      {/* {program.dailyLoss ? program.dailyLoss + '%' : '-'} */}
                     </td>
                     <td className="px-4 py-4 text-center">
                       <ChevronRight className="w-5 h-5 text-muted-foreground cursor-pointer hover:opacity-80" />
@@ -301,7 +301,7 @@ const ChallengesContent = () => {
                   <div className="bg-card border border-border rounded-lg p-4">
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">Daily Loss:</p>
-                      <p className="text-xl font-bold text-destructive/80">{selectedChallenge.dailyLoss}%</p>
+                      {/* <p className="text-xl font-bold text-destructive/80">{selectedChallenge.dailyLoss}%</p> */}
                     </div>
                   </div>
 
@@ -309,7 +309,7 @@ const ChallengesContent = () => {
                   <div className="bg-card border border-border rounded-lg p-4">
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">Max Loss Type:</p>
-                      <p className="text-lg font-bold text-foreground/80">{selectedChallenge.maxLossType}</p>
+                      {/* <p className="text-lg font-bold text-foreground/80">{selectedChallenge.maxLossType}</p> */}
                     </div>
                   </div>
 
@@ -326,7 +326,7 @@ const ChallengesContent = () => {
                   <div className="bg-card border border-border rounded-lg p-4">
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">Min Trading Days:</p>
-                      <p className="text-lg font-bold text-foreground/80">{selectedChallenge.minTradingDays} days</p>
+                      {/* <p className="text-lg font-bold text-foreground/80">{selectedChallenge.minTradingDays} days</p> */}
                     </div>
                   </div>
 
@@ -341,7 +341,7 @@ const ChallengesContent = () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">Min Trading Days</span>
-                      <span className="text-sm font-medium text-foreground">{selectedChallenge.minTradingDays} days</span>
+                      {/* <span className="text-sm font-medium text-foreground">{selectedChallenge.minTradingDays} days</span> */}
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">Time Limit</span>
@@ -351,7 +351,7 @@ const ChallengesContent = () => {
                 </div>
 
                 {/* Challenge Trading Overview */}
-                <div>
+                {/* <div>
                   <h3 className="text-sm font-medium text-foreground mb-3">Challenge Trading Overview</h3>
                   <div className="space-y-2">
                     {[
@@ -372,7 +372,7 @@ const ChallengesContent = () => {
                       </div>
                     ))}
                   </div>
-                </div>
+                </div> */}
 
                 {/* Payout Overview */}
                 <div>
@@ -380,7 +380,7 @@ const ChallengesContent = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">Refundable Fee</span>
-                      <span className="text-sm font-medium text-foreground">{selectedChallenge.refundFee ? 'Yes' : 'No'}</span>
+                      {/* <span className="text-sm font-medium text-foreground">{selectedChallenge.refundFee ? 'Yes' : 'No'}</span> */}
                     </div>
                     {selectedChallenge.payoutFrequency && selectedChallenge.payoutFrequency.length > 0 && (
                       <div>

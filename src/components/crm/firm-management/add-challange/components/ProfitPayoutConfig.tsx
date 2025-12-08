@@ -77,19 +77,7 @@ export const ProfitPayoutConfig: React.FC<ProfitPayoutConfigProps> = ({
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="leverage">Leverage *</Label>
-                        <Input
-                            id="leverage"
-                            {...register("leverage")}
-                            placeholder="e.g., 1:50"
-                        />
-                        {errors.leverage && (
-                            <p className="text-sm text-destructive">
-                                {errors.leverage.message}
-                            </p>
-                        )}
-                    </div>
+
                 </div>
 
                 <Separator />

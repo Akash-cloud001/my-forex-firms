@@ -1,11 +1,11 @@
 import React from "react";
-import { Control, UseFieldArrayRemove, UseFieldArrayAppend, UseFormRegister, FieldArrayWithId } from "react-hook-form";
+import { Control, UseFieldArrayRemove, UseFieldArrayAppend, UseFormRegister, FieldArrayWithId, FieldErrors } from "react-hook-form";
 import { Plus, Trash2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ProgramFormData, EvaluationStep } from "../types";
+import { ProgramFormData } from "../types";
 
 interface EvaluationStepsProps {
     control: Control<ProgramFormData>;
@@ -14,6 +14,7 @@ interface EvaluationStepsProps {
     appendStep: UseFieldArrayAppend<ProgramFormData, "evaluationSteps">;
     removeStep: UseFieldArrayRemove;
     isInstantType: boolean;
+    errors: FieldErrors<ProgramFormData>;
 }
 
 export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
@@ -22,6 +23,7 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
     appendStep,
     removeStep,
     isInstantType,
+    errors,
 }) => {
     if (isInstantType) return null;
 
@@ -41,6 +43,10 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
                             appendStep({
                                 stepNumber: stepFields.length + 1,
                                 profitTarget: "",
+                                maxLoss: "",
+                                dailyLoss: "",
+                                minTradingDays: 0,
+                                maxLossType: "static",
                             })
                         }
                         variant="outline"
@@ -86,6 +92,11 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
                                             { valueAsNumber: true }
                                         )}
                                     />
+                                    {errors.evaluationSteps?.[index]?.stepNumber && (
+                                        <p className="text-sm text-destructive">
+                                            {errors.evaluationSteps[index]?.stepNumber?.message}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2">
@@ -94,22 +105,37 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
                                         {...register(`evaluationSteps.${index}.profitTarget`)}
                                         placeholder="e.g., 8%"
                                     />
+                                    {errors.evaluationSteps?.[index]?.profitTarget && (
+                                        <p className="text-sm text-destructive">
+                                            {errors.evaluationSteps[index]?.profitTarget?.message}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>Max Loss</Label>
+                                    <Label>Max Loss *</Label>
                                     <Input
                                         {...register(`evaluationSteps.${index}.maxLoss`)}
                                         placeholder="e.g., 6%"
                                     />
+                                    {errors.evaluationSteps?.[index]?.maxLoss && (
+                                        <p className="text-sm text-destructive">
+                                            {errors.evaluationSteps[index]?.maxLoss?.message}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>Daily Loss</Label>
+                                    <Label>Daily Loss *</Label>
                                     <Input
                                         {...register(`evaluationSteps.${index}.dailyLoss`)}
                                         placeholder="e.g., 4%"
                                     />
+                                    {errors.evaluationSteps?.[index]?.dailyLoss && (
+                                        <p className="text-sm text-destructive">
+                                            {errors.evaluationSteps[index]?.dailyLoss?.message}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2">
@@ -122,6 +148,24 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
                                         )}
                                         placeholder="e.g., 5"
                                     />
+                                    {errors.evaluationSteps?.[index]?.minTradingDays && (
+                                        <p className="text-sm text-destructive">
+                                            {errors.evaluationSteps[index]?.minTradingDays?.message}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Max Loss Type *</Label>
+                                    <Input
+                                        {...register(`evaluationSteps.${index}.maxLossType`)}
+                                        placeholder="e.g., Static, Trailing"
+                                    />
+                                    {errors.evaluationSteps?.[index]?.maxLossType && (
+                                        <p className="text-sm text-destructive">
+                                            {errors.evaluationSteps[index]?.maxLossType?.message}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </CardContent>

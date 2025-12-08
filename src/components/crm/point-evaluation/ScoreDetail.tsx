@@ -18,7 +18,8 @@ const CompactScoresAdmin: React.FC<{ firmId: string }> = ({ firmId }) => {
         setEditValue,
         saveEdit,
         cancelEdit,
-        setEditingFactor
+        setEditingFactor,
+        isSaving
     } = useScoreEditing(setScoresData, firmId);
 
     const [expandedPillar, setExpandedPillar] = useState<string | null>('credibility');
@@ -48,7 +49,7 @@ const CompactScoresAdmin: React.FC<{ firmId: string }> = ({ firmId }) => {
     return (
         <div className="min-h-screen bg-background text-white p-4">
             <div className="max-w-6xl mx-auto">
-                <ScoreHeader firmName={scoresData.firmName} />
+                <ScoreHeader firmName={scoresData.firmName} ptiScore={scoresData.ptiScore} />
 
                 <div className="space-y-2">
                     {pillarsConfig.map((pillar: Pillar) => (
@@ -68,6 +69,7 @@ const CompactScoresAdmin: React.FC<{ firmId: string }> = ({ firmId }) => {
                             saveEdit={saveEdit}
                             cancelEdit={cancelEdit}
                             setEditingFactor={setEditingFactor}
+                            isSaving={isSaving}
                         />
                     ))}
                 </div>

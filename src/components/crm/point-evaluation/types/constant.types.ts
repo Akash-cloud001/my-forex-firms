@@ -42,15 +42,11 @@ export interface ScoresData {
     firmName: string;
     evaluatedAt: Date;
     isEvaluated: boolean;
+    ptiScore?: number;
     scores: {
         [pillarId: string]: PillarScores;
     };
 }
-
-// ============================================================================
-// TypeScript Type Definitions for Point Evaluation Constants
-// ============================================================================
-
 
 export interface EditingFactor {
     pillarId: string;

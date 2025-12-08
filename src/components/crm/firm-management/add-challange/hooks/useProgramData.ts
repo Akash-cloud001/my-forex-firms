@@ -43,22 +43,14 @@ export const useProgramData = ({ programId, propFirmId, reset }: UseProgramDataP
                         accountSizes: program.accountSizes || [],
                         profitSplit: program.profitSplit,
                         payoutFrequency: program.payoutFrequency || [],
-                        leverage: program.leverage,
-                        stopLossRequired: program.stopLossRequired,
-                        eaAllowed: program.eaAllowed,
-                        weekendHolding: program.weekendHolding,
-                        overnightHolding: program.overnightHolding,
-                        newsTrading: program.newsTrading,
-                        copyTrading: program.copyTrading,
-                        refundFee: program.refundFee,
+
+                        // Trading Rules
+                        evaluationRule: program.evaluationRule,
+                        fundedRule: program.fundedRule,
+
                         payoutMethods: program.payoutMethods || [],
-                        profitTarget: program.profitTarget,
-                        dailyLoss: program.dailyLoss,
-                        maxLoss: program.maxLoss,
-                        maxLossType: program.maxLossType,
                         timeLimit: program.timeLimit,
                         drawdownResetType: program.drawdownResetType,
-                        minTradingDays: program.minTradingDays,
                     });
 
                     toast.success("Program loaded successfully");

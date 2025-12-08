@@ -5,6 +5,7 @@ export interface IPointEvaluation extends Document {
     firmName: string;
     isEvaluated: boolean;
     evaluatedAt: Date;
+    ptiScore: number;
     scores: {
         credibility: {
             physical_legal_presence: {
@@ -75,6 +76,7 @@ const PointEvaluationSchema = new Schema<IPointEvaluation>(
         firmName: { type: String, required: true },
         isEvaluated: { type: Boolean, default: false },
         evaluatedAt: { type: Date, default: Date.now },
+        ptiScore: { type: Number, default: 0 },
         scores: {
             credibility: {
                 physical_legal_presence: {

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Save, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ const ProgramForm = ({ programId }: { programId?: string }) => {
     reset,
     formState: { errors },
   } = useForm<ProgramFormData>({
-    resolver: zodResolver(programSchema),
+    resolver: zodResolver(programSchema) as Resolver<ProgramFormData>,
     defaultValues: {
       ...DEFAULT_FORM_VALUES,
       propFirmId: params.id || "",
@@ -165,6 +165,7 @@ const ProgramForm = ({ programId }: { programId?: string }) => {
             appendStep={appendStep}
             removeStep={removeStep}
             isInstantType={isInstantType}
+            errors={errors}
           />
 
           {/* Account Sizes & Pricing */}
@@ -188,7 +189,7 @@ const ProgramForm = ({ programId }: { programId?: string }) => {
           />
 
           {/* Trading Rules & Restrictions */}
-          <TradingRules control={control} />
+          <TradingRules control={control} register={register} isInstantType={isInstantType} />
 
           {/* Advanced Settings */}
           <AdvancedSettings register={register} />

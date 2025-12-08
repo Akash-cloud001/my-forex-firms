@@ -20,6 +20,7 @@ interface PillarItemProps {
     saveEdit: () => void;
     cancelEdit: () => void;
     setEditingFactor: React.Dispatch<React.SetStateAction<EditingFactor | null>>;
+    isSaving: boolean;
 }
 
 const PillarItem: React.FC<PillarItemProps> = ({
@@ -36,7 +37,8 @@ const PillarItem: React.FC<PillarItemProps> = ({
     setEditValue,
     saveEdit,
     cancelEdit,
-    setEditingFactor
+    setEditingFactor,
+    isSaving
 }) => {
     const { total, maxTotal } = calculatePillarScore(pillar);
 
@@ -88,6 +90,7 @@ const PillarItem: React.FC<PillarItemProps> = ({
                                 saveEdit={saveEdit}
                                 cancelEdit={cancelEdit}
                                 setEditingFactor={setEditingFactor}
+                                isSaving={isSaving}
                             />
                         ))}
                     </div>

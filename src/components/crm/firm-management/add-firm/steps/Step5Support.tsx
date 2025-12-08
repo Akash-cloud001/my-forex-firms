@@ -9,7 +9,7 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import { StepProps } from "./Step2Leadership";
 import { FirmFormData } from "../schema/schema";
 
-export function Step5Support({ onNext, onPrevious }:StepProps) {
+export function Step5Support({ onNext, onPrevious }: StepProps) {
   const { register, control, watch, setValue, formState: { errors } } = useFormContext<FirmFormData>();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -26,11 +26,11 @@ export function Step5Support({ onNext, onPrevious }:StepProps) {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
+        <div className="space-y-2">
           <Label>Average Resolution Time</Label>
           <Input {...register('support.avgResolutionTime')} placeholder="e.g., 24 hours" />
         </div>
-        <div>
+        <div className="space-y-2">
           <Label>Support Hours</Label>
           <Input {...register('support.supportHours')} placeholder="e.g., 24/7" />
         </div>
@@ -105,7 +105,7 @@ export function Step5Support({ onNext, onPrevious }:StepProps) {
                     <Select
                       value={watch(`support.channels.${index}.status`)}
                       onValueChange={(value) =>
-                        setValue(`support.channels.${index}.status`,   value as "active" | "inactive")
+                        setValue(`support.channels.${index}.status`, value as "active" | "inactive")
                       }
                     >
                       <SelectTrigger>

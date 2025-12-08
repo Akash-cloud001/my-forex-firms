@@ -176,75 +176,100 @@ export async function POST(req: Request) {
             : 0.5;
 
         /** ------- SCORES OBJECT ------- **/
+        // Helper to sum values in a deeply nested object
+        const sumValues = (obj: Record<string, unknown>): number => {
+            let total = 0;
+            for (const key in obj) {
+                const value = obj[key];
+                if (typeof value === 'object' && value !== null) {
+                    total += sumValues(value as Record<string, unknown>);
+                } else if (typeof value === 'number') {
+                    total += value;
+                }
+            }
+            return total;
+        };
+
+        const credibilityScore = {
+            physical_legal_presence: {
+                registered_company: isRegisteredLegalCompany,//total ==1
+                physical_office: isPhysicalOfficeAddressVisible,//total ==1
+                dashboard_friendlyness: 0,//total ==1
+            },
+            public_identity_transparency: {
+                public_ceo_founder: publicCeoScore,//total ==1
+                support_quality: supportScore,//total ==1
+                terms_clarity: 0,//total ==1
+                brocker_backed: brokerBackedScore,//total ==0.3
+            },
+            social_community_presence: {
+                active_social: 0,//total ==0.5
+                transparent_comm: 0,//total ==0.5
+            },
+            trust_signals_history: {
+                verified_payouts: 0,//total ==0.5
+                lifetime_payouts: isLifeTimePayouts,//total ==1.2
+                no_controversies: 0,//total ==0.5
+                consistent_ops: isConsistentOperations,//total ==0.5
+            },
+        };
+
+        const tradingScore = {
+            trading_conditions: {
+                fair_spreads: 0, //total ==1
+                fair_commissions: 0, //total ==1
+                acceptable_slippage: 0, //total ==1
+                multiple_trading_platforms: multiPlatformScore, //total ==1
+            },
+            trading_freedom: {
+                profit_targets: profitTargetScore, //total ==1
+                consistancy_rule: 0,//total ==1
+                news_trading: 0,//total ==1
+            },
+            rules_fairness: {
+                lavrage_margin_rule: 0,//total ==1
+                no_hidden_restrictions_stratgy: 0,//total ==1
+                dd_type: 0,//total ==1
+            },
+        };
+
+        const payoutScore = {
+            payout_reliability: {
+                no_payout_denial_policy: 0,//total ==1
+                payout_cycle: payoutCycleScore,//total ==1
+                single_highest_payout: 0,//total ==1
+            },
+            payout_behavior: {
+                payout_time: processingTimeScore,//total ==2
+                flexible_payout_methods: payoutMethodScore,//total ==1
+                payout_denials: payoutDenialScore,//total ==1
+            },
+            payout_payment_structure: {
+                fair_profit_split: profitSplitScore, //total==1
+                flexible_payment_methods: paymentMethodsScore, //total==1
+                reasonable_minimum_payout_requiremnts: 0, //total==1
+            },
+        };
+
+        const totalCredibility = sumValues(credibilityScore);
+        const totalTrading = sumValues(tradingScore);
+        const totalPayoutScore = sumValues(payoutScore);
+
+        const initialPtiScore = (totalCredibility * 0.35) + (totalTrading * 0.30) + (totalPayoutScore * 0.35);
+
         const scoreData = {
             firmId: firm._id,
             firmName: firm.firmDetails.name,
             evaluatedAt: new Date(),
             isEvaluated: true,
+            ptiScore: parseFloat(initialPtiScore.toFixed(2)),
             scores: {
-                credibility: {
-                    physical_legal_presence: {
-
-                        registered_company: isRegisteredLegalCompany,//total ==1
-                        physical_office: isPhysicalOfficeAddressVisible,//total ==1
-                        dashboard_friendlyness: 0,//total ==1
-                    },
-                    public_identity_transparency: {
-                        public_ceo_founder: publicCeoScore,//total ==1
-                        support_quality: supportScore,//total ==1
-                        terms_clarity: 0,//total ==1
-                        brocker_backed: brokerBackedScore,//total ==0.3
-                    },
-                    social_community_presence: {
-                        active_social: 0,//total ==0.5
-                        transparent_comm: 0,//total ==0.5
-                    },
-                    trust_signals_history: {
-                        verified_payouts: 0,//total ==0.5
-                        lifetime_payouts: isLifeTimePayouts,//total ==1.2
-                        no_controversies: 0,//total ==0.5
-                        consistent_ops: isConsistentOperations,//total ==0.5
-                    },
-                },
-                trading_experience: {
-                    trading_conditions: {
-                        fair_spreads: 0, //total ==1
-                        fair_commissions: 0, //total ==1
-                        acceptable_slippage: 0, //total ==1
-                        multiple_trading_platforms: multiPlatformScore, //total ==1
-                    },
-                    trading_freedom: {
-                        profit_targets: profitTargetScore, //total ==1
-                        consistancy_rule: 0,//total ==1
-                        news_trading: 0,//total ==1
-                    },
-                    rules_fairness: {
-                        lavrage_margin_rule: 0,//total ==1
-                        no_hidden_restrictions_stratgy: 0,//total ==1
-                        dd_type: 0,//total ==1
-                    },
-                },
-                payout_payment_experience: {
-                    payout_reliability: {
-                        no_payout_denial_policy: 0,//total ==1
-                        payout_cycle: payoutCycleScore,//total ==1
-                        single_highest_payout: 0,//total ==1
-                    },
-                    payout_behavior: {
-                        payout_time: processingTimeScore,//total ==2
-                        flexible_payout_methods: payoutMethodScore,//total ==1
-                        payout_denials: payoutDenialScore,//total ==1
-                    },
-                    payout_payment_structure: {
-                        fair_profit_split: profitSplitScore, //total==1
-                        flexible_payment_methods: paymentMethodsScore, //total==1
-                        reasonable_minimum_payout_requiremnts: 0, //total==1
-                    },
-                },
+                credibility: credibilityScore,
+                trading_experience: tradingScore,
+                payout_payment_experience: payoutScore,
             },
         };
 
-        /** 🔥 Save or Update in DB */
         const evaluation = await PointEvaluation.findOneAndUpdate(
             { firmId: firm._id },
             { $set: scoreData },
