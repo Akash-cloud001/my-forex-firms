@@ -2,6 +2,7 @@
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
 import Canvas3D from "./Canvas3D";
+import AnimatedNumber from "@/components/common/AnimatedNumber";
 
 // Hook to detect if device is desktop (not touch)
 function useIsDesktop() {
@@ -130,9 +131,10 @@ function FirstSection() {
               </div>
             ))}
             <div className="flex flex-col items-start text-white/60 ml-2 !mt-3">
-              <p className="font-bold text-base md:text-[20px] leading-[100%]">
-                100+
-              </p>
+              <AnimatedNumber
+                value="100+"
+                className="font-bold text-base md:text-[20px] leading-[100%]"
+              />
               <p className="text-base md:text-[20px] font-light tracking-[-0.05em]">
                 Verified Brokers
               </p>
@@ -150,9 +152,10 @@ function FirstSection() {
                 <Image src={item.src} alt="verify-badge" fill />
               </div>
               <div className="flex gap-2 items-center text-white/60">
-                <p className="font-bold text-base md:text-lg leading-[100%]">
-                  {item.value}
-                </p>
+                <AnimatedNumber
+                  value={item.value}
+                  className="font-bold text-base md:text-lg leading-[100%]"
+                />
                 <p className="text-base md:text-lg font-light tracking-[-0.05em] whitespace-nowrap">
                   {item.label}
                 </p>
