@@ -22,7 +22,6 @@ export interface IProgram extends Document {
     label: string;
     percentage: string;
   }[];
-  leverage: string;
 
   evaluationRule: {
     stopLoss: { required: boolean; note: string };
@@ -32,6 +31,7 @@ export interface IProgram extends Document {
     newsTrading: { required: boolean; note: string };
     copyTrading: { required: boolean; note: string };
     consistency: { required: boolean; note: string };
+    maxRiskPerTrade: { required: boolean; note: string };
   };
 
   fundedRule: {
@@ -42,6 +42,7 @@ export interface IProgram extends Document {
     newsTrading: { required: boolean; note: string };
     copyTrading: { required: boolean; note: string };
     consistency: { required: boolean; note: string };
+    maxRiskPerTrade: { required: boolean; note: string };
   };
 
   payoutMethods: string[];
@@ -92,8 +93,6 @@ const ProgramSchema = new Schema<IProgram>(
       },
     ],
 
-    leverage: { type: String, required: true },
-
     evaluationRule: {
       stopLoss: RuleSchema,
       eaAllowed: RuleSchema,
@@ -102,6 +101,7 @@ const ProgramSchema = new Schema<IProgram>(
       newsTrading: RuleSchema,
       copyTrading: RuleSchema,
       consistency: RuleSchema,
+      maxRiskPerTrade: RuleSchema,
     },
 
     fundedRule: {
@@ -112,6 +112,7 @@ const ProgramSchema = new Schema<IProgram>(
       newsTrading: RuleSchema,
       copyTrading: RuleSchema,
       consistency: RuleSchema,
+      maxRiskPerTrade: RuleSchema
     },
 
     payoutMethods: [{ type: String }],

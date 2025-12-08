@@ -1,12 +1,20 @@
 import * as z from "zod";
 
-// Zod Schemas
+// Reusable rule schema
+const ruleSchema = z.object({
+    required: z.boolean().default(false),
+    note: z.string().optional(),
+});
+
 export const evaluationStepSchema = z.object({
     stepNumber: z.number().min(1),
     profitTarget: z.string().min(1, "Profit target is required"),
-    maxLoss: z.string().optional(),
-    dailyLoss: z.string().optional(),
-    minTradingDays: z.number().optional(),
+    maxLoss: z.string().min(1, "Max Loss is required"),
+    dailyLoss: z.string().min(1, "Daily Loss is required"),
+    minTradingDays: z.number().min(0).optional(),
+    maxLossType: z.enum(["trailing", "static"], {
+        message: "Max Loss Type must be either 'trailing' or 'static'",
+    }),
 });
 
 export const accountSizeSchema = z.object({
@@ -19,6 +27,17 @@ export const payoutFrequencySchema = z.object({
     percentage: z.string().min(1, "Percentage is required"),
 });
 
+export const tradingRuleSetSchema = z.object({
+    stopLoss: ruleSchema,
+    eaAllowed: ruleSchema,
+    weekendHolding: ruleSchema,
+    overnightHolding: ruleSchema,
+    newsTrading: ruleSchema,
+    copyTrading: ruleSchema,
+    consistency: ruleSchema,
+    maxRiskPerTrade: ruleSchema,
+});
+
 export const programSchema = z.object({
     propFirmId: z.string().min(1, "Prop Firm ID is required"),
     type: z.string().min(1, "Type is required"),
@@ -28,43 +47,20 @@ export const programSchema = z.object({
     accountSizes: z.array(accountSizeSchema).min(1, "At least one account size required"),
     profitSplit: z.string().min(1, "Profit split is required"),
     payoutFrequency: z.array(payoutFrequencySchema).min(1),
-    leverage: z.string().min(1, "Leverage is required"),
-    stopLossRequired: z.boolean(),
-    eaAllowed: z.boolean(),
-    weekendHolding: z.boolean(),
-    overnightHolding: z.boolean(),
-    newsTrading: z.boolean(),
-    copyTrading: z.boolean(),
-    refundFee: z.boolean(),
-    payoutMethods: z
-        .array(z.string())
-        .min(1, "At least one payout method required"),
-    profitTarget: z.string().optional(),
-    dailyLoss: z.string().optional(),
-    maxLoss: z.string().optional(),
-    maxLossType: z.string().optional(),
+
+    evaluationRule: tradingRuleSetSchema,
+    fundedRule: tradingRuleSetSchema,
+
+    payoutMethods: z.array(z.string()).min(1, "At least one payout method required"),
     timeLimit: z.string().optional(),
     drawdownResetType: z.string().optional(),
-    minTradingDays: z.number().optional(),
 });
 
-// TypeScript Types
+// Export TS types
 export type EvaluationStep = z.infer<typeof evaluationStepSchema>;
 export type AccountSize = z.infer<typeof accountSizeSchema>;
 export type PayoutFrequency = z.infer<typeof payoutFrequencySchema>;
+export type TradingRuleSet = z.infer<typeof tradingRuleSetSchema>;
 export type ProgramFormData = z.infer<typeof programSchema>;
 
 export type ChallengeType = "1-Step" | "2-Step" | "3-Step" | "Instant";
-
-export interface TradingRule {
-    name: keyof Pick<ProgramFormData,
-        "stopLossRequired" |
-        "eaAllowed" |
-        "weekendHolding" |
-        "overnightHolding" |
-        "newsTrading" |
-        "copyTrading" |
-        "refundFee"
-    >;
-    label: string;
-}

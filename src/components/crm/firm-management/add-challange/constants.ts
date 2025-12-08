@@ -1,4 +1,4 @@
-import { EvaluationStep, ProgramFormData, TradingRule } from "./types";
+import { EvaluationStep, ProgramFormData } from "./types";
 
 // Challenge Types
 export const CHALLENGE_TYPES = {
@@ -8,7 +8,19 @@ export const CHALLENGE_TYPES = {
     INSTANT: "Instant",
 } as const;
 
-// Default Form Values
+// Default Nested Rules
+const DEFAULT_RULE_SET = {
+    stopLoss: { required: false, note: "" },
+    eaAllowed: { required: false, note: "" },
+    weekendHolding: { required: false, note: "" },
+    overnightHolding: { required: false, note: "" },
+    newsTrading: { required: false, note: "" },
+    copyTrading: { required: false, note: "" },
+    consistency: { required: false, note: "" },
+    maxRiskPerTrade: { required: false, note: "" },
+};
+
+// Default Form Values Aligned to Updated Schema
 export const DEFAULT_FORM_VALUES: Partial<ProgramFormData> = {
     type: "",
     name: "",
@@ -17,18 +29,17 @@ export const DEFAULT_FORM_VALUES: Partial<ProgramFormData> = {
     accountSizes: [],
     profitSplit: "",
     payoutFrequency: [{ label: "", percentage: "" }],
-    leverage: "",
-    stopLossRequired: false,
-    eaAllowed: false,
-    weekendHolding: false,
-    overnightHolding: false,
-    newsTrading: false,
-    copyTrading: false,
-    refundFee: false,
+
+    // Global rules for the entire program
+    evaluationRule: DEFAULT_RULE_SET,
+    fundedRule: DEFAULT_RULE_SET,
+
     payoutMethods: [],
-    minTradingDays: 0,
+    timeLimit: "",
+    drawdownResetType: "",
 };
 
+// Default Evaluation Step Templates Based on Challenge Type
 export const DEFAULT_EVALUATION_STEPS: Record<string, EvaluationStep[]> = {
     "1-Step": [
         {
@@ -37,6 +48,7 @@ export const DEFAULT_EVALUATION_STEPS: Record<string, EvaluationStep[]> = {
             maxLoss: "",
             dailyLoss: "",
             minTradingDays: 0,
+            maxLossType: "static",
         },
     ],
     "2-Step": [
@@ -46,6 +58,7 @@ export const DEFAULT_EVALUATION_STEPS: Record<string, EvaluationStep[]> = {
             maxLoss: "",
             dailyLoss: "",
             minTradingDays: 0,
+            maxLossType: "static",
         },
         {
             stepNumber: 2,
@@ -53,6 +66,7 @@ export const DEFAULT_EVALUATION_STEPS: Record<string, EvaluationStep[]> = {
             maxLoss: "",
             dailyLoss: "",
             minTradingDays: 0,
+            maxLossType: "static",
         },
     ],
     "3-Step": [
@@ -62,6 +76,7 @@ export const DEFAULT_EVALUATION_STEPS: Record<string, EvaluationStep[]> = {
             maxLoss: "",
             dailyLoss: "",
             minTradingDays: 0,
+            maxLossType: "static",
         },
         {
             stepNumber: 2,
@@ -69,6 +84,7 @@ export const DEFAULT_EVALUATION_STEPS: Record<string, EvaluationStep[]> = {
             maxLoss: "",
             dailyLoss: "",
             minTradingDays: 0,
+            maxLossType: "static",
         },
         {
             stepNumber: 3,
@@ -76,18 +92,7 @@ export const DEFAULT_EVALUATION_STEPS: Record<string, EvaluationStep[]> = {
             maxLoss: "",
             dailyLoss: "",
             minTradingDays: 0,
+            maxLossType: "static",
         },
     ],
 };
-
-// Trading Rules Configuration
-export const TRADING_RULES: TradingRule[] = [
-    { name: "stopLossRequired", label: "Stop Loss Required" },
-    { name: "eaAllowed", label: "Expert Advisors (EA) Allowed" },
-    { name: "weekendHolding", label: "Weekend Position Holding" },
-    { name: "overnightHolding", label: "Overnight Position Holding" },
-    { name: "newsTrading", label: "News Trading Allowed" },
-    { name: "copyTrading", label: "Copy Trading Allowed" },
-    { name: "refundFee", label: "Refundable Fee" },
-
-];

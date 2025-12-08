@@ -272,7 +272,12 @@ export default function ReviewDetailModal({
                                 <Separator className="bg-border/50" />
 
                                 {/* Actions Section */}
-                                <div className="space-y-3 pt-2">
+
+                                {review.firmId === null ? (
+                                    <div className="mt-2 rounded-md bg-primary flex items-center justify-center px-3 py-2 text-sm text-white">
+                                        Please onboard this firm; it is not listed yet.
+                                    </div>
+                                ) : (<div className="space-y-3 pt-2">
                                     <Label className="text-xs text-muted-foreground">Actions</Label>
                                     <div className="grid grid-cols-3 gap-3">
                                         <Button
@@ -305,7 +310,8 @@ export default function ReviewDetailModal({
                                             Request Info
                                         </Button>
                                     </div>
-                                </div>
+                                </div>)}
+
                             </TabsContent>
 
                             <TabsContent value="communication" className="px-6 pb-6 mt-0 pt-4 space-y-3">
@@ -370,6 +376,7 @@ export default function ReviewDetailModal({
             </Dialog>
 
             {/* Request Info Form Dialog */}
+
             <Dialog open={showInfoForm} onOpenChange={setShowInfoForm}>
                 <DialogContent className="max-w-2xl bg-card text-white border-border">
                     <DialogHeader>
