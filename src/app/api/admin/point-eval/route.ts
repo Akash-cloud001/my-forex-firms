@@ -66,11 +66,34 @@ export async function POST(req: Request) {
             { $match: { propFirmId: new Types.ObjectId(firmId) } },
             {
                 $addFields: {
-                    isTwoStep: { $eq: [{ $toLower: "$type" }, "2-Step"] },
-                    phase1: { $toInt: { $arrayElemAt: ["$evaluationSteps.profitTarget", 0] } },
-                    phase2: { $toInt: { $arrayElemAt: ["$evaluationSteps.profitTarget", 1] } },
-                    profitSplitNumber: { $toInt: "$profitSplit" }
-
+                    isTwoStep: { $eq: [{ $toLower: "$type" }, "2-step"] },
+                    phase1: {
+                        $toInt: {
+                            $replaceAll: {
+                                input: { $toString: { $arrayElemAt: ["$evaluationSteps.profitTarget", 0] } },
+                                find: "%",
+                                replacement: ""
+                            }
+                        }
+                    },
+                    phase2: {
+                        $toInt: {
+                            $replaceAll: {
+                                input: { $toString: { $arrayElemAt: ["$evaluationSteps.profitTarget", 1] } },
+                                find: "%",
+                                replacement: ""
+                            }
+                        }
+                    },
+                    profitSplitNumber: {
+                        $toInt: {
+                            $replaceAll: {
+                                input: { $toString: "$profitSplit" },
+                                find: "%",
+                                replacement: ""
+                            }
+                        }
+                    }
                 }
             },
             {
@@ -263,6 +286,18 @@ export async function POST(req: Request) {
             evaluatedAt: new Date(),
             isEvaluated: true,
             ptiScore: parseFloat(initialPtiScore.toFixed(2)),
+            credibilityTransparency: {
+                maxScore: 10,
+                score: totalCredibility,
+            },
+            tradingExperience: {
+                maxScore: 10,
+                score: totalTrading,
+            },
+            payoutPaymentReliability: {
+                maxScore: 10,
+                score: totalPayoutScore,
+            },
             scores: {
                 credibility: credibilityScore,
                 trading_experience: tradingScore,
