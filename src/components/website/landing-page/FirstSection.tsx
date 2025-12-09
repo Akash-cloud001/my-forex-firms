@@ -53,11 +53,11 @@ function FirstSection() {
 
   const stats = [
     {
-      value: "1000+",
+      value: "200+",
       label: "Real Trader Complaints",
       src: "/website/real-trader.png",
     },
-    { value: "1M+", label: "Monthly Views", src: "/website/monthly-views.png" },
+    { value: "1000+", label: "Monthly Views", src: "/website/monthly-views.png" },
   ];
 
   // Handle mouse movement for camera rotation (desktop only)
@@ -120,19 +120,33 @@ function FirstSection() {
 
         <div>
           <div className="flex flex-row items-center mt-4">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className={index !== 0 ? "-ml-4" : ""}>
+              <div className="relative rounded-full overflow-hidden h-12 w-12 flex items-center justify-center bg-foreground/20">
                 <Image
-                  src={"/website/hero/trader" + (index + 1) + ".png"}
+                  src={"/website/hero/ftmo.png"}
+                  alt="verify-badge"
+                  height={24}
+                  width={24}
+                />
+              </div>
+              <div className="relative rounded-full overflow-hidden h-12 w-12 flex items-center justify-center bg-[#000042] -ml-2">
+                <Image
+                  src={"/website/hero/fundingPips.svg"}
+                  alt="verify-badge"
+                  height={24}
+                  width={24}
+                />
+              </div>
+              <div className="relative rounded-full overflow-hidden h-12 w-12 flex items-center justify-center -ml-2">
+                <Image
+                  src={"/website/hero/the5ers.jpeg"}
                   alt="verify-badge"
                   height={48}
                   width={48}
                 />
               </div>
-            ))}
             <div className="flex flex-col items-start text-white/60 ml-2 !mt-3">
               <AnimatedNumber
-                value="100+"
+                value="30+"
                 className="font-bold text-base md:text-[20px] leading-[100%]"
               />
               <p className="text-base md:text-[20px] font-light tracking-[-0.05em]">
