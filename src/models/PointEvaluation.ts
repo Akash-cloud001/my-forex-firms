@@ -6,6 +6,18 @@ export interface IPointEvaluation extends Document {
     isEvaluated: boolean;
     evaluatedAt: Date;
     ptiScore: number;
+    credibilityTransparency: {
+        maxScore: number;
+        score: number;
+    }
+    tradingExperience: {
+        maxScore: number;
+        score: number;
+    }
+    payoutPaymentReliability: {
+        maxScore: number;
+        score: number;
+    }
     scores: {
         credibility: {
             physical_legal_presence: {
@@ -77,6 +89,18 @@ const PointEvaluationSchema = new Schema<IPointEvaluation>(
         isEvaluated: { type: Boolean, default: false },
         evaluatedAt: { type: Date, default: Date.now },
         ptiScore: { type: Number, default: 0 },
+        credibilityTransparency: {
+            maxScore: { type: Number, default: 0 },
+            score: { type: Number, default: 0 },
+        },
+        tradingExperience: {
+            maxScore: { type: Number, default: 0 },
+            score: { type: Number, default: 0 },
+        },
+        payoutPaymentReliability: {
+            maxScore: { type: Number, default: 0 },
+            score: { type: Number, default: 0 },
+        },
         scores: {
             credibility: {
                 physical_legal_presence: {
