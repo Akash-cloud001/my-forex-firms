@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Star, Search, Scale, BarChart3, TrendingUp, List, LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableOfContentsItem } from '@/types/firm-review';
-import { useBlog } from '@/stores/blogStore';
+import { useBlogDetails } from '@/hooks/queries/useBlogDetails';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import BlogHero from '@/components/website/blog/BlogHero';
 import BlogIntroduction from '@/components/website/blog/BlogIntroduction';
@@ -42,19 +42,17 @@ const iconMap: Record<string, LucideIcon> = {
 export default function BlogDetailPage({ params }: BlogPageProps) {
     const [activeSection, setActiveSection] = React.useState('overview');
     const [isMobileTocOpen, setIsMobileTocOpen] = React.useState(false);
-    const { blog: reviewData, isLoading, error, fetchBlog, clearBlog } = useBlog();
+    const [slug, setSlug] = React.useState<string>('');
 
-    // Get slug from params and fetch blog
+    // Get slug from params
     React.useEffect(() => {
         params.then(({ slug: blogSlug }) => {
-            fetchBlog(blogSlug);
+            setSlug(blogSlug);
         });
+    }, [params]);
 
-        // Cleanup: clear blog when component unmounts
-        return () => {
-            clearBlog();
-        };
-    }, [params, fetchBlog, clearBlog]);
+    // Fetch blog using React Query
+    const { data: reviewData, isLoading, isError } = useBlogDetails(slug);
 
     // Table of contents data from review data
     const tableOfContents = React.useMemo(() => {
@@ -67,53 +65,104 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
     }, [reviewData]);
 
  
-    // Replace the existing "Scroll tracking for active section" useEffect with this:
+    // Scroll tracking for active section with proper timing for React Query
     React.useEffect(() => {
-        if (!tableOfContents || tableOfContents.length === 0) return;
+        if (!tableOfContents || tableOfContents.length === 0 || !reviewData) return;
 
-        // If the overview section exists right away, ensure activeSection starts as 'overview'
-        const overviewEl = document.getElementById('overview');
-        if (overviewEl) {
-            setActiveSection('overview');
-        }
+        let observer: IntersectionObserver | null = null;
+        let retryTimeout: NodeJS.Timeout | null = null;
+        let initialTimeout: NodeJS.Timeout | null = null;
 
-        // IntersectionObserver options: rootMargin moves the "viewport" so
-        // the section becomes active roughly when it's near the middle of the screen.
-        const observerOptions: IntersectionObserverInit = {
-            root: null,
-            rootMargin: '-40% 0px -40% 0px', // triggers roughly when section is in center area
-            threshold: 0, // 0 is fine because rootMargin handles when it becomes active
-        };
+        // Function to set up the observer
+        const setupObserver = () => {
+            // IntersectionObserver options: rootMargin moves the "viewport" so
+            // the section becomes active roughly when it's near the middle of the screen.
+            const observerOptions: IntersectionObserverInit = {
+                root: null,
+                rootMargin: '-40% 0px -40% 0px', // triggers roughly when section is in center area
+                threshold: 0, // 0 is fine because rootMargin handles when it becomes active
+            };
 
-        const observer = new IntersectionObserver((entries) => {
-            // We want the entry that's intersecting and has the largest intersectionRatio / isIntersecting
-            // Since rootMargin shrinks the intersection area, first intersecting entry is usually what we want.
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    setActiveSection(entry.target.id);
+            observer = new IntersectionObserver((entries) => {
+                // We want the entry that's intersecting and has the largest intersectionRatio / isIntersecting
+                // Since rootMargin shrinks the intersection area, first intersecting entry is usually what we want.
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setActiveSection(entry.target.id);
+                    }
+                });
+            }, observerOptions);
+
+            // Try to observe each section element
+            const elementsToObserve: Element[] = [];
+            tableOfContents.forEach((item) => {
+                const el = document.getElementById(item.id);
+                if (el) {
+                    elementsToObserve.push(el);
+                    observer!.observe(el);
                 }
             });
-        }, observerOptions);
 
-        // Observe each section element that exists
-        tableOfContents.forEach((item) => {
-            const el = document.getElementById(item.id);
-            if (el) observer.observe(el);
+            // If we found elements, we're done
+            if (elementsToObserve.length > 0) {
+                // Set initial active section to overview if it exists and no section is active yet
+                const overviewEl = document.getElementById('overview');
+                if (overviewEl) {
+                    // Use a small delay to check current state
+                    setTimeout(() => {
+                        const currentEl = document.querySelector('[id].bg-primary\\/10');
+                        if (!currentEl) {
+                            setActiveSection('overview');
+                        }
+                    }, 50);
+                }
+                return true;
+            }
+
+            return false;
+        };
+
+        // Use requestAnimationFrame to wait for DOM to be ready, then try to set up observer
+        const frameId = requestAnimationFrame(() => {
+            // Try setting up observer immediately
+            if (!setupObserver()) {
+                // If elements aren't found, retry after a short delay
+                retryTimeout = setTimeout(() => {
+                    if (!setupObserver()) {
+                        // Final retry after a longer delay
+                        setTimeout(() => {
+                            setupObserver();
+                        }, 300);
+                    }
+                }, 100);
+            }
         });
 
         // Fallback: ensure initial active is 'overview' if nothing intersects quickly
-        const initialTimeout = window.setTimeout(() => {
-            if (!document.getElementById(activeSection)) {
-                // if activeSection is invalid for some reason, set to overview if present
-                if (overviewEl) setActiveSection('overview');
+        initialTimeout = setTimeout(() => {
+            const overviewEl = document.getElementById('overview');
+            if (overviewEl) {
+                // Check if any section is currently active by looking for the active class
+                const activeEl = document.querySelector('[id].bg-primary\\/10');
+                if (!activeEl) {
+                    setActiveSection('overview');
+                }
             }
-        }, 200); // short timeout — safe fallback
+        }, 500);
 
         return () => {
-            observer.disconnect();
-            clearTimeout(initialTimeout);
+            cancelAnimationFrame(frameId);
+            if (observer) {
+                observer.disconnect();
+            }
+            if (retryTimeout) {
+                clearTimeout(retryTimeout);
+            }
+            if (initialTimeout) {
+                clearTimeout(initialTimeout);
+            }
         };
-    }, [tableOfContents]); // only re-run when tableOfContents changes
+    }, [tableOfContents, reviewData]); // Depend on reviewData to ensure data is loaded
 
 
     const scrollToSection = (sectionId: string) => {
@@ -138,11 +187,11 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
     }
 
     // Error state
-    if (error || !reviewData) {
+    if (isError || !reviewData) {
         return (
             <div className="min-h-screen bg-background pt-12 flex items-center justify-center">
                 <div className="text-center">
-                    <p className="text-destructive text-lg mb-4">{error || 'Review not found'}</p>
+                    <p className="text-destructive text-lg mb-4">Review not found</p>
                     <Button asChild variant="link">
                         <Link href="/blogs">Back to Blogs</Link>
                     </Button>
@@ -152,7 +201,7 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
     }
 
     return (
-        <div className="min-h-screen bg-background pt-12">
+        <div className="min-h-screen bg-background pt-24">
             {/* Main Layout Container */}
             <div className="relative max-w-7xl mx-auto grid grid-cols-12">
                 {/* Table of Contents */}

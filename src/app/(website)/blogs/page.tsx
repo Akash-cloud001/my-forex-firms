@@ -5,19 +5,12 @@ import Link from "next/link";
 import { ArrowRightIcon, Calendar, Clock, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AnimatedSection from "@/components/website/AnimatedSection";
-import { useBlogList } from "@/stores/blogStore";
+import { useBlogList } from "@/hooks/queries/useBlogList";
 import { Badge } from "@/components/ui/badge";
 import LoadingScreen from "@/components/ui/LoadingScreen";
 
 export default function BlogsPage() {
-  const { blogs, isLoading, error, fetchBlogs, hasBlogs } = useBlogList();
-
-  // Fetch blogs on mount
-  React.useEffect(() => {
-    if (!hasBlogs && !isLoading) {
-      fetchBlogs();
-    }
-  }, [hasBlogs, isLoading, fetchBlogs]);
+  const { data: blogs = [], isLoading, isError, error } = useBlogList();
 
   // Show LoadingScreen at page level when loading
   if (isLoading) {
@@ -25,7 +18,7 @@ export default function BlogsPage() {
   }
 
   return (
-      <section className="w-full bg-background pt-12 pb-16 sm:pb-24">
+      <section className="w-full bg-background pt-24 pb-16 sm:pb-24">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <AnimatedSection id="blogs-page-header" delay={0.2}>
                 <div className="text-center space-y-3">
@@ -42,11 +35,11 @@ export default function BlogsPage() {
                 </div>
                 </AnimatedSection>
                 
-                {error ? (
+                {isError ? (
                     <div className="mt-12 flex items-center justify-center py-20">
                         <div className="text-center">
-                            <p className="text-destructive mb-4">{error}</p>
-                            <Button onClick={fetchBlogs}>Try Again</Button>
+                            <p className="text-destructive mb-4">{error?.message || 'Failed to load blogs'}</p>
+                            <Button onClick={() => window.location.reload()}>Try Again</Button>
                         </div>
                     </div>
                 ) : blogs.length === 0 ? (
@@ -68,7 +61,7 @@ export default function BlogsPage() {
                                     <div className="absolute inset-0 opacity-70 transition duration-500 group-hover:opacity-90" />
                                     <div className="relative z-10 flex h-full flex-col justify-between bg-black/30 backdrop-blur-[2px] p-6 sm:p-8">
                                         <div className="space-y-4">
-                                            <div className="flex items-center gap-2 flex-wrap">
+                                            {/* <div className="flex items-center gap-2 flex-wrap">
                                                 <Badge variant="outline" className="text-xs capitalize">
                                                     {blog.firmName}
                                                 </Badge>
@@ -76,12 +69,15 @@ export default function BlogsPage() {
                                                     <Star className="h-3 w-3 text-yellow-400 fill-current" />
                                                     <span className="text-xs text-white/60">{blog.rating.toFixed(1)}</span>
                                                 </div>
-                                            </div>
+                                            </div> */}
                                             <h3 className="text-2xl font-semibold text-white font-geist-sans leading-tight capitalize">
                                                 {blog.title}
                                             </h3>
-                                            <p className="text-white/80 text-sm sm:text-base font-light line-clamp-1 capitalize">
+                                            <p className="text-white/80 text-sm sm:text-base font-light line-clamp-1 capitalize -mt-3">
                                                 {blog.subtitle}
+                                            </p>
+                                            <p className="text-white/80 text-xs sm:text-sm font-light line-clamp-2 capitalize">
+                                                {blog.introduction}
                                             </p>
                                             <div className="flex items-center gap-4 text-xs text-white/60">
                                                 <div className="flex items-center gap-1">

@@ -29,7 +29,7 @@ export default function BlogHero({ reviewData }: BlogHeroProps) {
         <AnimatedSection id="blog-hero">
             <section className="relative overflow-hidden max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
                 <div className="w-full">
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center justify-between mb-4">
                         <Button
                             asChild
                             variant="link"
