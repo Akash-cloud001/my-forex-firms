@@ -11,11 +11,10 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12 lg:py-16">
+      <div className="max-w-4xl mx-auto pt-24 pb-12 px-4">
         {/* Header */}
         <div className="mb-8 sm:mb-12">
-          <div className="flex items-center gap-3 mb-4">
-            <Info className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+          <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">
               About Us — MyForexFirms
             </h1>
