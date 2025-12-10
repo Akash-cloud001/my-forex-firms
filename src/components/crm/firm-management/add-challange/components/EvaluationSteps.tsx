@@ -25,7 +25,89 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
     isInstantType,
     errors,
 }) => {
-    if (isInstantType) return null;
+    if (isInstantType) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>Funded Criteria</CardTitle>
+                    <CardDescription>
+                        Define the funded account criteria for instant funding
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <Label>Profit Target *</Label>
+                            <Input
+                                {...register("fundedCriteria.profitTarget")}
+                                placeholder="e.g., 10%"
+                            />
+                            {errors.fundedCriteria?.profitTarget && (
+                                <p className="text-sm text-destructive">
+                                    {errors.fundedCriteria.profitTarget.message}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Max Loss *</Label>
+                            <Input
+                                {...register("fundedCriteria.maxLoss")}
+                                placeholder="e.g., 6%"
+                            />
+                            {errors.fundedCriteria?.maxLoss && (
+                                <p className="text-sm text-destructive">
+                                    {errors.fundedCriteria.maxLoss.message}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Daily Loss *</Label>
+                            <Input
+                                {...register("fundedCriteria.dailyLoss")}
+                                placeholder="e.g., 4%"
+                            />
+                            {errors.fundedCriteria?.dailyLoss && (
+                                <p className="text-sm text-destructive">
+                                    {errors.fundedCriteria.dailyLoss.message}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Min Trading Days</Label>
+                            <Input
+                                type="number"
+                                {...register("fundedCriteria.minTradingDays", {
+                                    valueAsNumber: true,
+                                })}
+                                placeholder="e.g., 5"
+                            />
+                            {errors.fundedCriteria?.minTradingDays && (
+                                <p className="text-sm text-destructive">
+                                    {errors.fundedCriteria.minTradingDays.message}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Max Loss Type *</Label>
+                            <Input
+                                {...register("fundedCriteria.maxLossType")}
+                                placeholder="e.g., Static, Trailing"
+                            />
+                            {errors.fundedCriteria?.maxLossType && (
+                                <p className="text-sm text-destructive">
+                                    {errors.fundedCriteria.maxLossType.message}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
 
     return (
         <Card>

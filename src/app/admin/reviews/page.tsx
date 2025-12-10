@@ -52,7 +52,7 @@ export default function ReviewsList() {
   const updateReviewStatus = async (reviewId: string, status: ReviewStatus) => {
     try {
       setIsUpdating(true);
-      const response = await fetch(`/api/reviews/${reviewId}`, {
+      const response = await fetch(`/api/admin/reviews/${reviewId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
