@@ -145,7 +145,7 @@ const ReviewsPage = () => {
   }
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-screen pt-24 pb-8">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-8">

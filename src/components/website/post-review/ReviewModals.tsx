@@ -2,6 +2,7 @@ import React from 'react'
 import { AlertCircle } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
 interface SuccessModalProps {
   open: boolean
@@ -14,14 +15,14 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({ open, onOpenChange }
       <DialogContent className="sm:max-w-md text-white border-none rounded-md">
         <div className="space-y-4 py-4">
           <div className="text-center">
-            <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 text-4xl">
-              🎉
+            <div className="mx-auto w-20 h-20 rounded-full bg-secondary/5 flex items-center justify-center text-4xl mb-4">
+              <Image src="/website/complaint-icon.svg" alt="Success" width={50} height={50} />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              Review Submitted Successfully
+              Complaint Submitted Successfully
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Your review will be reviewed by our team and published once approved. 
+              Your complaint will be reviewed by our team and published once approved. 
               This helps maintain the quality and credibility of our PropTrust Index™.
             </p>
           </div>
@@ -54,7 +55,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({ open, onOpenChange, erro
             Submission Failed
           </DialogTitle>
           <DialogDescription className="text-center text-base">
-            There was an error submitting your review.
+            There was an error submitting your complaint.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -63,7 +64,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({ open, onOpenChange, erro
               <AlertCircle className="h-8 w-8 text-red-600" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              Review Submission Failed
+              Complaint Submission Failed
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
               {errorMessage}
