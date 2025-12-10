@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Target, Shield, Eye, TrendingUp, Users, CheckCircle2, Info, Lightbulb, FileText, BarChart3, Heart, Lock, Globe2 } from 'lucide-react';
 
 export const metadata = {
   title: 'About Us | MyForexFirms.com',
@@ -29,8 +28,7 @@ export default function AboutPage() {
             <div className="prose prose-slate dark:prose-invert max-w-none">
               {/* Introduction */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   Introduction
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4">
@@ -45,8 +43,7 @@ export default function AboutPage() {
 
               {/* Why We Built This */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   Why We Built This
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4">
@@ -64,8 +61,7 @@ export default function AboutPage() {
 
               {/* What We Do */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   What We Do
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-6">
@@ -168,8 +164,7 @@ export default function AboutPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Card className="border-border bg-muted/30">
                     <CardContent className="p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <Target className="h-5 w-5 text-primary" />
+                      <div className="mb-4">
                         <h3 className="text-lg font-bold text-foreground">Mission</h3>
                       </div>
                       <p className="text-sm text-muted-foreground leading-relaxed">
@@ -180,8 +175,7 @@ export default function AboutPage() {
 
                   <Card className="border-border bg-muted/30">
                     <CardContent className="p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <Eye className="h-5 w-5 text-primary" />
+                      <div className="mb-4">
                         <h3 className="text-lg font-bold text-foreground">Vision</h3>
                       </div>
                       <p className="text-sm text-muted-foreground leading-relaxed">
@@ -196,14 +190,12 @@ export default function AboutPage() {
 
               {/* Core Values */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-6 flex items-center gap-2">
-                  <Heart className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-6">
                   Our Core Values
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <Card className="border-border bg-muted/30">
                     <CardContent className="p-4 text-center">
-                      <Shield className="h-6 w-6 text-primary mx-auto mb-3" />
                       <h3 className="text-base font-semibold text-foreground mb-2">Integrity</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground">
                         Ratings are never influenced by money or partnerships.
@@ -213,7 +205,6 @@ export default function AboutPage() {
 
                   <Card className="border-border bg-muted/30">
                     <CardContent className="p-4 text-center">
-                      <CheckCircle2 className="h-6 w-6 text-primary mx-auto mb-3" />
                       <h3 className="text-base font-semibold text-foreground mb-2">Accuracy</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground">
                         Every rating is supported by research and verification.
@@ -223,7 +214,6 @@ export default function AboutPage() {
 
                   <Card className="border-border bg-muted/30">
                     <CardContent className="p-4 text-center">
-                      <Eye className="h-6 w-6 text-primary mx-auto mb-3" />
                       <h3 className="text-base font-semibold text-foreground mb-2">Transparency</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground">
                         Our methodology and scoring are public and fair.
@@ -233,7 +223,6 @@ export default function AboutPage() {
 
                   <Card className="border-border bg-muted/30">
                     <CardContent className="p-4 text-center">
-                      <TrendingUp className="h-6 w-6 text-primary mx-auto mb-3" />
                       <h3 className="text-base font-semibold text-foreground mb-2">Independence</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground">
                         Affiliate links never affect ratings or PTI.
@@ -243,7 +232,6 @@ export default function AboutPage() {
 
                   <Card className="border-border bg-muted/30 sm:col-span-2 lg:col-span-1">
                     <CardContent className="p-4 text-center">
-                      <Users className="h-6 w-6 text-primary mx-auto mb-3" />
                       <h3 className="text-base font-semibold text-foreground mb-2">Trader‑First</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground">
                         Every feature is built with trader protection in mind.
@@ -257,8 +245,7 @@ export default function AboutPage() {
 
               {/* Team */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Users className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   Team Behind MyForexFirms
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-6">
@@ -330,8 +317,7 @@ export default function AboutPage() {
 
               {/* Independence */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Lock className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   Independence
                 </h2>
                 <Card className="border-border bg-muted/30">
@@ -341,23 +327,23 @@ export default function AboutPage() {
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></div>
                         <p className="text-xs sm:text-sm text-muted-foreground">No paid reviews</p>
                       </div>
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></div>
                         <p className="text-xs sm:text-sm text-muted-foreground">No rating manipulation</p>
                       </div>
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></div>
                         <p className="text-xs sm:text-sm text-muted-foreground">No influence from affiliate earnings</p>
                       </div>
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></div>
                         <p className="text-xs sm:text-sm text-muted-foreground">Evidence required for complaint impact</p>
                       </div>
                       <div className="flex items-start gap-3 sm:col-span-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></div>
                         <p className="text-xs sm:text-sm text-muted-foreground">Transparent penalty and scoring rules</p>
                       </div>
                     </div>
@@ -372,8 +358,7 @@ export default function AboutPage() {
 
               {/* Commitment */}
               <section className="mb-4">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Globe2 className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   Commitment to Traders
                 </h2>
                 <Card className="border-border bg-muted/30">
@@ -383,27 +368,27 @@ export default function AboutPage() {
                     </p>
                     <div className="space-y-3">
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></div>
                         <p className="text-xs sm:text-sm text-muted-foreground">Stay neutral</p>
                       </div>
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></div>
                         <p className="text-xs sm:text-sm text-muted-foreground">Stay transparent</p>
                       </div>
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></div>
                         <p className="text-xs sm:text-sm text-muted-foreground">Protect trader interests</p>
                       </div>
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></div>
                         <p className="text-xs sm:text-sm text-muted-foreground">Keep improving scoring models</p>
                       </div>
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></div>
                         <p className="text-xs sm:text-sm text-muted-foreground">Update firm ratings as new data emerges</p>
                       </div>
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></div>
                         <p className="text-xs sm:text-sm text-muted-foreground">Hold firms accountable using verified reporting</p>
                       </div>
                     </div>

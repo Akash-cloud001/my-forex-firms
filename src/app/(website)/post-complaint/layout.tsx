@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "/post-review",
+    url: "/post-complaint",
     siteName: "My Forex Firms",
     title: "Submit a Review - Share Your Trading Experience",
     description: "Share your honest review of prop trading firms. Help the trading community make informed decisions.",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   alternates: {
-    canonical: "/post-review",
+    canonical: "/post-complaint",
   },
 };
 

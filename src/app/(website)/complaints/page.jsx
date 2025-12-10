@@ -116,9 +116,9 @@ const ReviewsPage = () => {
       <div className="min-h-screen py-8">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-foreground mb-4 headline-grad">Your Reviews</h1>
+            <h1 className="text-4xl font-bold text-foreground mb-4 headline-grad">Your Complaints</h1>
             <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
-              <p className="text-yellow-800 dark:text-yellow-200">Please sign in to view your reviews.</p>
+              <p className="text-yellow-800 dark:text-yellow-200">Please sign in to view your complaints.</p>
             </div>
           </div>
         </div>
@@ -131,9 +131,9 @@ const ReviewsPage = () => {
       <div className="min-h-screen py-8">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-foreground mb-4 headline-grad">Your Reviews</h1>
+            <h1 className="text-4xl font-bold text-foreground mb-4 headline-grad">Your Complaints</h1>
             <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-              <p className="text-red-800 dark:text-red-200">Error loading reviews: {error}</p>
+              <p className="text-red-800 dark:text-red-200">Error loading Complaints: {error}</p>
               <Button onClick={fetchReviews} className="mt-4">
                 Try Again
               </Button>
@@ -169,7 +169,7 @@ const ReviewsPage = () => {
               }
             </p>
             <Button asChild>
-              <a href="/post-review">Submit Your First Complaint</a>
+              <a href="/post-complaint">Submit Your First Complaint</a>
             </Button>
           </div>
         ) : (
