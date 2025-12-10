@@ -63,9 +63,9 @@ const Navbar = () => {
         <div 
             onClick={() => router.push('/reviews')} 
             variant="outline" 
-            className="text-foreground font-semibold w-full sm:w-auto text-sm capitalize font-geist-sans cursor-pointer btn-grad"
+            className="text-foreground font-semibold w-full sm:w-auto text-sm capitalize font-geist-sans cursor-pointer btn-grad w-max"
           >
-            My Reviews
+            My Complaints
           </div>
           <div onClick={() => router.push("/profile")} className="relative cursor-pointer">
             {user?.imageUrl ? (
