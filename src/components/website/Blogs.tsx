@@ -99,18 +99,17 @@ const Blogs = () => {
 
     {/* Mobile View */}
     <div className="grid lg:hidden grid-cols-1 grid-rows-4  gap-6 m-4">
-        <div className="relative overflow-hidden card-custom-grad rounded-md pt-4 px-4 pb-2">
+        <Link href="/blogs/funding-pips-review" className="relative overflow-hidden card-custom-grad rounded-md pt-4 px-4 pb-2">
             <Image src="/website/blog-1-bg.png" alt="Blog 1" fill className="absolute top-0 left-0 w-full h-full object-cover object-center" />
             <div className="relative z-[1] h-full w-full">
                 <h3 className="text-3xl md:text-6xl lg:text-7xl text-primary font-extrabold font-geist-sans tracking-tight text-left">
                     B-1
                 </h3>
                 <p className="mt-4 text-lg md:text-2xl lg:text-4xl font-geist-sans font-semibold first-letter:uppercase leading-tight text-white whitespace-normal tracking-tight">
-                    How myforexfirms works ?
+                    Funding Pips Review 2025
                 </p>
                 <p className="mt-2 text-base font-geist-sans font-light leading-tight text-white/80 whitespace-normal line-clamp-3">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptatibus quia placeat odio cupiditate aperiam corrupti, ducimus exercitationem aut in enim rem molestias corporis sunt doloribus, suscipit, consequatur itaque reprehenderit at!
-                    Mollitia similique ut, provident maxime in nam, nostrum quibusdam beatae impedit dolores harum ex nihil 
+                    Is Funding Pips really a trader‑friendly prop firm, or just another hype-driven evaluation company? After researching their rules, payout structure, trader feedback, risk parameters, and comparing them with top prop firms in 2025, this is the most honest, complete, and data-based Funding Pips review you&apos;ll read this year.
                 </p>
                 <Button className="mt-4 text-primary/80 hover:text-primary duration-300 ease-in-out float-right" variant="ghost">
                     <span className="text-primary/80 hover:text-primary duration-300 ease-in-out">Read More</span>
@@ -118,64 +117,61 @@ const Blogs = () => {
                 </Button>
             </div>
 
-        </div>
-        <div className="relative overflow-hidden card-custom-grad rounded-md pt-4 px-4 pb-2">
-            <Image src="/website/blog-3-bg.png" alt="Blog 1" fill className="absolute top-0 left-0 w-full h-full object-cover object-center" />
+        </Link>
+        <Link href="/blogs/maven-review" className="relative overflow-hidden card-custom-grad rounded-md pt-4 px-4 pb-2">
+            <Image src="/website/blog-2-bg.png" alt="Blog 2" fill className="absolute top-0 left-0 w-full h-full object-cover object-center" />
             <div className="relative z-[1] h-full w-full">
                 <h3 className="text-3xl md:text-6xl lg:text-7xl text-primary font-extrabold font-geist-sans tracking-tight text-left">
                     B-2
                 </h3>
                 <p className="mt-4 text-lg md:text-2xl lg:text-4xl font-geist-sans font-semibold first-letter:uppercase leading-tight text-white whitespace-normal tracking-tight">
-                    How myforexfirms works ?
+                    Maven Review 2025
                 </p>
                 <p className="mt-2 text-base font-geist-sans font-light leading-tight text-white/80 whitespace-normal line-clamp-3">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptatibus quia placeat odio cupiditate aperiam corrupti, ducimus exercitationem aut in enim rem molestias corporis sunt doloribus, suscipit, consequatur itaque reprehenderit at!
-                    Mollitia similique ut, provident maxime in nam, nostrum quibusdam beatae impedit dolores harum ex nihil 
+                    Before judging whether Maven is genuinely a trader-friendly prop firm or just another hype-driven evaluation company, I took a deep look at their rules, payout system, trader feedback, and risk model. After comparing all of that with the leading prop firms of 2025, this turned into one of the most straightforward and data-driven Maven reviews you&apos;ll read this year.
                 </p>
                 <Button className="mt-4 text-primary/80 hover:text-primary duration-300 ease-in-out float-right" variant="ghost">
                     <span className="text-primary/80 hover:text-primary duration-300 ease-in-out">Read More</span>
                     <ArrowRightIcon className="w-4 h-4" />
                 </Button>
             </div>
-        </div>
-        <div className="relative overflow-hidden card-custom-grad rounded-md pt-4 px-4 pb-2">
-            <Image src="/website/blog-2-bg.png" alt="Blog 1" fill className="absolute top-0 left-0 w-full h-full object-cover object-center" />
+        </Link>
+        <Link href="/blogs/the5ers-review" className="relative overflow-hidden card-custom-grad rounded-md pt-4 px-4 pb-2">
+            <Image src="/website/blog-3-bg.png" alt="Blog 3" fill className="absolute top-0 left-0 w-full h-full object-cover object-center" />
             <div className="relative z-[1] h-full w-full">
                 <h3 className="text-3xl md:text-6xl lg:text-7xl text-primary font-extrabold font-geist-sans tracking-tight text-left">
                     B-3
                 </h3>
                 <p className="mt-4 text-lg md:text-2xl lg:text-4xl font-geist-sans font-semibold first-letter:uppercase leading-tight text-white whitespace-normal tracking-tight">
-                    How myforexfirms works ?
+                    The5ers Review 2025
                 </p>
                 <p className="mt-2 text-base font-geist-sans font-light leading-tight text-white/80 whitespace-normal line-clamp-3">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptatibus quia placeat odio cupiditate aperiam corrupti, ducimus exercitationem aut in enim rem molestias corporis sunt doloribus, suscipit, consequatur itaque reprehenderit at!
-                    Mollitia similique ut, provident maxime in nam, nostrum quibusdam beatae impedit dolores harum ex nihil 
+                    Before calling The5ers trader-friendly or hype-driven, it made sense to break down their rules, payouts, trader experiences, and risk model. After comparing all of that with the leading prop firms of 2025, this review turned out to be one of the most honest and data-backed takes you&apos;ll read this year.
                 </p>
                 <Button className="mt-4 text-primary/80 hover:text-primary duration-300 ease-in-out float-right" variant="ghost">
                     <span className="text-primary/80 hover:text-primary duration-300 ease-in-out">Read More</span>
                     <ArrowRightIcon className="w-4 h-4" />
                 </Button>
             </div>
-        </div>
-        <div className="relative overflow-hidden card-custom-grad rounded-md pt-4 px-4 pb-2">
-            <Image src="/website/blog-4-bg.png" alt="Blog 1" fill className="absolute top-0 left-0 w-full h-full object-cover object-center" />
+        </Link>
+        <Link href="/blogs/funded-next-review" className="relative overflow-hidden card-custom-grad rounded-md pt-4 px-4 pb-2">
+            <Image src="/website/blog-4-bg.png" alt="Blog 4" fill className="absolute top-0 left-0 w-full h-full object-cover object-center" />
             <div className="relative z-[1] h-full w-full">
                 <h3 className="text-3xl md:text-6xl lg:text-7xl text-primary font-extrabold font-geist-sans tracking-tight text-left">
                     B-4
                 </h3>
                 <p className="mt-4 text-lg md:text-2xl lg:text-4xl font-geist-sans font-semibold first-letter:uppercase leading-tight text-white whitespace-normal tracking-tight">
-                    How myforexfirms works ?
+                    Funded Next Review 2025
                 </p>
                 <p className="mt-2 text-base font-geist-sans font-light leading-tight text-white/80 whitespace-normal line-clamp-3">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptatibus quia placeat odio cupiditate aperiam corrupti, ducimus exercitationem aut in enim rem molestias corporis sunt doloribus, suscipit, consequatur itaque reprehenderit at!
-                    Mollitia similique ut, provident maxime in nam, nostrum quibusdam beatae impedit dolores harum ex nihil 
+                    Is Funded Trader Markets LTD really a trader‑friendly prop firm, or just another hype-driven evaluation company? After researching their rules, payout structure, trader feedback, risk parameters, and comparing them with top prop firms in 2025, this is the most honest, complete, and data-based Funded Next review you&apos;ll read this year.
                 </p>
                 <Button className="mt-4 text-primary/80 hover:text-primary duration-300 ease-in-out float-right" variant="ghost">
                     <span className="text-primary/80 hover:text-primary duration-300 ease-in-out">Read More</span>
                     <ArrowRightIcon className="w-4 h-4" />
                 </Button>
             </div>
-        </div>
+        </Link>
     </div>
     </section>
   );

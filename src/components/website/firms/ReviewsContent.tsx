@@ -23,6 +23,14 @@ const ReviewsContent: React.FC<ReviewsContentProps> = ({ reviews = [], isLoading
     setSelectedReview(null);
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'approved': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+      case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+      case 'rejected': return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+    }
+  }
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -62,6 +70,7 @@ const ReviewsContent: React.FC<ReviewsContentProps> = ({ reviews = [], isLoading
           <ReviewCard
             key={review._id}
             userName={review.userName}
+            firmName={review.firmName}
             issueType={review.issueType}
             description={review.description}
             files={review.files.map(file => ({
@@ -84,7 +93,7 @@ const ReviewsContent: React.FC<ReviewsContentProps> = ({ reviews = [], isLoading
           ...selectedReview,
           isVerified: true, // Public reviews are always verified/approved
         } : null}
-        getStatusColor={undefined}
+        getStatusColor={getStatusColor}
         formatDate={formatDate}
         onDelete={undefined} // No delete functionality in public view
       />

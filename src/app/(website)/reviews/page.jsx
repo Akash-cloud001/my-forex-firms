@@ -145,13 +145,13 @@ const ReviewsPage = () => {
   }
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-screen pt-24 pb-8">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2 headline-grad">Your Reviews</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-2 headline-grad">Your Complaints</h1>
           <p className="text-base text-muted-foreground">
-            Manage and track your submitted reviews
+            Manage and track your submitted complaints
           </p>
         </div>
 
@@ -161,15 +161,15 @@ const ReviewsPage = () => {
             <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
               <MessageSquare className="h-12 w-12 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">No reviews found</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-2">No complaints found</h3>
             <p className="text-muted-foreground mb-4">
               {filter === 'all' 
-                ? "You haven't submitted any reviews yet." 
-                : `No ${filter} reviews found.`
+                ? "You haven't submitted any complaints yet." 
+                : `No ${filter} complaints found.`
               }
             </p>
             <Button asChild>
-              <a href="/post-review">Submit Your First Review</a>
+              <a href="/post-review">Submit Your First Complaint</a>
             </Button>
           </div>
         ) : (
@@ -182,6 +182,7 @@ const ReviewsPage = () => {
                 files={review.files}
                 userId={review.userId}
                 userName={user?.fullName || user?.firstName || undefined}
+                firmName={review.firmName}
                 onClick={() => handleViewReview(review)}
                 status={review.status}
                 getStatusColor={getStatusColor}

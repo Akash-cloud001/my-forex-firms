@@ -23,7 +23,7 @@ const bottombar = () => {
           </section>
         </TooltipTrigger>
         <TooltipContent side="left" className="bg-black/90 text-white border-none">
-          <p>Post Review</p>
+          <p>Post Complaint</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

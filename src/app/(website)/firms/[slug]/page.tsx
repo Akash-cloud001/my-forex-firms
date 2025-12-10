@@ -21,7 +21,7 @@ const tabs = [
     value: 'challenges'
   },
   {
-    name: 'Reviews',
+    name: 'Complaints',
     value: 'reviews'
   },
   {
@@ -117,7 +117,7 @@ const FirmPage = () => {
   }
 
   return (
-    <section className='w-full min-h-screen py-12 px-4 text-foreground background-gradient overflow-hidden'>
+    <section className='w-full min-h-screen pt-24 pb-12 px-4 text-foreground background-gradient overflow-hidden'>
       <FirmHeader
         firmData={firmData || null}
         firmId={firmData._id}

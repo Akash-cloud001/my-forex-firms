@@ -13,7 +13,8 @@ const isPublicRoute = createRouteMatcher([
   '/privacy-policy(.*)',
   '/terms-conditions(.*)',
   '/about(.*)',
-  '/reviews(.*)',
+  '/model(.*)',
+  '/site-map(.*)',
 ])
 
 const isDashboardRoute = createRouteMatcher([

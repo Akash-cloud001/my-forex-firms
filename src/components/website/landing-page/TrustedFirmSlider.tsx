@@ -69,7 +69,7 @@ export default function TrustedFirmSlider() {
   }
 
   return (
-    <div className="mt-0 pt-0 pb-24">
+    <div className="mt-12 pt-0 pb-24">
       <div className="flex flex-col justify-center items-center ">
         <h3 className="font-geist-sans font-semibold text-2xl text-primary text-shadow-white">
           Industry
