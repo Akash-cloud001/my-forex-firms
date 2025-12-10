@@ -236,7 +236,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
           )}
 
           <Button variant="outline" size="sm" className="text-primary font-semibold text-xs cursor-pointer" onClick={onClick}>
-            Read Review
+            Read Complaint
           </Button>
         </div>
       </div>

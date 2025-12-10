@@ -149,7 +149,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
     <>
       <Card className="shadow-xl">
         <CardHeader>
-          <CardTitle className="text-2xl">Review Form</CardTitle>
+          <CardTitle className="text-2xl">Complaint Form</CardTitle>
           <CardDescription>
             Please provide detailed information about your experience. All
             fields are required unless marked optional.
@@ -335,7 +335,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
                 disabled={isSubmittingForm}
                 className="min-w-32 btn-grad"
               >
-                {isSubmittingForm ? "Submitting..." : "Submit Review"}
+                {isSubmittingForm ? "Submitting..." : "Submit Complaint"}
               </Button>
             </div>
           </form>
@@ -344,7 +344,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
 
       <p className="text-xs text-muted-foreground max-w-3xl mx-auto mt-8 px-5 text-center">
         Help the trading community by sharing your experience with prop firms.
-        Your review contributes to our PropTrust Index™ and helps other traders
+        Your complaint contributes to our PropTrust Index™ and helps other traders
         make informed decisions.
       </p>
 

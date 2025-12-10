@@ -17,8 +17,8 @@ const bottombar = () => {
       <Tooltip>
         <TooltipTrigger asChild>
           <section className="w-12 h-12 rounded-full border border-border bg-white/10 backdrop-blur-sm fixed bottom-16 right-4 md:right-8 z-50 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-colors">
-            <Link href="/post-review" className='relative block w-6 h-6 '>
-              <Image src="/website/review-btn.svg" alt="review" fill className='object-contain' />
+            <Link href="/post-complaint" className='relative block w-6 h-6 '>
+              <Image src="/website/review-btn.svg" alt="Complaint" fill className='object-contain' />
             </Link>
           </section>
         </TooltipTrigger>

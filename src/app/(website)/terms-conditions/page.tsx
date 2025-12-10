@@ -1,7 +1,6 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Scale, Users, Shield, AlertTriangle, BookOpen, Link as LinkIcon, UserX, RefreshCw, Mail } from "lucide-react";
 
 export const metadata = {
   title: 'Terms & Conditions | MyForexFirms.com',
@@ -9,12 +8,6 @@ export const metadata = {
 };
 
 export default function TermsConditionsPage() {
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto pt-24 pb-12 px-4">
@@ -35,8 +28,7 @@ export default function TermsConditionsPage() {
             <div className="prose prose-slate dark:prose-invert max-w-none">
               {/* Introduction */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   1. Introduction
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -60,8 +52,7 @@ export default function TermsConditionsPage() {
 
               {/* Who Can Use Our Platform */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Users className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   3. Who Can Use Our Platform
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -85,8 +76,7 @@ export default function TermsConditionsPage() {
 
               {/* Information Accuracy */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   5. Information Accuracy
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -98,8 +88,7 @@ export default function TermsConditionsPage() {
 
               {/* Ratings & Indexes */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <BookOpen className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   6. Ratings & Indexes
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -135,8 +124,7 @@ export default function TermsConditionsPage() {
 
               {/* No Financial Advice */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   9. No Financial Advice
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -172,8 +160,7 @@ export default function TermsConditionsPage() {
 
               {/* External Links */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <LinkIcon className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   12. External Links
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -185,8 +172,7 @@ export default function TermsConditionsPage() {
 
               {/* Account Removal */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <UserX className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   13. Account Removal
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -198,8 +184,7 @@ export default function TermsConditionsPage() {
 
               {/* Changes to These Terms */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <RefreshCw className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   14. Changes to These Terms
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -211,8 +196,7 @@ export default function TermsConditionsPage() {
 
               {/* Contact Us */}
               <section className="mb-4">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Mail className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   15. Contact Us
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">

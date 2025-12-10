@@ -6,45 +6,41 @@ import Image from "next/image";
 const logos = [
   {
     name: "5%ers",
-    link: "/reviews?firm=5ers",
+    link: "https://the5ers.com",
     url: "/website/firm/5s1.png",
   },
   {
     name: "Alpha Capital",
-    link: "/reviews?firm=alpha-capital",
+    link: "https://alphacapitalgroup.uk",
     url: "/website/firm/alpha1.png",
   },
   {
     name: "E8 Markets",
-    link: "/reviews?firm=e8-markets",
+    link: "https://e8markets.com",
     url: "/website/firm/e81.png",
   },
   {
     name: "Funding Pips",
-    link: "/reviews?firm=funding-pips",
+    link: "https://fundingpips.com",
     url: "/website/firm/fundingPips2.png",
   },
   {
-    name: "Group",
-    link: "/reviews?firm=group",
-    url: "/website/firm/Group.png",
-  },
-  {
     name: "5%ers",
-    link: "/reviews?firm=5ers",
+    link: "https://the5ers.com",
     url: "/website/firm/5s1.png",
   },
   {
     name: "Alpha Capital",
-    link: "/reviews?firm=alpha-capital",
+    link: "https://alphacapitalgroup.uk",
     url: "/website/firm/alpha1.png",
   },
   {
     name: "E8 Markets",
-    link: "/reviews?firm=e8-markets",
+    link: "https://e8markets.com",
     url: "/website/firm/e81.png",
   }
 ];
+
 
 export default function TrustedFirmSlider() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -93,7 +89,7 @@ export default function TrustedFirmSlider() {
               key={index}
               className="shrink-0 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 opacity-60 hover:opacity-100 "
             >
-              <a href={logo.link} className="cursor-pointer relative h-24 w-24">
+              <a href={logo.link} target="_blank" rel="noopener noreferrer" className="cursor-pointer relative h-24 w-24">
                 <Image
                   src={logo.url}
                   alt={logo.name}

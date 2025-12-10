@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Shield, FileText, Eye, Lock, Globe, Mail } from 'lucide-react';
 
 export const metadata = {
   title: 'Privacy Policy | MyForexFirms.com',
@@ -9,12 +8,6 @@ export const metadata = {
 };
 
 export default function PrivacyPolicyPage() {
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto pt-24 pb-12 px-4">
@@ -35,8 +28,7 @@ export default function PrivacyPolicyPage() {
             <div className="prose prose-slate dark:prose-invert max-w-none">
               {/* Introduction */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   Introduction
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4">
@@ -66,8 +58,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Information We Collect */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Eye className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   Information We Collect
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -91,8 +82,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Complaint Data Confidentiality */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Lock className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   Complaint Data Confidentiality
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -158,8 +148,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Data Security */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   Data Security
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -171,8 +160,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Third‑Party Links */}
               <section className="mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Globe className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   Third‑Party Links
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -220,8 +208,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Contact Us */}
               <section className="mb-4">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Mail className="h-5 w-5" />
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
                   Contact Us
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">

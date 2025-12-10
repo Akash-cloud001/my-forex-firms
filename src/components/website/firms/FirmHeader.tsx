@@ -162,7 +162,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
 
         {/* Add Complaint Button */}
         <Link
-          href={`/post-review?firmId=${firmId}`}
+          href={`/post-complaint?firmId=${firmId}`}
           className='flex items-center justify-center md:justify-start gap-2 px-4 py-2 rounded-full border-gradient text-primary tracking-tight w-full md:w-auto shrink-0'
         >
           <Plus className='w-4 h-4 text-primary' />
