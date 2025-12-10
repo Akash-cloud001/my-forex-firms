@@ -7,12 +7,18 @@ import { useFirmDetails } from '@/hooks/queries/useFirmDetails'
 import { useParams } from 'next/navigation'
 import { IProgram } from '@/models/FirmProgram'
 import Image from 'next/image'
+import { ArrowRight, Infinity, Info } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface GroupedProgram {
   type: string
@@ -214,7 +220,7 @@ const ChallengesContent = () => {
           return (
             <div
               key={group.type}
-              className="w-full sm:w-[500px] rounded-lg overflow-hidden border border-primary/50 bg-secondary/5"
+              className="w-full sm:w-[500px] rounded-lg overflow-hidden border border-primary/50 bg-secondary/5 relative pb-8"
             >
               {/* Header Section - Orange Background */}
               <div className="bg-primary p-5 flex items-center justify-between flex-wrap gap-0 sm:gap-3 h-auto sm:h-16">
@@ -227,7 +233,7 @@ const ChallengesContent = () => {
               </div>
 
               {/* Main Content - Dark Gray Background */}
-              <div className="p-5 space-y-3 text-white">
+              <div className="p-5 space-y-3 text-white ">
                 {/* Account Sizes */}
                 <div className="flex justify-between items-center">
                   <p className="text-xs sm:text-sm font-medium text-secondary/80">Account Sizes:</p>
@@ -395,15 +401,15 @@ const ChallengesContent = () => {
                 )}
 
                 {/* Features Link */}
-                <div className="flex justify-end pt-2">
+                <div className="absolute bottom-5 right-5">
                   <button
                     onClick={() => {
                       setSelectedStepType(group.type)
                       setIsFeaturesModalOpen(true)
                     }}
-                    className="text-[#F66435] underline text-xs sm:text-sm hover:opacity-80 transition-opacity"
+                    className="text-[#F66435] text-xs sm:text-sm hover:opacity-80 transition-opacity flex items-center gap-1"
                   >
-                    Features
+                    Features <ArrowRight className="w-4 h-4 -rotate-45" />
                   </button>
                 </div>
               </div>
@@ -414,14 +420,135 @@ const ChallengesContent = () => {
 
       {/* Features Modal */}
       <Dialog open={isFeaturesModalOpen} onOpenChange={setIsFeaturesModalOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-xs sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-sm">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-base sm:text-xl text-primary">
               Features - {selectedStepType ? selectedStepType.toUpperCase().replace('-', ' ') : ''} Challenge
             </DialogTitle>
           </DialogHeader>
-          <div className="py-4">
-            <p className="text-foreground/60">Features content will be added here.</p>
+          <div className="py-4 space-y-6">
+            {(() => {
+              const selectedGroup = groupedPrograms.find(g => g.type === selectedStepType)
+              if (!selectedGroup || selectedGroup.programs.length === 0) {
+                return <p className="text-foreground/60">No challenge data available.</p>
+              }
+
+              // Use first program from the group for detailed data
+              const program = selectedGroup.programs[0] as IProgram & {
+                stopLossRequired?: boolean
+                eaAllowed?: boolean
+                weekendHolding?: boolean
+                overnightHolding?: boolean
+                newsTrading?: boolean
+                copyTrading?: boolean
+                refundFee?: boolean
+                leverage?: string
+                minTradingDays?: number
+              }
+
+              return (
+                <div className="space-y-6">
+                  {/* Trading Rules */}
+                  <div>
+                    <h3 className="text-base font-semibold text-foreground mb-2">Trading Rules</h3>
+                    <div className="grid grid-cols-1 gap-2">
+                      {(() => {
+                        // Handle both direct properties and evaluationRule structure
+                        const stopLoss = program.stopLossRequired ?? program.evaluationRule?.stopLoss?.required ?? false
+                        const eaAllowed = program.eaAllowed ?? program.evaluationRule?.eaAllowed?.required ?? false
+                        const weekendHolding = program.weekendHolding ?? program.evaluationRule?.weekendHolding?.required ?? false
+                        const overnightHolding = program.overnightHolding ?? program.evaluationRule?.overnightHolding?.required ?? false
+                        const newsTrading = program.newsTrading ?? program.evaluationRule?.newsTrading?.required ?? false
+                        const copyTrading = program.copyTrading ?? program.evaluationRule?.copyTrading?.required ?? false
+
+                        const rules = [
+                          { name: 'Stop Loss Required', value: stopLoss },
+                          { name: 'EA Allowed', value: eaAllowed },
+                          { name: 'Weekend Holding', value: weekendHolding },
+                          { name: 'Overnight Holding', value: overnightHolding },
+                          { name: 'News Trading', value: newsTrading },
+                          { name: 'Copy Trading', value: copyTrading },
+                        ]
+
+                        return (
+                          <>
+                            {rules.map((rule, idx) => (
+                              <div key={idx} className="flex justify-between items-center">
+                                <span className="text-sm text-foreground/60">{rule.name}:</span>
+                                <div className="flex items-center gap-2">
+                                  <span className={`text-sm font-medium ${rule.value ? 'text-success' : 'text-destructive'}`}>
+                                    {rule.value ? 'Yes' : 'No'}
+                                  </span>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Info className="w-4 h-4 text-foreground/40 hover:text-foreground/60 cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>{rule.name}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
+                              </div>
+                            ))}
+                          </>
+                        )
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Additional Information */}
+                  <div>
+                    <h3 className="text-base font-semibold text-foreground mb-2">Additional Information</h3>
+                    <div className="space-y-2">
+                      {program.leverage && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-foreground/60 text-left">Leverage:</span>
+                          <span className="text-sm font-medium text-foreground text-right">{program.leverage}</span>
+                        </div>
+                      )}
+                      {program.timeLimit && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-foreground/60 text-left">Time Limit:</span>
+                          <span className="text-sm font-medium text-foreground text-right">
+                            {program.timeLimit === 'Unlimited' ? <Infinity className="w-6 h-6" /> +'Unlimited' : `${program.timeLimit} days`}
+                          </span>
+                        </div>
+                      )}
+                      {program.drawdownResetType && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-foreground/60 text-left">Drawdown Reset Type:</span>
+                          <span className="text-sm font-medium text-foreground text-right">{program.drawdownResetType}</span>
+                        </div>
+                      )}
+                      {program.refundFee !== undefined && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-foreground/60 text-left">Refundable Fee:</span>
+                          <span className="text-sm font-medium text-foreground text-right">{program.refundFee ? 'Yes' : 'No'}</span>
+                        </div>
+                      )}
+                      {program.evaluationSteps && program.evaluationSteps.length > 0 && program.evaluationSteps[0]?.profitTarget && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-foreground/60 text-left">Profit Target:</span>
+                          <span className="text-sm font-medium text-foreground text-right">{program.evaluationSteps[0].profitTarget.endsWith('%') ? program.evaluationSteps[0].profitTarget.split('%')[0] + '%' : program.evaluationSteps[0].profitTarget}</span>
+                        </div>
+                      )}
+                      {program.evaluationSteps && program.evaluationSteps.length > 0 && program.evaluationSteps[0]?.maxLoss && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-foreground/60 text-left">Max Loss:</span>
+                          <span className="text-sm font-medium text-foreground text-right">{program.evaluationSteps[0].maxLoss.endsWith('%') ? program.evaluationSteps[0].maxLoss.split('%')[0] + '%' : program.evaluationSteps[0].maxLoss}</span>
+                        </div>
+                      )}
+                      {program.evaluationSteps && program.evaluationSteps.length > 0 && program.evaluationSteps[0]?.dailyLoss && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-foreground/60 text-left">Daily Loss:</span>
+                          <span className="text-sm font-medium text-foreground text-right">{program.evaluationSteps[0].dailyLoss.endsWith('%') ? program.evaluationSteps[0].dailyLoss.split('%')[0] + '%' : program.evaluationSteps[0].dailyLoss}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
           </div>
         </DialogContent>
       </Dialog>

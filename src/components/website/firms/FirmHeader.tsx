@@ -33,6 +33,30 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
   factor3
 }) => {
   const isMobile = useIsMobile()
+  
+  const formatPayout = (value: number | string): string => {
+    const numValue = typeof value === 'string' ? parseFloat(value.replace(/[^0-9.-]/g, '')) : value
+    
+    if (isNaN(numValue)) return '$0'
+    
+    if (numValue >= 1000000000) {
+      // Billions
+      const billions = numValue / 1000000000
+      return `$${billions % 1 === 0 ? billions.toFixed(0) : billions.toFixed(1)}B`
+    } else if (numValue >= 1000000) {
+      // Millions
+      const millions = numValue / 1000000
+      return `$${millions % 1 === 0 ? millions.toFixed(0) : millions.toFixed(1)}M`
+    } else if (numValue >= 1000) {
+      // Thousands
+      const thousands = numValue / 1000
+      return `$${thousands % 1 === 0 ? thousands.toFixed(0) : thousands.toFixed(1)}k`
+    } else {
+      // Less than 1000
+      return `$${Math.round(numValue)}`
+    }
+  }
+  
   const getCountryCode = (name: string) => {
     // Try to get alpha-2 code from name
     const code = countries.getAlpha2Code(name, 'en')
@@ -65,7 +89,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
                 src={firmData?.firmDetails.image?.url || "/website/firm/imagePlac.png"}
                 alt={firmData?.firmDetails.name || ""}
                 fill
-                className='object-contain scale-70'
+                className='object-contain scale-80 rounded-sm'
               />
             </figure>
             <figure className="h-20 w-20 sm:h-24 sm:w-24 bg-foreground/10 rounded-[8px] relative flex flex-col items-center justify-end pb-2 shrink-0">
@@ -129,7 +153,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
                   Total Payout
                 </span>
                 <span className='text-sm md:text-base text-primary font-bold'>
-                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(firmData?.firmDetails?.totalPayout))}
+                  {formatPayout(firmData.firmDetails.totalPayout)}
                 </span>
               </div>}
             </div>
