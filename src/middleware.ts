@@ -8,13 +8,18 @@ const isPublicRoute = createRouteMatcher([
   '/api/users/webhook',
   '/api/public(.*)',
   '/api/coming-soon',
-  '/blogs(.*)',
+  '/blogs$',
   '/firms(.*)',
   '/privacy-policy(.*)',
   '/terms-conditions(.*)',
   '/about(.*)',
   '/model(.*)',
   '/site-map(.*)',
+])
+
+const isBlogEditorRoute = createRouteMatcher([
+  '/blogs/add(.*)',
+  '/blogs/edit(.*)',
 ])
 
 const isDashboardRoute = createRouteMatcher([
@@ -38,6 +43,34 @@ export default clerkMiddleware(async (auth, req) => {
   if (req.nextUrl.pathname === '/api/users/webhook') {
     return NextResponse.next();
   }
+  
+  // Check blog editor routes - require authentication and admin/editor role
+  if (isBlogEditorRoute(req)) {
+    await auth.protect()
+    const { userId } = await auth()
+    
+    if (!userId) {
+      return NextResponse.redirect(new URL('/sign-in', req.url))
+    }
+
+    try {
+      const { clerkClient } = await import('@clerk/nextjs/server')
+      const clerk = await clerkClient()
+      const user = await clerk.users.getUser(userId)
+      const userRole = user.publicMetadata?.role as string | undefined
+      const allowedRoles = ['admin', 'editor']
+
+      if (!userRole || !allowedRoles.includes(userRole)) {
+        return NextResponse.redirect(new URL('/admin/unauthorized', req.url))
+      }
+
+      return NextResponse.next()
+    } catch (error) {
+      console.error('Middleware error:', error)
+      return NextResponse.redirect(new URL('/', req.url))
+    }
+  }
+  
   if (!isPublicRoute(req)) {
     await auth.protect()
     

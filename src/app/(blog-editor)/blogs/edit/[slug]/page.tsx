@@ -1,11 +1,10 @@
 "use client";
 
-import React, { Suspense } from 'react';
+import React from 'react';
 import { useUser } from '@clerk/nextjs';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import LoadingScreen from '@/components/ui/LoadingScreen';
-import { getReviewTemplate } from '@/lib/blog-templates';
 import { FirmReview } from '@/types/firm-review';
 import BlogEditorLayout from '@/components/admin/blog-editor/BlogEditorLayout';
 import EditableBlogHero from '@/components/admin/blog-editor/editable/EditableBlogHero';
@@ -37,15 +36,18 @@ const iconMap: Record<string, LucideIcon> = {
     List,
 };
 
-function AddBlogPageContent() {
+interface AdminBlogPageProps {
+    params: Promise<{ slug: string }>;
+}
+
+export default function AdminBlogEditorPage({ params }: AdminBlogPageProps) {
     const { user, isLoaded } = useUser();
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const template = searchParams.get('template');
-    
     const [reviewData, setReviewData] = React.useState<FirmReview | null>(null);
     const [originalData, setOriginalData] = React.useState<FirmReview | null>(null);
+    const [slug, setSlug] = React.useState<string>('');
     const [isSaving, setIsSaving] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(true);
     const [activeSection, setActiveSection] = React.useState('overview');
     const [isMobileTocOpen, setIsMobileTocOpen] = React.useState(false);
 
@@ -59,57 +61,49 @@ function AddBlogPageContent() {
         }
     }, [isLoaded, user, router]);
 
-    // Initialize blog data based on template
+    // Load review data from API
     React.useEffect(() => {
-        if (!template) {
-            router.push('/admin/blogs');
-            return;
-        }
+        const fetchReviewData = async () => {
+            try {
+                const { slug: blogSlug } = await params;
+                setSlug(blogSlug);
+                
+                const response = await fetch(`/api/admin/firm-reviews/${blogSlug}`);
+                const data = await response.json();
 
-        if (template === 'review-template') {
-            const templateData = getReviewTemplate();
-            const tempSlug = 'new-blog-' + Date.now();
-            const initialized = {
-                ...templateData,
-                slug: tempSlug,
-            };
-            setReviewData(initialized);
-            setOriginalData(JSON.parse(JSON.stringify(initialized)));
-        } else {
-            router.push('/admin/blogs');
-        }
-    }, [template, router]);
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        toast.error('Review not found');
+                        router.push('/admin/blogs');
+                        return;
+                    }
+                    throw new Error(data.error || 'Failed to fetch review');
+                }
 
-    // Generate slug from firm name
-    React.useEffect(() => {
-        if (reviewData?.firmName && reviewData.firmName !== '') {
-            const generatedSlug = reviewData.firmName
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/(^-|-$)/g, '')
-                + '-review';
-            
-            if (generatedSlug && generatedSlug !== reviewData.slug) {
-                setReviewData(prev => prev ? { ...prev, slug: generatedSlug } : null);
+                if (data.success && data.review) {
+                    const clonedData = JSON.parse(JSON.stringify(data.review));
+                    setReviewData(clonedData);
+                    setOriginalData(clonedData);
+                } else {
+                    throw new Error('Invalid response format');
+                }
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : 'Failed to load review';
+                toast.error(errorMessage);
+                router.push('/admin/blogs');
+            } finally {
+                setIsLoading(false);
             }
-        }
-    }, [reviewData?.firmName, reviewData?.slug]);
+        };
+
+        fetchReviewData();
+    }, [params, router]);
 
     // Check if there are changes
     const hasChanges = React.useMemo(() => {
         if (!reviewData || !originalData) return false;
         return JSON.stringify(reviewData) !== JSON.stringify(originalData);
     }, [reviewData, originalData]);
-
-    // Check if required fields are filled
-    const hasRequiredFields = React.useMemo(() => {
-        if (!reviewData) return false;
-        return !!(
-            reviewData.firmName &&
-            reviewData.title &&
-            reviewData.slug
-        );
-    }, [reviewData]);
 
     // Handle data updates
     const handleUpdate = React.useCallback((updates: Partial<FirmReview>) => {
@@ -125,20 +119,12 @@ function AddBlogPageContent() {
 
     // Handle save
     const handleSave = async () => {
-        if (!reviewData || !hasRequiredFields) {
-            toast.error('Please fill in required fields: Firm Name and Title');
-            return;
-        }
-        
-        if (!reviewData.slug.endsWith('-review')) {
-            toast.error('Slug must end with "-review"');
-            return;
-        }
+        if (!reviewData || !hasChanges) return;
         
         setIsSaving(true);
         try {
-            const response = await fetch('/api/admin/firm-reviews', {
-                method: 'POST',
+            const response = await fetch(`/api/admin/firm-reviews/${slug}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -148,14 +134,13 @@ function AddBlogPageContent() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || 'Failed to create blog');
+                throw new Error(data.error || 'Failed to update review');
             }
 
-            toast.success('Blog created successfully!');
             setOriginalData(JSON.parse(JSON.stringify(reviewData)));
-            router.push(`/admin/blogs/${reviewData.slug}`);
+            toast.success('Review updated successfully!');
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Failed to save blog. Please try again.';
+            const errorMessage = error instanceof Error ? error.message : 'Failed to save review. Please try again.';
             toast.error(errorMessage);
         } finally {
             setIsSaving(false);
@@ -226,12 +211,12 @@ function AddBlogPageContent() {
     }
 
     // Loading state
-    if (!reviewData) {
+    if (isLoading || !reviewData) {
         return (
             <div className="min-h-screen bg-background pt-12 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Initializing template...</p>
+                    <p className="text-muted-foreground">Loading review...</p>
                 </div>
             </div>
         );
@@ -239,15 +224,16 @@ function AddBlogPageContent() {
 
     return (
         <BlogEditorLayout
-            title="Create New Blog Review"
-            subtitle="Template: Review Template"
-            hasChanges={hasChanges && hasRequiredFields}
+            title={`Edit: ${reviewData.title}`}
+            subtitle="Click on any field to edit its content. Save changes when done."
+            slug={slug}
+            hasChanges={hasChanges}
             isSaving={isSaving}
             onSave={handleSave}
-            isEditMode={false}
+            isEditMode={true}
         >
             <div className="min-h-screen bg-background pt-24">
-                <div className="relative max-w-7xl mx-auto grid grid-cols-12 border">
+                <div className="relative max-w-7xl mx-auto grid grid-cols-12">
                     {/* Table of Contents */}
                     <BlogTableOfContents
                         tableOfContents={tableOfContents}
@@ -277,12 +263,14 @@ function AddBlogPageContent() {
                             <EditableBlogOverview
                                 overview={reviewData.overview}
                                 onUpdate={(newValue) => handleSectionUpdate('overview', newValue)}
+                                firmName={reviewData.firmName}
                             />
 
                             {/* What is Section */}
                             <EditableBlogWhatIs
                                 whatIs={reviewData.whatIs}
                                 onUpdate={(newValue) => handleSectionUpdate('whatIs', newValue)}
+                                firmName={reviewData.firmName}
                             />
 
                             {/* How Differs Section */}
@@ -354,12 +342,10 @@ function AddBlogPageContent() {
                             />
 
                             {/* FAQ's */}
-                            {reviewData.faqs && reviewData.faqs.length > 0 && (
-                                <EditableBlogFAQs
-                                    faqs={reviewData.faqs}
-                                    onUpdate={(newValue) => handleUpdate({ faqs: newValue })}
-                                />
-                            )}
+                            <EditableBlogFAQs
+                                faqs={reviewData.faqs || []}
+                                onUpdate={(newValue) => handleUpdate({ faqs: newValue })}
+                            />
                         </section>
                     </article>
                 </div>
@@ -368,17 +354,3 @@ function AddBlogPageContent() {
     );
 }
 
-export default function AddBlogPage() {
-    return (
-        <Suspense fallback={
-            <div className="min-h-screen bg-background pt-12 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Loading...</p>
-                </div>
-            </div>
-        }>
-            <AddBlogPageContent />
-        </Suspense>
-    );
-}

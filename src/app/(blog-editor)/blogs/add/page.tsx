@@ -153,7 +153,7 @@ function AddBlogPageContent() {
 
             toast.success('Blog created successfully!');
             setOriginalData(JSON.parse(JSON.stringify(reviewData)));
-            router.push(`/admin/blogs/${reviewData.slug}`);
+            router.push(`/blogs/${reviewData.slug}`);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Failed to save blog. Please try again.';
             toast.error(errorMessage);
@@ -247,7 +247,7 @@ function AddBlogPageContent() {
             isEditMode={false}
         >
             <div className="min-h-screen bg-background pt-24">
-                <div className="relative max-w-7xl mx-auto grid grid-cols-12 border">
+                <div className="relative max-w-7xl mx-auto grid grid-cols-12">
                     {/* Table of Contents */}
                     <BlogTableOfContents
                         tableOfContents={tableOfContents}
@@ -266,7 +266,7 @@ function AddBlogPageContent() {
                         />
 
                         {/* Article Content */}
-                        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+                        <section className="mx-auto px-4 sm:px-6 lg:px-8 pb-16">
                             {/* Introduction */}
                             <EditableBlogIntroduction
                                 introduction={reviewData.introduction}
@@ -277,12 +277,14 @@ function AddBlogPageContent() {
                             <EditableBlogOverview
                                 overview={reviewData.overview}
                                 onUpdate={(newValue) => handleSectionUpdate('overview', newValue)}
+                                firmName={reviewData.firmName}
                             />
 
                             {/* What is Section */}
                             <EditableBlogWhatIs
                                 whatIs={reviewData.whatIs}
                                 onUpdate={(newValue) => handleSectionUpdate('whatIs', newValue)}
+                                firmName={reviewData.firmName}
                             />
 
                             {/* How Differs Section */}
@@ -382,3 +384,4 @@ export default function AddBlogPage() {
         </Suspense>
     );
 }
+

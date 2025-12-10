@@ -1,21 +1,40 @@
 "use client";
 
 import React from 'react';
-import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, Eye, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import { FirmReview } from '@/types/firm-review';
-import BasicInfoEditor from '@/components/admin/blog-editor/sections/BasicInfoEditor';
-import OverviewEditor from '@/components/admin/blog-editor/sections/OverviewEditor';
-import WhatIsEditor from '@/components/admin/blog-editor/sections/WhatIsEditor';
-import HowDiffersEditor from '@/components/admin/blog-editor/sections/HowDiffersEditor';
-import ProgramsComparisonEditor from '@/components/admin/blog-editor/sections/ProgramsComparisonEditor';
-import PlatformsEditor from '@/components/admin/blog-editor/sections/PlatformsEditor';
-import FinalVerdictEditor from '@/components/admin/blog-editor/sections/FinalVerdictEditor';
+import BlogEditorLayout from '@/components/admin/blog-editor/BlogEditorLayout';
+import EditableBlogHero from '@/components/admin/blog-editor/editable/EditableBlogHero';
+import EditableBlogIntroduction from '@/components/admin/blog-editor/editable/EditableBlogIntroduction';
+import EditableBlogOverview from '@/components/admin/blog-editor/editable/EditableBlogOverview';
+import EditableBlogWhatIs from '@/components/admin/blog-editor/editable/EditableBlogWhatIs';
+import EditableBlogHowDiffers from '@/components/admin/blog-editor/editable/EditableBlogHowDiffers';
+import EditableBlogProgramsComparison from '@/components/admin/blog-editor/editable/EditableBlogProgramsComparison';
+import EditableBlogPlatforms from '@/components/admin/blog-editor/editable/EditableBlogPlatforms';
+import EditableBlogPayoutsWithdrawal from '@/components/admin/blog-editor/editable/EditableBlogPayoutsWithdrawal';
+import EditableBlogSupportReputation from '@/components/admin/blog-editor/editable/EditableBlogSupportReputation';
+import EditableBlogTraderFeedback from '@/components/admin/blog-editor/editable/EditableBlogTraderFeedback';
+import EditableBlogProsCons from '@/components/admin/blog-editor/editable/EditableBlogProsCons';
+import EditableBlogRedFlags from '@/components/admin/blog-editor/editable/EditableBlogRedFlags';
+import EditableBlogWhoShouldUse from '@/components/admin/blog-editor/editable/EditableBlogWhoShouldUse';
+import EditableBlogFundedAccountProcess from '@/components/admin/blog-editor/editable/EditableBlogFundedAccountProcess';
+import EditableBlogFinalVerdict from '@/components/admin/blog-editor/editable/EditableBlogFinalVerdict';
+import EditableBlogFAQs from '@/components/admin/blog-editor/editable/EditableBlogFAQs';
+import BlogTableOfContents from '@/components/website/blog/BlogTableOfContents';
+import { Star, Search, Scale, BarChart3, TrendingUp, List, LucideIcon } from 'lucide-react';
+import { TableOfContentsItem } from '@/types/firm-review';
+
+const iconMap: Record<string, LucideIcon> = {
+    Star,
+    Search,
+    Scale,
+    BarChart3,
+    TrendingUp,
+    List,
+};
 
 interface AdminBlogPageProps {
     params: Promise<{ slug: string }>;
@@ -29,6 +48,8 @@ export default function AdminBlogEditorPage({ params }: AdminBlogPageProps) {
     const [slug, setSlug] = React.useState<string>('');
     const [isSaving, setIsSaving] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(true);
+    const [activeSection, setActiveSection] = React.useState('overview');
+    const [isMobileTocOpen, setIsMobileTocOpen] = React.useState(false);
 
     // Check authentication and role
     React.useEffect(() => {
@@ -60,7 +81,6 @@ export default function AdminBlogEditorPage({ params }: AdminBlogPageProps) {
                 }
 
                 if (data.success && data.review) {
-                    // Deep clone the data to track original
                     const clonedData = JSON.parse(JSON.stringify(data.review));
                     setReviewData(clonedData);
                     setOriginalData(clonedData);
@@ -91,6 +111,12 @@ export default function AdminBlogEditorPage({ params }: AdminBlogPageProps) {
         setReviewData({ ...reviewData, ...updates });
     }, [reviewData]);
 
+    // Handle section-specific updates
+    const handleSectionUpdate = React.useCallback((section: keyof FirmReview, data: unknown) => {
+        if (!reviewData) return;
+        setReviewData({ ...reviewData, [section]: data });
+    }, [reviewData]);
+
     // Handle save
     const handleSave = async () => {
         if (!reviewData || !hasChanges) return;
@@ -111,7 +137,6 @@ export default function AdminBlogEditorPage({ params }: AdminBlogPageProps) {
                 throw new Error(data.error || 'Failed to update review');
             }
 
-            // Update original data after successful save
             setOriginalData(JSON.parse(JSON.stringify(reviewData)));
             toast.success('Review updated successfully!');
         } catch (error) {
@@ -119,6 +144,58 @@ export default function AdminBlogEditorPage({ params }: AdminBlogPageProps) {
             toast.error(errorMessage);
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    // Table of contents data
+    const tableOfContents = React.useMemo(() => {
+        if (!reviewData?.tableOfContents) return [];
+        return reviewData.tableOfContents.map((item: TableOfContentsItem) => ({
+            id: item.id,
+            title: item.title,
+            icon: iconMap[item.icon] || Star,
+        }));
+    }, [reviewData]);
+
+    // Scroll tracking for active section
+    React.useEffect(() => {
+        if (!tableOfContents || tableOfContents.length === 0 || !reviewData) return;
+
+        const observerOptions: IntersectionObserverInit = {
+            root: null,
+            rootMargin: '-40% 0px -40% 0px',
+            threshold: 0,
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    setActiveSection(entry.target.id);
+                }
+            });
+        }, observerOptions);
+
+        tableOfContents.forEach((item) => {
+            const el = document.getElementById(item.id);
+            if (el) {
+                observer.observe(el);
+            }
+        });
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [tableOfContents, reviewData]);
+
+    const scrollToSection = (sectionId: string) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            const elementPosition = element.offsetTop;
+            window.scrollTo({
+                top: elementPosition,
+                behavior: 'smooth'
+            });
+            setIsMobileTocOpen(false);
         }
     };
 
@@ -130,7 +207,7 @@ export default function AdminBlogEditorPage({ params }: AdminBlogPageProps) {
     // Check role after user is loaded
     const userRole = user?.publicMetadata?.role as string | undefined;
     if (isLoaded && user && (!userRole || !['admin', 'editor'].includes(userRole))) {
-        return null; // Redirect will happen
+        return null;
     }
 
     // Loading state
@@ -146,115 +223,131 @@ export default function AdminBlogEditorPage({ params }: AdminBlogPageProps) {
     }
 
     return (
-        <div className="min-h-screen bg-background">
-            {/* Admin Header */}
-            <div className="border-b border-border bg-background sticky top-[53px] z-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex flex-col items-start gap-4">
-                            <Button
-                                asChild
-                                variant="link"
-                                size="sm"
-                            >
-                                <Link href="/admin/blogs" className="flex items-center gap-2">
-                                    <ArrowLeft className="h-4 w-4" />
-                                    Back to Blogs
-                                </Link>
-                            </Button>
-                            <div>
-                                <h1 className="text-2xl font-bold text-foreground">Edit: {reviewData.title}</h1>
-                                <p className="text-sm text-muted-foreground">Click on any field to edit its content. Save changes when done.</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                asChild
-                            >
-                                <Link href={`/blogs/${slug}`} target="_blank" className="text-foreground/80 flex items-center gap-2">
-                                    <Eye className="h-4 w-4" />
-                                    Preview
-                                </Link>
-                            </Button>
-                            <Button
-                                onClick={handleSave}
-                                disabled={!hasChanges || isSaving}
-                                size="sm"
-                                className="flex items-center gap-2"
-                            >
-                                {isSaving ? (
-                                    <>
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                        Saving...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save className="h-4 w-4" />
-                                        Save Changes
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                    </div>
-                    {hasChanges && (
-                        <div className="mt-2 text-sm text-yellow-600 dark:text-yellow-400">
-                            You have unsaved changes
-                        </div>
-                    )}
+        <BlogEditorLayout
+            title={`Edit: ${reviewData.title}`}
+            subtitle="Click on any field to edit its content. Save changes when done."
+            slug={slug}
+            hasChanges={hasChanges}
+            isSaving={isSaving}
+            onSave={handleSave}
+            isEditMode={true}
+        >
+            <div className="min-h-screen bg-background pt-24">
+                <div className="relative max-w-7xl mx-auto grid grid-cols-12">
+                    {/* Table of Contents */}
+                    <BlogTableOfContents
+                        tableOfContents={tableOfContents}
+                        activeSection={activeSection}
+                        isMobileTocOpen={isMobileTocOpen}
+                        setIsMobileTocOpen={setIsMobileTocOpen}
+                        scrollToSection={scrollToSection}
+                    />
+
+                    {/* Main Content Area */}
+                    <article className="col-span-12 xl:col-span-8">
+                        {/* Hero Section */}
+                        <EditableBlogHero
+                            reviewData={reviewData}
+                            onUpdate={handleUpdate}
+                        />
+
+                        {/* Article Content */}
+                        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+                            {/* Introduction */}
+                            <EditableBlogIntroduction
+                                introduction={reviewData.introduction}
+                                onUpdate={(newValue) => handleUpdate({ introduction: newValue })}
+                            />
+
+                            {/* Overview */}
+                            <EditableBlogOverview
+                                overview={reviewData.overview}
+                                onUpdate={(newValue) => handleSectionUpdate('overview', newValue)}
+                            />
+
+                            {/* What is Section */}
+                            <EditableBlogWhatIs
+                                whatIs={reviewData.whatIs}
+                                onUpdate={(newValue) => handleSectionUpdate('whatIs', newValue)}
+                            />
+
+                            {/* How Differs Section */}
+                            <EditableBlogHowDiffers
+                                howDiffers={reviewData.howDiffers}
+                                onUpdate={(newValue) => handleSectionUpdate('howDiffers', newValue)}
+                            />
+
+                            {/* Program Comparison */}
+                            <EditableBlogProgramsComparison
+                                programsComparison={reviewData.programsComparison}
+                                onUpdate={(newValue) => handleSectionUpdate('programsComparison', newValue)}
+                            />
+
+                            {/* Platforms & Execution */}
+                            <EditableBlogPlatforms
+                                platformsExecution={reviewData.platformsExecution}
+                                onUpdate={(newValue) => handleSectionUpdate('platformsExecution', newValue)}
+                            />
+
+                            {/* Payouts & Withdrawal */}
+                            <EditableBlogPayoutsWithdrawal
+                                payoutsWithdrawal={reviewData.payoutsWithdrawal}
+                                onUpdate={(newValue) => handleSectionUpdate('payoutsWithdrawal', newValue)}
+                            />
+                            
+                            {/* Support & Reputation */}
+                            <EditableBlogSupportReputation
+                                supportReputation={reviewData.supportReputation}
+                                onUpdate={(newValue) => handleSectionUpdate('supportReputation', newValue)}
+                            />
+
+                            {/* Trader Feedback */}
+                            <EditableBlogTraderFeedback
+                                traderFeedback={reviewData.traderFeedback}
+                                onUpdate={(newValue) => handleSectionUpdate('traderFeedback', newValue)}
+                            />
+
+                            {/* Pros and Cons */}
+                            <EditableBlogProsCons
+                                prosCons={reviewData.prosCons}
+                                onUpdate={(newValue) => handleSectionUpdate('prosCons', newValue)}
+                            />
+
+                            {/* Red Flags */}
+                            <EditableBlogRedFlags
+                                redFlags={reviewData.redFlags}
+                                onUpdate={(newValue) => handleSectionUpdate('redFlags', newValue)}
+                            />
+
+                            {/* Who Should Use */}
+                            <EditableBlogWhoShouldUse
+                                whoShouldUse={reviewData.whoShouldUse}
+                                onUpdate={(newValue) => handleSectionUpdate('whoShouldUse', newValue)}
+                            />
+
+                            {/* Funded Account Process */}
+                            <EditableBlogFundedAccountProcess
+                                fundedAccountProcess={reviewData.fundedAccountProcess}
+                                onUpdate={(newValue) => handleSectionUpdate('fundedAccountProcess', newValue)}
+                            />
+
+                            {/* Final Verdict */}
+                            <EditableBlogFinalVerdict
+                                finalVerdict={reviewData.finalVerdict}
+                                firmName={reviewData.firmName}
+                                trustScore={reviewData.trustScore}
+                                onUpdate={(newValue) => handleSectionUpdate('finalVerdict', newValue)}
+                            />
+
+                            {/* FAQ's */}
+                            <EditableBlogFAQs
+                                faqs={reviewData.faqs || []}
+                                onUpdate={(newValue) => handleUpdate({ faqs: newValue })}
+                            />
+                        </section>
+                    </article>
                 </div>
             </div>
-
-            {/* Editor Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="bg-muted/30 border border-border rounded-lg p-4 mb-6">
-                    <p className="text-sm text-muted-foreground">
-                        Click on any field to edit. Changes will be saved when you click &quot;Save Changes&quot;.
-                    </p>
-                </div>
-
-                {/* Editable Sections */}
-                {reviewData && (
-                    <div className="space-y-6">
-                        <BasicInfoEditor
-                            reviewData={reviewData}
-                            onUpdate={handleUpdate}
-                        />
-                        
-                        <OverviewEditor
-                            reviewData={reviewData}
-                            onUpdate={handleUpdate}
-                        />
-                        
-                        <WhatIsEditor
-                            reviewData={reviewData}
-                            onUpdate={handleUpdate}
-                        />
-                        
-                        <HowDiffersEditor
-                            reviewData={reviewData}
-                            onUpdate={handleUpdate}
-                        />
-                        
-                        <ProgramsComparisonEditor
-                            reviewData={reviewData}
-                            onUpdate={handleUpdate}
-                        />
-                        
-                        <PlatformsEditor
-                            reviewData={reviewData}
-                            onUpdate={handleUpdate}
-                        />
-                        
-                        <FinalVerdictEditor
-                            reviewData={reviewData}
-                            onUpdate={handleUpdate}
-                        />
-                    </div>
-                )}
-            </div>
-        </div>
+        </BlogEditorLayout>
     );
 }
-

@@ -36,7 +36,7 @@ export default function TemplateSelectionModal({ open, onOpenChange }: TemplateS
 
     const handleTemplateSelect = (templateId: string) => {
         onOpenChange(false);
-        router.push(`/admin/blogs/add?template=${templateId}`);
+        router.push(`/blogs/add?template=${templateId}`);
     };
 
     return (

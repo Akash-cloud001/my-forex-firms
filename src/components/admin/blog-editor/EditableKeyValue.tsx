@@ -3,6 +3,7 @@
 import React from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import EditableField from './EditableField';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +18,8 @@ interface EditableKeyValueProps {
     onSave: (newItems: KeyValueItem[]) => void;
     className?: string;
     disabled?: boolean;
+    nonDeletableLabels?: string[]; // Labels that cannot be deleted
+    disabledValueLabels?: string[]; // Labels whose values cannot be edited
 }
 
 export default function EditableKeyValue({
@@ -24,9 +27,10 @@ export default function EditableKeyValue({
     onSave,
     className,
     disabled = false,
+    nonDeletableLabels = [],
+    disabledValueLabels = [],
 }: EditableKeyValueProps) {
     const [editingLabelIndex, setEditingLabelIndex] = React.useState<number | null>(null);
-    const [editingValueIndex, setEditingValueIndex] = React.useState<number | null>(null);
 
     const handleLabelSave = (index: number, newLabel: string) => {
         const updatedItems = [...items];
@@ -35,16 +39,40 @@ export default function EditableKeyValue({
         setEditingLabelIndex(null);
     };
 
-    const handleValueSave = (index: number, newValue: string) => {
+    const handleValueChange = (index: number, newValue: string) => {
         const updatedItems = [...items];
-        updatedItems[index] = { ...updatedItems[index], value: newValue.trim() };
+        updatedItems[index] = { ...updatedItems[index], value: newValue };
         onSave(updatedItems);
-        setEditingValueIndex(null);
     };
 
     const handleRemoveItem = (index: number) => {
+        const item = items[index];
+        // Check if this item is non-deletable
+        const isNonDeletable = nonDeletableLabels.some(label => 
+            item.label.toLowerCase().trim() === label.toLowerCase().trim() ||
+            item.label.toLowerCase().trim().includes(label.toLowerCase().trim())
+        );
+        
+        if (isNonDeletable) {
+            return; // Don't allow deletion of non-deletable items
+        }
+        
         const updatedItems = items.filter((_, i) => i !== index);
         onSave(updatedItems);
+    };
+
+    const isItemNonDeletable = (item: KeyValueItem) => {
+        return nonDeletableLabels.some(label => 
+            item.label.toLowerCase().trim() === label.toLowerCase().trim() ||
+            item.label.toLowerCase().trim().includes(label.toLowerCase().trim())
+        );
+    };
+
+    const isValueDisabled = (item: KeyValueItem) => {
+        return disabledValueLabels.some(label => 
+            item.label.toLowerCase().trim() === label.toLowerCase().trim() ||
+            item.label.toLowerCase().trim().includes(label.toLowerCase().trim())
+        );
     };
 
     const handleAddItem = () => {
@@ -76,27 +104,19 @@ export default function EditableKeyValue({
                         )}
                     </div>
                     <div className="flex items-center gap-2 flex-1 justify-end">
-                        {editingValueIndex === index ? (
-                            <EditableField
-                                value={item.value}
-                                onSave={(newValue) => handleValueSave(index, newValue)}
-                                className="text-right"
-                                placeholder="Value"
-                            />
-                        ) : (
-                            <span
-                                onClick={() => !disabled && setEditingValueIndex(index)}
-                                className={cn(
-                                    "font-semibold cursor-pointer hover:opacity-80 transition-opacity text-right",
-                                    item.highlight === 'success' ? 'text-green-400' :
-                                    item.highlight ? 'text-primary' :
-                                    'text-foreground'
-                                )}
-                            >
-                                {item.value}
-                            </span>
-                        )}
-                        {!disabled && (
+                        <Input
+                            value={item.value}
+                            onChange={(e) => handleValueChange(index, e.target.value)}
+                            className={cn(
+                                "text-right",
+                                item.highlight === 'success' ? 'border-green-400/50 focus:border-green-400' :
+                                item.highlight ? 'border-primary/50 focus:border-primary' :
+                                ''
+                            )}
+                            placeholder="Value"
+                            disabled={disabled || isValueDisabled(item)}
+                        />
+                        {!disabled && !isItemNonDeletable(item) && (
                             <Button
                                 size="sm"
                                 variant="ghost"

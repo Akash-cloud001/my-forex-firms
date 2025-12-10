@@ -231,7 +231,7 @@ export default function AdminBlogsPage() {
                                                         size="sm"
                                                         className="h-8"
                                                     >
-                                                        <Link href={`/admin/blogs/${blog.slug}`} className="flex items-center gap-2">
+                                                        <Link href={`/blogs/edit/${blog.slug}`} className="flex items-center gap-2">
                                                             <Edit className="h-4 w-4" />
                                                             Edit
                                                         </Link>
