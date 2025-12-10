@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "My Reviews - Manage Your Submissions",
-  description: "View and manage all your submitted prop trading firm reviews. Track the status of your reviews and see how they help the trading community.",
-  keywords: ["my reviews", "review management", "submitted reviews", "trading reviews", "review status"],
+  title: "My Complaints - Manage Your Submissions",
+  description: "View and manage all your submitted prop trading firm complaints. Track the status of your complaints and see how they help the trading community.",
+  keywords: ["my reviews", "review management", "submitted reviews", "trading reviews", "review status", "complaints", "my complaints", "complaint management", "complaint status", "prop firm complaints"],
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "/reviews",
+    url: "/complaints",
     siteName: "My Forex Firms",
-    title: "My Reviews - Manage Your Submissions",
-    description: "View and manage all your submitted prop trading firm reviews. Track the status of your reviews.",
+    title: "My Complaints - Manage Your Submissions",
+    description: "View and manage all your submitted prop trading firm complaints. Track the status of your complaints.",
     images: [
       {
         url: "/og-image.png",
@@ -22,12 +22,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "My Reviews - Manage Your Submissions",
-    description: "View and manage all your submitted prop trading firm reviews.",
+    title: "My Complaints - Manage Your Submissions",
+    description: "View and manage all your submitted prop trading firm complaints.",
     images: ["/og-image.png"],
   },
   alternates: {
-    canonical: "/reviews",
+    canonical: "/complaints",
   },
 };
 

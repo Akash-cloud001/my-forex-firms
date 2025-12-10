@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s | My Forex Firms",
   },
   description: "Transparency, Verified Ratings, and Traders Trust. Discover verified prop trading firms, read honest reviews, and make informed decisions about funded trading accounts.",
-  keywords: ["prop trading", "forex firms", "funded trading", "prop firms", "trading reviews", "forex reviews", "funded accounts"],
+  keywords: ["prop trading", "forex firms", "funded trading", "prop firms", "trading reviews", "forex reviews", "funded accounts", "complaints", "prop firm complaints", "trading complaints", "complaint submission"],
   authors: [{ name: "My Forex Firms" }],
   creator: "My Forex Firms",
   publisher: "My Forex Firms",

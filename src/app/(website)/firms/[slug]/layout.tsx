@@ -51,6 +51,9 @@ export async function generateMetadata(
         "funded trading",
         "trading challenge",
         firm.firmDetails?.jurisdiction || "",
+        "complaints",
+        "firm complaints",
+        "complaint submission",
       ].filter(Boolean),
       authors: [{ name: "My Forex Firms" }],
       openGraph: {
