@@ -15,8 +15,8 @@ import { useEffect } from "react";
 export default function Page() {
 
   return <>
-    {/* <ComingSoon />; */}
-    <main className="w-full min-h-screen bg-background overflow-hidden">
+    <ComingSoon />;
+    {/* <main className="w-full min-h-screen bg-background overflow-hidden">
       <AnimatedSection id="first-section">
         <FirstSection />
       </AnimatedSection>
@@ -29,9 +29,6 @@ export default function Page() {
         <FirmListSection />
       </AnimatedSection>
 
-      {/* <AnimatedSection id="reviews">
-    <Reviews/>
-    </AnimatedSection> */}
       <AnimatedSection id="blogs">
         <Blogs />
       </AnimatedSection>
@@ -44,7 +41,7 @@ export default function Page() {
       <AnimatedSection id="subscribe">
         <Subscribe />
       </AnimatedSection>
-    </main>
+    </main> */}
 
   </>
 

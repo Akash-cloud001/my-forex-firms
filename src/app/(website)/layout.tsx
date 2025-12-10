@@ -11,11 +11,11 @@ const WebsiteLayout = ({
   return (
     <section className="bg-background min-h-screen w-full">
        {/* pt-14 */}
-      <Navbar />
+      {/* <Navbar /> */}
       {children}
-      <Footer />
+      {/* <Footer />
       <BottomBar />
-      <TradingViewTicker />
+      <TradingViewTicker /> */}
     </section>
   );
 };
