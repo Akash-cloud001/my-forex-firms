@@ -18,6 +18,7 @@ export interface IProgram extends Document {
     price: number;
   }[];
   profitSplit: string;
+  minPayout: string;
   payoutFrequency: {
     label: string;
     percentage: string;
@@ -44,6 +45,14 @@ export interface IProgram extends Document {
     consistency: { required: boolean; note: string };
     maxRiskPerTrade: { required: boolean; note: string };
   };
+
+  fundedCriteria: {
+    profitTarget: { type: string, required: false },
+    maxLoss: { type: string, required: false },
+    dailyLoss: { type: string, required: false },
+    minTradingDays: { type: number, required: false },
+    maxLossType: { type: string, required: false }
+  },
 
   payoutMethods: string[];
   timeLimit: string;
@@ -85,6 +94,7 @@ const ProgramSchema = new Schema<IProgram>(
     ],
 
     profitSplit: { type: String, required: true },
+    minPayout: { type: String, required: true },
 
     payoutFrequency: [
       {
@@ -92,6 +102,14 @@ const ProgramSchema = new Schema<IProgram>(
         percentage: { type: String, required: true },
       },
     ],
+    fundedCriteria: {
+      profitTarget: { type: String, required: false },
+      maxLoss: { type: String, required: false },
+      dailyLoss: { type: String, required: false },
+      minTradingDays: { type: Number, required: false },
+      maxLossType: { type: String, required: false }
+    },
+
 
     evaluationRule: {
       stopLoss: RuleSchema,

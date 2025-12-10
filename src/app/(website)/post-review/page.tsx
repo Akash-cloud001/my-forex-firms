@@ -19,8 +19,8 @@ const ReviewPageContent: React.FC = () => {
             height={500}
             className='hidden md:block opacity-20 max-w-full h-auto'
           />
-          <h1 className="text-4xl font-geist-sans opacity-50 font-bold text-foreground -mt-12">
-            Submit Your Review
+          <h1 className="text-3xl md:text-4xl font-geist-sans opacity-50 font-bold text-foreground md:-mt-12">
+            Submit Your Complaint
           </h1>
         </div>
       </div>

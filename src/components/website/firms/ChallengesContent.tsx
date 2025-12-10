@@ -237,7 +237,7 @@ const ChallengesContent = () => {
               {/* Main Content - Dark Gray Background */}
               <div className="p-5 space-y-3 text-white ">
                 {/* Account Sizes */}
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-start">
                   <p className="text-xs sm:text-sm font-medium text-secondary/80">Account Sizes:</p>
                   {/* Mobile: Select dropdown */}
                   <div className="sm:hidden">
@@ -276,7 +276,7 @@ const ChallengesContent = () => {
                 </div>
 
                 {/* Prices/Fees */}
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-start">
                   <p className="text-xs sm:text-sm font-medium text-secondary/80">Prices:</p>
                   {/* Mobile: Show selected size's fee */}
                   <div className="sm:hidden">
@@ -305,7 +305,7 @@ const ChallengesContent = () => {
 
                 {/* Profit Targets */}
                 {group.profitTargets.length > 0 && (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-start">
                     <p className="text-xs sm:text-sm font-medium text-secondary/80">Profit Targets:</p>
                     <div className="flex flex-wrap gap-2 items-end justify-end">
                       {group.profitTargets.map((target, idx) => (
@@ -321,7 +321,7 @@ const ChallengesContent = () => {
                 )}
 
                 {/* Profit Split */}
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-start">
                   <p className="text-xs sm:text-sm font-medium text-secondary/80">Profit Split:</p>
                   <div className="flex flex-wrap gap-2 items-end justify-end">
                     <span className="px-4 py-1.5 text-xs text-secondary flex items-center justify-center rounded-md bg-white/10 border border-white/20 font-semibold font-inter  ">
@@ -332,7 +332,7 @@ const ChallengesContent = () => {
 
                 {/* Platforms */}
                 {platforms.length > 0 && (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-start">
                     <p className="text-xs sm:text-sm font-medium text-secondary/80">Platforms:</p>
                     <div className="flex flex-wrap gap-2 items-end justify-end">
                       {platforms.map((platform, idx) => {

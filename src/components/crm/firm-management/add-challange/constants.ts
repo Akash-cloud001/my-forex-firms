@@ -28,12 +28,19 @@ export const DEFAULT_FORM_VALUES: Partial<ProgramFormData> = {
     evaluationSteps: [],
     accountSizes: [],
     profitSplit: "",
+    minPayout: "",
     payoutFrequency: [{ label: "", percentage: "" }],
 
     // Global rules for the entire program
     evaluationRule: DEFAULT_RULE_SET,
     fundedRule: DEFAULT_RULE_SET,
-
+    fundedCriteria: {
+        profitTarget: "",
+        maxLoss: "",
+        dailyLoss: "",
+        minTradingDays: 0,
+        maxLossType: "static",
+    },
     payoutMethods: [],
     timeLimit: "",
     drawdownResetType: "",

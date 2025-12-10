@@ -76,6 +76,19 @@ export const ProfitPayoutConfig: React.FC<ProfitPayoutConfigProps> = ({
                             </p>
                         )}
                     </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="minPayout">Min Payout</Label>
+                        <Input
+                            id="minPayout"
+                            {...register("minPayout")}
+                            placeholder="e.g., 1/2 (in percentage) no need to write %"
+                        />
+                        {errors.minPayout && (
+                            <p className="text-sm text-destructive">
+                                {errors.minPayout.message}
+                            </p>
+                        )}
+                    </div>
 
 
                 </div>

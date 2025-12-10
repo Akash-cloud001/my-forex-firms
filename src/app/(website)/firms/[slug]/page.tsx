@@ -21,7 +21,7 @@ const tabs = [
     value: 'challenges'
   },
   {
-    name: 'Reviews',
+    name: 'Complaints',
     value: 'reviews'
   },
   {

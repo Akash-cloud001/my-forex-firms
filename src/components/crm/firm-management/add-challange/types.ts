@@ -37,7 +37,15 @@ export const tradingRuleSetSchema = z.object({
     consistency: ruleSchema,
     maxRiskPerTrade: ruleSchema,
 });
-
+export const fundedCriteriaSchema = z.object({
+    profitTarget: z.string().min(1, "Profit target is required"),
+    maxLoss: z.string().min(1, "Max Loss is required"),
+    dailyLoss: z.string().min(1, "Daily Loss is required"),
+    minTradingDays: z.number().min(0).optional(),
+    maxLossType: z.enum(["trailing", "static"], {
+        message: "Max Loss Type must be either 'trailing' or 'static'",
+    }),
+});
 export const programSchema = z.object({
     propFirmId: z.string().min(1, "Prop Firm ID is required"),
     type: z.string().min(1, "Type is required"),
@@ -47,10 +55,10 @@ export const programSchema = z.object({
     accountSizes: z.array(accountSizeSchema).min(1, "At least one account size required"),
     profitSplit: z.string().min(1, "Profit split is required"),
     payoutFrequency: z.array(payoutFrequencySchema).min(1),
-
+    minPayout: z.string().min(1, "Min payout is required"),
     evaluationRule: tradingRuleSetSchema,
     fundedRule: tradingRuleSetSchema,
-
+    fundedCriteria: fundedCriteriaSchema,
     payoutMethods: z.array(z.string()).min(1, "At least one payout method required"),
     timeLimit: z.string().optional(),
     drawdownResetType: z.string().optional(),
@@ -62,5 +70,6 @@ export type AccountSize = z.infer<typeof accountSizeSchema>;
 export type PayoutFrequency = z.infer<typeof payoutFrequencySchema>;
 export type TradingRuleSet = z.infer<typeof tradingRuleSetSchema>;
 export type ProgramFormData = z.infer<typeof programSchema>;
+export type FundedCriteria = z.infer<typeof fundedCriteriaSchema>;
 
 export type ChallengeType = "1-Step" | "2-Step" | "3-Step" | "Instant";

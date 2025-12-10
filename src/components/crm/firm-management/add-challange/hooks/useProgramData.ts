@@ -43,7 +43,8 @@ export const useProgramData = ({ programId, propFirmId, reset }: UseProgramDataP
                         accountSizes: program.accountSizes || [],
                         profitSplit: program.profitSplit,
                         payoutFrequency: program.payoutFrequency || [],
-
+                        minPayout: program.minPayout,
+                        fundedCriteria: program.fundedCriteria,
                         // Trading Rules
                         evaluationRule: program.evaluationRule,
                         fundedRule: program.fundedRule,

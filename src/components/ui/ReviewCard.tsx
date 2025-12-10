@@ -1,4 +1,4 @@
-import { Paperclip, Expand, Download } from 'lucide-react'
+import { Expand, Download, Building2 } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -32,6 +32,7 @@ interface ReviewCardProps {
   }>
   userId?: string
   userName?: string
+  firmName?: string
   onClick?: () => void
   status?: string
   getStatusColor?: (status: string) => string
@@ -43,6 +44,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
   files = [],
   userId,
   userName,
+  firmName,
   onClick,
   status,
   getStatusColor
@@ -61,10 +63,6 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
 
   // Get display name
   const displayName = userName || userId || 'Anonymous'
-
-  // Format attachment text
-  const attachmentCount = files?.length || 0
-  const attachmentText = attachmentCount === 1 ? '1 attachment' : `${attachmentCount} attachments`
 
   // Get status color class
   const statusColorClass = getStatusColor && status ? getStatusColor(status) : ''
@@ -229,16 +227,11 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
         </p>
 
         <div className='flex items-center justify-between gap-1 text-primary'>
-          {/* Attachments */}
-          {attachmentCount > 0 ? (
-            <div className='flex items-center gap-1 text-secondary'>
-              <Paperclip className='h-3 w-3 text-secondary' />
-              <p className='text-xs font-medium text-secondary'>{attachmentText}</p>
-            </div>
-          ) : (
-            <div className='flex items-center gap-1 text-secondary'>
-              <Paperclip className='h-3 w-3 text-secondary' />
-              <p className='text-xs font-medium text-secondary'>0 attachments</p>
+          {/* Firm Name */}
+          {firmName && (
+            <div className='flex items-center gap-1 text-primary font-semibold'>
+              <Building2 className='h-3 w-3 mb-px' />
+              <p className='text-xs font-medium'>{firmName}</p>
             </div>
           )}
 
