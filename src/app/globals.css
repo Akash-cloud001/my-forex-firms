@@ -152,6 +152,7 @@
   --font-montserrat: var(--font-montserrat);
   --font-geist-sans: var(--font-geist-sans);
   --font-geist-mono: var(--font-geist-mono);
+  --color-green: #34C759;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
