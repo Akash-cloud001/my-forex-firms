@@ -189,12 +189,14 @@ const ChallengesContent = () => {
 
   if (isLoading) {
     return (
-      <div className="w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="w-[500px] rounded-lg overflow-hidden">
-              <Skeleton className="h-12 w-full bg-orange-500/20" />
-              <Skeleton className="h-96 w-full bg-gray-800/20" />
+      <div className="max-w-[1032px] w-full mx-auto mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2  gap-6">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <div key={index} className="w-[500px] rounded-sm overflow-hidden">
+              <Skeleton className="h-96 w-full bg-gray-800/20">
+                <Skeleton className="h-16 w-full bg-gray-800/30 " />
+              
+              </Skeleton>
             </div>
           ))}
         </div>
