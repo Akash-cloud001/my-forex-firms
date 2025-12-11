@@ -4,9 +4,9 @@ import React, { useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
-const AnimatedSection = ({ children, id, delay = 0 }) => {
+const AnimatedSection = ({ children, id, delay = 0, threshold = 0.2 }) => {
   const controls = useAnimation();
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.2 });
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: threshold });
 
   useEffect(() => {
     if (inView) {

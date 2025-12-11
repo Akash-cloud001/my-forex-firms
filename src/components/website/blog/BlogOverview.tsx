@@ -17,7 +17,7 @@ export default function BlogOverview({ overview, iconMap }: BlogOverviewProps) {
     const IconComponent = iconMap[overview.icon] || Star;
 
     return (
-        <AnimatedSection id="blog-overview" delay={0.3}>
+        <AnimatedSection id="blog-overview" delay={0.1} threshold={0}>
             <Card id="overview" className="mb-12 card-custom-grad border-border">
                 <CardContent className="p-8">
                     <div className="flex items-center gap-3 mb-6">

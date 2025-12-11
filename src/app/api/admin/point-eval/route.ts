@@ -242,9 +242,9 @@ export async function POST(req: Request) {
                 fair_spreads: 0, //total ==1
                 fair_commissions: 0, //total ==1
                 acceptable_slippage: 0, //total ==1
-                multiple_trading_platforms: multiPlatformScore, //total ==1
             },
             trading_freedom: {
+                multiple_trading_platforms: multiPlatformScore, //total ==1
                 profit_targets: profitTargetScore, //total ==1
                 consistancy_rule: 0,//total ==1
                 news_trading: 0,//total ==1

@@ -89,11 +89,11 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-4 py-4 sm:py-6 lg:py-8">
+      <div className="max-w-4xl mx-auto px-4 pt-24 pb-4 sm:pb-6 lg:pb-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">My Profile</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold gradient-text tracking-tight">My Profile</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
               Manage your account settings and personal information
             </p>

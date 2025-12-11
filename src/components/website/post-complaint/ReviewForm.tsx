@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import {
   Card,
@@ -29,6 +30,7 @@ interface ReviewFormProps {
 }
 
 export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
+  const router = useRouter();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [showThankYouModal, setShowThankYouModal] = useState(false);
@@ -136,6 +138,11 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
       reset();
       setSelectedFiles([]);
       setSelectedFirm({ name: "" }); // Reset firm selector
+      
+      // Redirect to home page after 3 seconds
+      setTimeout(() => {
+        router.push('/');
+      }, 3000);
     } catch (error) {
       console.error("Error submitting review:", error);
       setErrorMessage(error instanceof Error ? error.message : "An unexpected error occurred.");

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { auth } from '@clerk/nextjs/server';
-import Review from '@/models/Review';
+import Review, { IssueType } from '@/models/Review';
 import { uploadToCloudinary } from '@/services/cloudinary';
 import { validateReviewFile, cleanupReviewFiles } from '@/lib/reviewFileUtils';
+import { getRelatedSubFactor } from '@/utils/issueMapping';
 
 // Type for review data
 interface ReviewData {
@@ -22,7 +23,8 @@ interface ReviewData {
     url: string;
     public_id?: string;
   }>;
-  status?: 'pending' | 'approved' | 'rejected';
+  status?: 'pending' | 'approved' | 'rejected' | 'info-requested';
+  relatedSubFactor?: string;
   isVerified?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -273,6 +275,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    const relatedSubFactor = getRelatedSubFactor(reviewData.issueType as IssueType);
 
     // Create review object
     const newReview = new Review({
@@ -288,7 +291,8 @@ export async function POST(request: NextRequest) {
       status: 'pending',
       isVerified: false,
       createdBy: userId,
-      lastModifiedBy: userId
+      lastModifiedBy: userId,
+      relatedSubFactor: relatedSubFactor,
     });
     console.log(newReview, "newReview")
     // Save to MongoDB

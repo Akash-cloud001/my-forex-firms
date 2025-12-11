@@ -285,16 +285,7 @@ export const pillarsConfig: Pillar[] = [
                         ]
                     },
 
-                    multiple_trading_platforms: {
-                        label: "Multiple trading Platforms",
-                        max: 1,
-                        criteria: [
-                            { label: "All Major", value: 1 },
-                            { label: "Only MT5", value: 0.8 },
-                            { label: "Only Ctrader + Other", value: 0.7 },
-                            { label: "No Mt5/ctrader", value: 0.5 }
-                        ]
-                    }
+
                 }
             },
 
@@ -305,6 +296,18 @@ export const pillarsConfig: Pillar[] = [
                 id: "trading_freedom",
                 name: "Trading Freedom",
                 factors: {
+
+                    multiple_trading_platforms: {
+                        label: "Multiple trading Platforms",
+                        max: 1,
+                        criteria: [
+                            { label: "All Major", value: 1 },
+                            { label: "Only MT5", value: 0.8 },
+                            { label: "Only Ctrader + Other", value: 0.7 },
+                            { label: "No Mt5/ctrader", value: 0.5 }
+                        ]
+                    },
+
                     profit_targets: {
                         label: "PROFIT TARGETs",
                         max: 1,
