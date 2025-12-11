@@ -15,6 +15,7 @@ import {
 import Image from "next/image";
 import AnimatedSection from "@/components/website/AnimatedSection";
 import { useRouter } from "next/navigation";
+import ScrollToTop from '@/components/website/ScrollToTop';
 interface Firm {
   id: string;
   name: string;
@@ -141,10 +142,11 @@ const FirmsPage = () => {
   };
 
   return (
-    <section className="w-full bg-background pt-12 pb-16 sm:pb-24 min-h-screen">
+    <section className="w-full bg-background pt-24 pb-16 sm:pb-24 min-h-screen">
+      <ScrollToTop />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <AnimatedSection id="firms-page-header" delay={0.2}>
+        <AnimatedSection id="firms-page-header">
           <div className="text-center space-y-3 mb-12">
             <p className="uppercase tracking-[0.3em] text-xs sm:text-sm text-foreground/60 font-geist-sans">
               Prop Trading Firms
@@ -156,10 +158,7 @@ const FirmsPage = () => {
               Browse and compare verified prop trading firms. Find the best funding opportunity for your trading style.
             </p>
           </div>
-        </AnimatedSection>
-
         {/* Search and Filters Bar */}
-        <AnimatedSection id="firms-search-filters" delay={0.3}>
           <div className="flex flex-col md:flex-row gap-4 mb-8">
             {/* Search Bar - Left */}
             <div className="flex-1">
@@ -241,7 +240,7 @@ const FirmsPage = () => {
 
         {/* Firms Grid */}
         {!loading && !error && (
-          <AnimatedSection id="firms-list" delay={0.4}>
+          <AnimatedSection id="firms-list" threshold={0}>
             {firms.length === 0 ? (
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">

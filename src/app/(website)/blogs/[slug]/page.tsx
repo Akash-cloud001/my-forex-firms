@@ -168,11 +168,15 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
     const scrollToSection = (sectionId: string) => {
         const element = document.getElementById(sectionId);
         if (element) {
-            const elementPosition = element.offsetTop;
-            const offsetPosition = elementPosition; // 100px offset for navbar spacing
+            // Use getBoundingClientRect() to get accurate position relative to viewport
+            const rect = element.getBoundingClientRect();
+            // Calculate absolute position from top of document
+            const absoluteTop = rect.top + window.scrollY;
+            // Account for fixed navbar (pt-24 = 96px, plus some spacing)
+            const offsetPosition = absoluteTop - 200;
 
             window.scrollTo({
-                top: offsetPosition,
+                top: Math.max(0, offsetPosition), // Ensure we don't scroll to negative position
                 behavior: 'smooth'
             });
             setIsMobileTocOpen(false); // Close mobile TOC after navigation
@@ -202,6 +206,7 @@ export default function BlogDetailPage({ params }: BlogPageProps) {
 
     return (
         <div className="min-h-screen bg-background pt-24">
+            {/* <ScrollToTop /> */}
             {/* Main Layout Container */}
             <div className="relative max-w-7xl mx-auto grid grid-cols-12">
                 {/* Table of Contents */}
