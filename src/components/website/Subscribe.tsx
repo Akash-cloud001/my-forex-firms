@@ -71,7 +71,7 @@ const Subscribe = () => {
                 {...register("email", { required: "Email is required", pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email address" } })}
                 className={`w-full rounded-full border border-white/15 bg-white/5 px-5 py-3 text-base text-white/80 placeholder:text-white/40 shadow-inner shadow-black/40 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition ${errors.email ? "!border-destructive" : ""}`}
               />
-              <Button disabled={isLoading} variant="outline" className="w-full sm:w-auto max-w-xs btn-grad hover:text-white !py-6 !px-8 rounded-full text-base md:text-xl font-medium font-geist-sans">
+              <Button disabled={isLoading} variant="outline" className="w-full sm:w-auto max-w-xs btn-grad hover:text-white border-none !py-6 !px-8 rounded-full text-base md:text-xl font-medium font-geist-sans">
                 {isLoading ? <div className="flex items-center justify-center gap-1"> <Loader2 className="w-4 h-4 animate-spin" /> Subscribing</div> : "Subscribe"}
               </Button>
             </form>

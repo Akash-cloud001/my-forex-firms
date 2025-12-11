@@ -61,7 +61,7 @@ const Navbar = () => {
         </SignedOut>
         <SignedIn>
         <div 
-            onClick={() => router.push('/reviews')} 
+            onClick={() => router.push('/complaints')} 
             variant="outline" 
             className="text-foreground font-semibold w-full sm:w-auto text-sm capitalize font-geist-sans cursor-pointer btn-grad w-max"
           >

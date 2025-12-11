@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dot, List, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 // import { TableOfContentsItem } from '@/types/firm-review';
@@ -25,6 +25,18 @@ export default function BlogTableOfContents({
     setIsMobileTocOpen,
     scrollToSection,
 }: BlogTableOfContentsProps) {
+    // Lock body scroll when mobile TOC is open
+    useEffect(() => {
+        if (isMobileTocOpen) {
+            const originalOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            
+            return () => {
+                document.body.style.overflow = originalOverflow;
+            };
+        }
+    }, [isMobileTocOpen]);
+
     return (
         <>
             {/* Desktop Table of Contents - Fixed Sidebar */}
@@ -70,9 +82,15 @@ export default function BlogTableOfContents({
 
             {/* Mobile Table of Contents Overlay */}
             {isMobileTocOpen && (
-                <div className="fixed inset-0 z-40 xl:hidden">
-                    <div className="absolute inset-0 bg-black/50" onClick={() => setIsMobileTocOpen(false)} />
-                    <div className="absolute bottom-20 left-8 bg-background border border-border rounded-lg p-4 w-80 max-h-[60vh] overflow-y-auto shadow-xl max-w-2xs">
+                <div className="fixed inset-0 z-50 xl:hidden">
+                    <div 
+                        className="absolute inset-0 bg-black/50 backdrop-blur-sm" 
+                        onClick={() => setIsMobileTocOpen(false)} 
+                    />
+                    <div 
+                        className="absolute bottom-20 left-4 right-4 sm:left-8 sm:right-auto sm:w-80 bg-background border border-border rounded-lg p-4 max-h-[60vh] overflow-y-auto shadow-xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="flex items-center gap-2 mb-4 pb-2 border-b border-border">
                             <List className="h-4 w-4 text-primary" />
                             <span className="font-semibold text-foreground text-sm">Table of Contents</span>

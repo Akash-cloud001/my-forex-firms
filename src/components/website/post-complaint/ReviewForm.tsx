@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import {
   Card,
@@ -29,6 +30,7 @@ interface ReviewFormProps {
 }
 
 export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
+  const router = useRouter();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [showThankYouModal, setShowThankYouModal] = useState(false);
@@ -136,6 +138,11 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
       reset();
       setSelectedFiles([]);
       setSelectedFirm({ name: "" }); // Reset firm selector
+      
+      // Redirect to home page after 3 seconds
+      setTimeout(() => {
+        router.push('/');
+      }, 3000);
     } catch (error) {
       console.error("Error submitting review:", error);
       setErrorMessage(error instanceof Error ? error.message : "An unexpected error occurred.");
@@ -149,7 +156,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
     <>
       <Card className="shadow-xl">
         <CardHeader>
-          <CardTitle className="text-2xl">Review Form</CardTitle>
+          <CardTitle className="text-2xl">Complaint Form</CardTitle>
           <CardDescription>
             Please provide detailed information about your experience. All
             fields are required unless marked optional.
@@ -335,7 +342,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
                 disabled={isSubmittingForm}
                 className="min-w-32 btn-grad"
               >
-                {isSubmittingForm ? "Submitting..." : "Submit Review"}
+                {isSubmittingForm ? "Submitting..." : "Submit Complaint"}
               </Button>
             </div>
           </form>
@@ -344,7 +351,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ initialFirmId }) => {
 
       <p className="text-xs text-muted-foreground max-w-3xl mx-auto mt-8 px-5 text-center">
         Help the trading community by sharing your experience with prop firms.
-        Your review contributes to our PropTrust Index™ and helps other traders
+        Your complaint contributes to our PropTrust Index™ and helps other traders
         make informed decisions.
       </p>
 

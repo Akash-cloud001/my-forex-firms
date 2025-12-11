@@ -189,10 +189,10 @@ const ChallengesContent = () => {
 
   if (isLoading) {
     return (
-      <div className="max-w-[1032px] w-full mx-auto mt-8">
+      <div className="max-w-7xl w-full mx-auto mt-8">
         <div className="grid grid-cols-1 md:grid-cols-2  gap-6">
           {Array.from({ length: 2 }).map((_, index) => (
-            <div key={index} className="w-[500px] rounded-sm overflow-hidden">
+            <div key={index} className="w-[600px] rounded-sm overflow-hidden">
               <Skeleton className="h-96 w-full bg-gray-800/20">
                 <Skeleton className="h-16 w-full bg-gray-800/30 " />
               
@@ -213,7 +213,7 @@ const ChallengesContent = () => {
   }
 
   return (
-    <div className="max-w-[1032px] w-full mx-auto mt-8">
+    <div className="max-w-7xl w-full mx-auto mt-8">
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-8 justify-items-center">
         {groupedPrograms.map((group) => {
           const leverageData = getLeverageForStepType(group.type)
@@ -222,7 +222,7 @@ const ChallengesContent = () => {
           return (
             <div
               key={group.type}
-              className="w-full sm:w-[500px] rounded-lg overflow-hidden border border-primary/50 bg-secondary/5 relative pb-8"
+              className="w-full sm:w-[600px] rounded-lg overflow-hidden border border-primary/50 bg-secondary/5 relative pb-8"
             >
               {/* Header Section - Orange Background */}
               <div className="bg-primary p-5 flex items-center justify-between flex-wrap gap-0 sm:gap-3 h-auto sm:h-16">

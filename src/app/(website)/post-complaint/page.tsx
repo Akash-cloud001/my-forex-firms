@@ -2,7 +2,7 @@
 import React, { Suspense } from 'react'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
-import { ReviewForm } from '@/components/website/post-review'
+import { ReviewForm } from '@/components/website/post-complaint'
 
 const ReviewPageContent: React.FC = () => {
   const searchParams = useSearchParams()
