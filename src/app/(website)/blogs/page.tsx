@@ -8,10 +8,11 @@ import AnimatedSection from "@/components/website/AnimatedSection";
 import { useBlogList } from "@/hooks/queries/useBlogList";
 import { Badge } from "@/components/ui/badge";
 import LoadingScreen from "@/components/ui/LoadingScreen";
+import { useRouter } from 'next/navigation';
 
 export default function BlogsPage() {
   const { data: blogs = [], isLoading, isError, error } = useBlogList();
-
+  const router = useRouter();
   // Show LoadingScreen at page level when loading
   if (isLoading) {
     return <LoadingScreen title="Loading blogs..." subtitle="Fetching the latest reviews and insights..." />;
@@ -56,7 +57,8 @@ export default function BlogsPage() {
                             {blogs.map((blog) => (
                                 <article
                                     key={blog.slug}
-                                    className="relative card-custom-grad rounded-[28px] overflow-hidden group"
+                                    className="relative card-custom-grad rounded-[28px] overflow-hidden group cursor-pointer"
+                                    onClick={() => router.push(`/blogs/${blog.slug}`)}
                                 >
                                     <div className="absolute inset-0 opacity-70 transition duration-500 group-hover:opacity-90" />
                                     <div className="relative z-10 flex h-full flex-col justify-between bg-black/30 backdrop-blur-[2px] p-6 sm:p-8">
@@ -92,14 +94,11 @@ export default function BlogsPage() {
                                         </div>
                                         <div className="flex items-center justify-end mt-4">
                                             <Button
-                                                asChild
                                                 variant="ghost"
                                                 className="text-primary hover:text-white px-0"
                                             >
-                                                <Link href={`/blogs/${blog.slug}`} className="flex items-center gap-2">
                                                     Read More
                                                     <ArrowRightIcon className="h-4 w-4" />
-                                                </Link>
                                             </Button>
                                         </div>
                                     </div>
