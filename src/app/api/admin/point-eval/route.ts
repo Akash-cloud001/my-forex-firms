@@ -285,7 +285,7 @@ export async function POST(req: Request) {
             firmName: firm.firmDetails.name,
             evaluatedAt: new Date(),
             isEvaluated: true,
-            ptiScore: parseFloat(initialPtiScore.toFixed(2)),
+            ptiScore: parseFloat(initialPtiScore.toFixed(3)),
             credibilityTransparency: {
                 maxScore: 10,
                 score: totalCredibility,

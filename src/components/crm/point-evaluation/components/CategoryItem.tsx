@@ -55,7 +55,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                     <span className="font-medium">{category.name}</span>
                 </div>
                 <span className="text-xs">
-                    {catTotal.toFixed(1)} / {catMax.toFixed(1)}
+                    {catTotal.toFixed(3)} / {catMax.toFixed(3)}
                 </span>
             </div>
 
