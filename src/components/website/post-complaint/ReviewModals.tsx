@@ -13,6 +13,9 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({ open, onOpenChange }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md text-white border-none rounded-md">
+        <DialogHeader>
+          <DialogTitle className="sr-only">Complaint Submitted Successfully</DialogTitle>
+        </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="text-center">
             <div className="mx-auto w-20 h-20 rounded-full bg-secondary/5 flex items-center justify-center text-4xl mb-4">
