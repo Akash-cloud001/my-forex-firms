@@ -44,7 +44,7 @@ export const fundedCriteriaSchema = z.object({
     minTradingDays: z.number().min(0).optional(),
     maxLossType: z.enum(["trailing", "static"], {
         message: "Max Loss Type must be either 'trailing' or 'static'",
-    }),
+    }).optional(),
 });
 export const programSchema = z.object({
     propFirmId: z.string().min(1, "Prop Firm ID is required"),
@@ -58,11 +58,22 @@ export const programSchema = z.object({
     minPayout: z.string().min(1, "Min payout is required"),
     evaluationRule: tradingRuleSetSchema,
     fundedRule: tradingRuleSetSchema,
-    fundedCriteria: fundedCriteriaSchema,
+    fundedCriteria: fundedCriteriaSchema.optional(),
     payoutMethods: z.array(z.string()).min(1, "At least one payout method required"),
     timeLimit: z.string().optional(),
     drawdownResetType: z.string().optional(),
-});
+}).refine(
+    (data) => {
+        if (data.type === "Instant") {
+            return !!data.fundedCriteria; // must exist
+        }
+        return true;
+    },
+    {
+        message: "Funded Criteria is required for Instant programs",
+        path: ["fundedCriteria"],
+    }
+);
 
 // Export TS types
 export type EvaluationStep = z.infer<typeof evaluationStepSchema>;

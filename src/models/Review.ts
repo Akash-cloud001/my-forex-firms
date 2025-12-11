@@ -22,45 +22,38 @@ export interface IAdminMessage {
 }
 export type IssueType =
   // Payout Issues
-  | 'payout-delays'
-  | 'payout-denial'
-  | 'other-payout'
+  | 'payout-delays' //payout behaviour
+  | 'payout-denial' // payout behavour
+  | 'other-payout' //pending
   // Account/Platform Issues
-  | 'missing-account'
-  | 'technical-problems'
-  | 'platform-instability'
+  | 'missing-account' //trading freedom
+  | 'technical-problems'// physical and legal
+  | 'platform-instability'// physical and legal
   | 'other-account'
   // Trading Related Issues
-  | 'slippage'
-  | 'spreads'
-  | 'execution'
-  | 'rule-enforcement'
-  | 'commissions-discrepancy'
-  | 'restrictions'
+  | 'slippage' //trading conditions
+  | 'spreads' //trading conditions
+  | 'execution' //trading conditions
+  | 'rule-enforcement' //Rules & Fairness
+  | 'commissions-discrepancy'//trading conditions
+  | 'restrictions'//Rules & Fairness
   | 'other-trading'
   // Rule/Policy Issues
-  | 'rule-changes'
-  | 'unclear-terms'
-  | 'hidden-rules'
+  | 'rule-changes' //Public Identity & Transparency
+  | 'unclear-terms' //public identity & transparency 
+  | 'hidden-rules' //public identity & transp
   | 'other-rule'
   // Support/Communication Issues
-  | 'ignored-emails'
-  | 'no-response'
-  | 'slow-support'
-  | 'miscommunication'
-  | 'immature-support'
+  | 'no-response' //support & communication
+  | 'slow-support' //support & communication
+  | 'miscommunication' //support & communication
+  | 'immature-support' //support & communication
   | 'other-support'
   // Misconduct
-  | 'misleading-marketing'
-  | 'unfair-practices'
-  | 'fake-claims'
-  // Legacy/Fallback
-  | 'user-complaints'
-  | 'payout-denials'
-  | 'poor-practices'
-  | 'unethical-marketing'
-  | 'community-trust'
-  | 'other';
+  | 'misleading-marketing' //trust and signal
+  | 'unfair-practices' //trust and signal
+  | 'fake-claims' //trust and signal
+
 
 // ============================================================================
 // SUB-SCHEMAS (Best Practice: Break down complex schemas)
@@ -135,7 +128,6 @@ const ReviewSchema = new Schema({
       'hidden-rules',
       'other-rule',
       // Support/Communication Issues
-      'ignored-emails',
       'no-response',
       'slow-support',
       'miscommunication',
@@ -145,13 +137,7 @@ const ReviewSchema = new Schema({
       'misleading-marketing',
       'unfair-practices',
       'fake-claims',
-      // Legacy/Fallback
-      'user-complaints',
-      'payout-denials',
-      'poor-practices',
-      'unethical-marketing',
-      'community-trust',
-      'other'
+
     ]
   },
   customIssueType: String,
@@ -167,6 +153,50 @@ const ReviewSchema = new Schema({
   // Admin/Moderator Message Tracking
   adminMessages: [AdminMessageSchema],              // Array of all admin messages
   infoRequestCount: { type: Number, default: 0 },   // Quick count of info requests
+
+  // === PTI v3 fields (optional for now) ===
+  severity: { type: Number, min: 1, max: 5, default: 2 },
+  relatedSubFactor: {
+    type: String,
+    enum: [
+      "registered_company",
+      "physical_office",
+      "dashboard_friendlyness",
+      "public_ceo_founder",
+      "support_quality",
+      "terms_clarity",
+      "brocker_backed",
+      "active_social",
+      "transparent_comm",
+      "verified_payouts",
+      "lifetime_payouts",
+      "no_controversies",
+      "consistent_ops",
+      "fair_spreads",
+      "fair_commissions",
+      "acceptable_slippage",
+      "multiple_trading_platforms",
+      "profit_targets",
+      "consistancy_rule",
+      "news_trading",
+      "lavrage_margin_rule",
+      "no_hidden_restrictions_stratgy",
+      "dd_type",
+      "no_payout_denial_policy",
+      "payout_cycle",
+      "single_highest_payout",
+      "payout_time",
+      "flexible_payout_methods",
+      "payout_denials",
+      "fair_profit_split",
+      "flexible_payment_methods",
+      "reasonable_minimum_payout_requiremnts"
+    ],
+    required: false
+  },
+
+
+
 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
@@ -208,9 +238,9 @@ ReviewSchema.virtual('displayFirmName').get(function () {
 });
 
 // Virtual for display issue type (issue type or custom issue type)
-ReviewSchema.virtual('displayIssueType').get(function () {
-  return this.issueType === 'other' ? this.customIssueType : this.issueType;
-});
+// ReviewSchema.virtual('displayIssueType').get(function () {
+//   return this.issueType === 'other' ? this.customIssueType : this.issueType;
+// });
 
 // Virtual for review age
 ReviewSchema.virtual('ageInDays').get(function () {
@@ -411,6 +441,9 @@ export interface IReview extends Document {
   // Admin/Moderator Message Tracking
   adminMessages: IAdminMessage[];
   infoRequestCount: number;
+  // PTI v3 fields
+  severity?: number;
+  relatedSubFactor?: string;
 
   createdAt: Date;
   updatedAt: Date;
