@@ -38,6 +38,31 @@ const logos = [
     name: "E8 Markets",
     link: "https://e8markets.com",
     url: "/website/firm/e81.png",
+  },
+  {
+    name: "Funding Pips",
+    link: "https://fundingpips.com",
+    url: "/website/firm/fundingPips2.png",
+  },
+  {
+    name: "5%ers",
+    link: "https://the5ers.com",
+    url: "/website/firm/5s1.png",
+  },
+  {
+    name: "Alpha Capital",
+    link: "https://alphacapitalgroup.uk",
+    url: "/website/firm/alpha1.png",
+  },
+  {
+    name: "E8 Markets",
+    link: "https://e8markets.com",
+    url: "/website/firm/e81.png",
+  },
+  {
+    name: "Funding Pips",
+    link: "https://fundingpips.com",
+    url: "/website/firm/fundingPips2.png",
   }
 ];
 
