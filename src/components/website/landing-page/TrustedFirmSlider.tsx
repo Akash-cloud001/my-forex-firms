@@ -65,7 +65,7 @@ export default function TrustedFirmSlider() {
   }
 
   return (
-    <div className="mt-12 pt-0 pb-24">
+    <div className="pt-4 pb-12">
       <div className="flex flex-col justify-center items-center ">
         <h3 className="font-geist-sans font-semibold text-2xl text-primary text-shadow-white">
           Industry
@@ -80,7 +80,7 @@ export default function TrustedFirmSlider() {
       >
         <div
           ref={scrollerRef}
-          className={`flex gap-24 shrink-0 w-max flex-nowrap ${
+          className={`flex gap-12 shrink-0 w-max flex-nowrap ${
             start ? 'animate-scroll' : ''
           } hover:[animation-play-state:paused]`}
         >
@@ -89,7 +89,7 @@ export default function TrustedFirmSlider() {
               key={index}
               className="shrink-0 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 opacity-60 hover:opacity-100 "
             >
-              <a href={logo.link} target="_blank" rel="noopener noreferrer" className="cursor-pointer relative h-24 w-24">
+              <a href={logo.link} target="_blank" rel="noopener noreferrer" className="cursor-pointer relative h-16 w-16">
                 <Image
                   src={logo.url}
                   alt={logo.name}
