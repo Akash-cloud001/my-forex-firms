@@ -28,7 +28,7 @@ const ScoreHeader: React.FC<ScoreHeaderProps> = ({ firmName, ptiScore }) => {
                 {ptiScore !== undefined && (
                     <div className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-lg border border-primary/20">
                         <span className="text-sm font-medium text-muted-foreground">PTI Score:</span>
-                        <span className="text-xl font-bold text-primary">{ptiScore.toFixed(2)}</span>
+                        <span className="text-xl font-bold text-primary">{ptiScore.toFixed(3)}</span>
                     </div>
                 )}
             </CardHeader>

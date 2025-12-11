@@ -161,7 +161,7 @@ async function applyPTIDeduction(firmId: string, relatedSubFactor: string): Prom
   console.log('│ Step 2: Calculate Per-Complaint Deduction');
   console.log(`│   PerComplaint = d_slab × (maxPoints / 10)`);
   console.log(`│   PerComplaint = ${deductionRate} × (${categoryMax} / 10)`);
-  console.log(`│   PerComplaint = ${deductionRate} × ${(categoryMax / 10).toFixed(2)}`);
+  console.log(`│   PerComplaint = ${deductionRate} × ${(categoryMax / 10).toFixed(3)}`);
   console.log(`│   PerComplaint = ${deduction.toFixed(4)}`);
   console.log('│');
 
@@ -233,8 +233,8 @@ async function applyPTIDeduction(firmId: string, relatedSubFactor: string): Prom
   console.log('├─────────────────────────────────────────────────────────────┤');
   console.log('│ Metric              Before      After       Change          │');
   console.log('├─────────────────────────────────────────────────────────────┤');
-  console.log(`│ Sub-Factor Score    ${currentScore.toFixed(2).padEnd(10)} ${newScore.toFixed(2).padEnd(10)} -${deduction.toFixed(2).padEnd(14)}│`);
-  console.log(`│ PTI Score           ${oldPTI.toFixed(2).padEnd(10)} ${ptiScore.toFixed(2).padEnd(10)} -${(oldPTI - ptiScore).toFixed(2).padEnd(14)}│`);
+  console.log(`│ Sub-Factor Score    ${currentScore.toFixed(3).padEnd(10)} ${newScore.toFixed(3).padEnd(10)} -${deduction.toFixed(3).padEnd(14)}│`);
+  console.log(`│ PTI Score           ${oldPTI.toFixed(3).padEnd(10)} ${ptiScore.toFixed(3).padEnd(10)} -${(oldPTI - ptiScore).toFixed(3).padEnd(14)}│`);
   console.log('└─────────────────────────────────────────────────────────────┘\n');
 
   console.log('✅ PTI Updated Successfully!\n');

@@ -88,7 +88,7 @@ export async function PATCH(req: Request) {
         const ptiRaw = (C * 0.35) + (T * 0.30) + (P * 0.35);
         const ptiScore = isNaN(ptiRaw) ? 0 : ptiRaw;
 
-        evaluation.ptiScore = parseFloat(ptiScore.toFixed(2));
+        evaluation.ptiScore = parseFloat(ptiScore.toFixed(3));
 
         // 5. Save the document
         // Mark the modified path as modified to ensure mongoose saves it

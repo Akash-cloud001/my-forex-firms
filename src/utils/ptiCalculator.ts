@@ -133,9 +133,9 @@ export function recalculatePTI(scores: {
     const ptiScore = (0.35 * credibilityTotal) + (0.30 * tradingTotal) + (0.35 * payoutTotal);
 
     return {
-        credibilityTotal: parseFloat(credibilityTotal.toFixed(2)),
-        tradingTotal: parseFloat(tradingTotal.toFixed(2)),
-        payoutTotal: parseFloat(payoutTotal.toFixed(2)),
-        ptiScore: parseFloat(ptiScore.toFixed(2))
+        credibilityTotal: parseFloat(credibilityTotal.toFixed(3)),
+        tradingTotal: parseFloat(tradingTotal.toFixed(3)),
+        payoutTotal: parseFloat(payoutTotal.toFixed(3)),
+        ptiScore: parseFloat(ptiScore.toFixed(3))
     };
 }
