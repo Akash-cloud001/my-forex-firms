@@ -29,9 +29,17 @@ const isAdminRoute = createRouteMatcher([
 const isEditorRestrictedRoute = createRouteMatcher([
   '/admin/role-management(.*)',
   '/admin/newsletter(.*)',
-  '/admin/affiliates(.*)'
+  '/admin/affiliates(.*)',
+  '/admin/reviews(.*)',
+  '/admin/point-evaluation(.*)',
+  '/admin/faq-management(.*)',
 ])
 
+const isModeratorRestrictedRoute = createRouteMatcher([
+  '/admin/role-management(.*)',
+  '/admin/newsletter(.*)',
+  '/admin/affiliates(.*)'
+])
 
 
 export default clerkMiddleware(async (auth, req) => {
@@ -72,6 +80,11 @@ export default clerkMiddleware(async (auth, req) => {
 
         // Check if editor is trying to access restricted routes
         if (isEditorRestrictedRoute(req) && userRole === 'editor') {
+          return NextResponse.redirect(new URL('/admin/unauthorized', req.url))
+        }
+
+        // Check if moderator is trying to access restricted routes
+        if (isModeratorRestrictedRoute(req) && userRole === 'moderator') {
           return NextResponse.redirect(new URL('/admin/unauthorized', req.url))
         }
 
