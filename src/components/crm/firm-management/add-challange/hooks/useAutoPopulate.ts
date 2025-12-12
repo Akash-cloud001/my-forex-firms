@@ -27,8 +27,17 @@ export const useAutoPopulate = ({ watch, setValue, isEditing }: UseAutoPopulateP
                 setValue("evaluationSteps", []);
             }
             setValue("evaluationPhases", 0);
+            setValue("fundedCriteria", {
+                profitTarget: "",
+                maxLoss: "",
+                dailyLoss: "",
+                minTradingDays: 0,
+                maxLossType: "static",
+            });
             return;
         }
+
+        setValue("fundedCriteria", undefined);
 
         // Auto-populate for 1-Step, 2-Step, or 3-Step challenges
         // Only populate if steps don't already exist (prevents clearing on validation errors)

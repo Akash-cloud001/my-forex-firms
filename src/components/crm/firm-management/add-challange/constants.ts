@@ -34,13 +34,6 @@ export const DEFAULT_FORM_VALUES: Partial<ProgramFormData> = {
     // Global rules for the entire program
     evaluationRule: DEFAULT_RULE_SET,
     fundedRule: DEFAULT_RULE_SET,
-    fundedCriteria: {
-        profitTarget: "",
-        maxLoss: "",
-        dailyLoss: "",
-        minTradingDays: 0,
-        maxLossType: "static",
-    },
     payoutMethods: [],
     timeLimit: "",
     drawdownResetType: "",
