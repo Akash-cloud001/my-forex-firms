@@ -433,12 +433,14 @@ my-forex-firms/
 - `GET /api/analytics/overview` - Get overview analytics (admin only)
   - Returns: total users (7d/30d), page views (7d/30d), sessions (7d/30d), bounce rate (7d)
   - Includes growth percentages vs previous periods
+  - Enhanced error handling: Specific error messages for missing env vars, auth failures, permission errors
 - `GET /api/analytics/page` - Get page-specific analytics (admin only)
   - Query params: `path` (required), `startDate`, `endDate`
   - Returns: page views for specified path
 - `GET /api/analytics/top-pages` - Get top pages by views (admin only)
   - Query params: `limit` (default: 10), `startDate`, `endDate`
   - Returns: array of top pages with path and view counts
+  - Enhanced error handling: Detailed error messages for debugging
 
 ### Testing API (`/api/test-db/`)
 - `GET /api/test-db` - Test MongoDB connection and list collections
@@ -471,6 +473,8 @@ my-forex-firms/
 - **Growth Tracking**: Period-over-period growth calculations
 - **Top Pages**: Most viewed pages list
 - **Admin Only**: Analytics access restricted to admin role
+- **Error Handling**: Enhanced error messages for API failures, missing environment variables, authentication issues, and permission errors
+- **User Feedback**: Detailed error messages displayed in Dashboard component with proper error extraction from API responses
 
 ### 3. Admin Dashboard
 - **Dashboard**: Statistics and overview with GA4 analytics integration
@@ -741,7 +745,13 @@ npm start
 ### Error Handling
 - API routes return JSON with `success` boolean
 - Error messages in `message` or `error` field
-- HTTP status codes: 200 (success), 400 (bad request), 401 (unauthorized), 404 (not found), 500 (server error)
+- HTTP status codes: 200 (success), 400 (bad request), 401 (unauthorized), 403 (forbidden), 404 (not found), 500 (server error)
+- **Analytics API**: Enhanced error handling with specific messages for:
+  - Missing Google Analytics environment variables
+  - Authentication/credential failures
+  - Permission errors (403 status)
+  - Safe error message exposure (excludes sensitive data like private keys)
+- **Frontend Error Display**: Dashboard components extract and display actual error messages from API responses for better debugging
 
 ### Pagination Pattern
 - Query params: `page`, `limit`
@@ -818,6 +828,8 @@ npm start
 ## 📝 Recent Git Commits
 
 ### Latest Commits Summary (December 7-12, 2025)
+- **b46ba6c** (Dec 12): Enhance role-based access control and error handling in analytics and reviews APIs - Improved error messages for Google Analytics API failures, enhanced Dashboard component error handling with detailed error extraction from API responses, added specific error messages for missing environment variables, authentication failures, and permission errors in analytics routes
+- **a834491** (Dec 12): Rebrand Reviews to Complaints and enhance admin navigation - Updated terminology and navigation structure
 - **fdfb132** (Dec 12): Update ReviewViewModal and FirmListSection for improved UI and terminology - Added MessageCircle icon, updated styling, changed "Reviews" to "Complaints"
 - **6def384** (Dec 12): Enhance scrollbar visibility and navbar scroll effect - Hidden scrollbars across all browsers, integrated scroll progress indicator with gradient bar
 - **a7be352** (Dec 12): Introduce InfiniteSlider component for enhanced image display - Seamless scrolling image experience, integrated into TrustedFirmSlider
@@ -899,6 +911,12 @@ npm start
 - **Firm Program Configuration**: Complete CRM system for firm program creation with profit/payout settings
 
 ### Recently Added Features 🆕 (December 7-12, 2025)
+- **Analytics Error Handling**: Enhanced error handling for analytics API
+  - Detailed error messages for missing Google Analytics environment variables
+  - Specific error messages for authentication and credential failures
+  - Permission error handling with appropriate HTTP status codes
+  - Dashboard component extracts and displays actual error messages from API responses
+  - Improved debugging experience with clear error context
 - **Scroll-Linked Animation**: Navbar scroll progress indicator
   - Framer Motion integration with `useScroll` hook and `scrollYProgress`
   - Gradient progress bar (3px height) at top of page
@@ -1062,7 +1080,7 @@ npm start
 
 ---
 
-**Last Updated**: December 12, 2025 - Updated based on recent Git commits (Dec 7-12, 2025) including scroll-linked animation, complaints system rebranding, InfiniteSlider component, PTI point evaluation system, ScrollToTop component, AnimatedNumber component, 3D model integration, and various UI/UX enhancements
+**Last Updated**: December 12, 2025 - Updated based on recent Git commits (Dec 7-12, 2025) including analytics error handling improvements, role-based access control enhancements, scroll-linked animation, complaints system rebranding, InfiniteSlider component, PTI point evaluation system, ScrollToTop component, AnimatedNumber component, 3D model integration, and various UI/UX enhancements
 **Version**: 1.5.0
 **Maintainer**: Development Team
 
