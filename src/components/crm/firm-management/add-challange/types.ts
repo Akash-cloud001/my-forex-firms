@@ -38,14 +38,15 @@ export const tradingRuleSetSchema = z.object({
     maxRiskPerTrade: ruleSchema,
 });
 export const fundedCriteriaSchema = z.object({
-    profitTarget: z.string().min(1, "Profit target is required"),
-    maxLoss: z.string().min(1, "Max Loss is required"),
-    dailyLoss: z.string().min(1, "Daily Loss is required"),
+    profitTarget: z.string().optional(),
+    maxLoss: z.string().optional(),
+    dailyLoss: z.string().optional(),
     minTradingDays: z.number().min(0).optional(),
     maxLossType: z.enum(["trailing", "static"], {
         message: "Max Loss Type must be either 'trailing' or 'static'",
     }).optional(),
 });
+
 export const programSchema = z.object({
     propFirmId: z.string().min(1, "Prop Firm ID is required"),
     type: z.string().min(1, "Type is required"),
@@ -62,18 +63,43 @@ export const programSchema = z.object({
     payoutMethods: z.array(z.string()).min(1, "At least one payout method required"),
     timeLimit: z.string().optional(),
     drawdownResetType: z.string().optional(),
-}).refine(
-    (data) => {
-        if (data.type === "Instant") {
-            return !!data.fundedCriteria; // must exist
+}).superRefine((data, ctx) => {
+    // Only validate fundedCriteria fields when type is "Instant"
+    if (data.type === "Instant") {
+        if (!data.fundedCriteria) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Funded Criteria is required for Instant programs",
+                path: ["fundedCriteria"],
+            });
+            return;
         }
-        return true;
-    },
-    {
-        message: "Funded Criteria is required for Instant programs",
-        path: ["fundedCriteria"],
+
+        if (!data.fundedCriteria.profitTarget || data.fundedCriteria.profitTarget.trim() === "") {
+            ctx.addIssue({
+                code: "custom",
+                message: "Profit target is required",
+                path: ["fundedCriteria", "profitTarget"],
+            });
+        }
+
+        if (!data.fundedCriteria.maxLoss || data.fundedCriteria.maxLoss.trim() === "") {
+            ctx.addIssue({
+                code: "custom",
+                message: "Max Loss is required",
+                path: ["fundedCriteria", "maxLoss"],
+            });
+        }
+
+        if (!data.fundedCriteria.dailyLoss || data.fundedCriteria.dailyLoss.trim() === "") {
+            ctx.addIssue({
+                code: "custom",
+                message: "Daily Loss is required",
+                path: ["fundedCriteria", "dailyLoss"],
+            });
+        }
     }
-);
+});
 
 // Export TS types
 export type EvaluationStep = z.infer<typeof evaluationStepSchema>;
