@@ -127,18 +127,7 @@ const editorNavigationItems = [
     icon: Building2,
     hasSubmenu: false,
   },
-  {
-    title: "Reviews",
-    url: "/admin/reviews",
-    icon: AlertCircle,
-    hasSubmenu: false,
-  },
-  {
-    title: "Penalties",
-    url: "/admin/penalties",
-    icon: ShieldAlert,
-    hasSubmenu: false,
-  },
+ 
   {
     title: "FAQ",
     url: "/admin/faq-management",
@@ -172,9 +161,21 @@ const moderatorNavigationItems = [
     hasSubmenu: false,
   },
   {
+    title: "Blogs",
+    url: "/admin/blogs",
+    icon: Book,
+    hasSubmenu: false,
+  },
+  {
     title: "FAQ",
     url: "/admin/faq-management",
     icon: MessageCircleQuestionMark,
+    hasSubmenu: false,
+  },
+  {
+    title: "Penalties",
+    url: "/admin/penalties",
+    icon: ShieldAlert,
     hasSubmenu: false,
   },
 ];

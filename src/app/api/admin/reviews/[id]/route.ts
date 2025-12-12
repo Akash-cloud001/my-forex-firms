@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import { auth } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import Review from '@/models/Review';
 import FundingFirm from '@/models/FirmDetails';
 import PointEvaluation from '@/models/PointEvaluation';
@@ -24,6 +24,19 @@ export async function PUT(
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+
+    // Check if user is admin or moderator
+    const clerk = await clerkClient();
+    const currentUser = await clerk.users.getUser(userId);
+    const userRole = currentUser.publicMetadata?.role as string | undefined;
+    const allowedRoles = ['admin', 'moderator'];
+
+    if (!userRole || !allowedRoles.includes(userRole)) {
+      return NextResponse.json(
+        { error: 'Admin or moderator access required' },
+        { status: 403 }
       );
     }
 
