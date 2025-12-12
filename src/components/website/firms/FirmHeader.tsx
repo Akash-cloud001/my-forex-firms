@@ -172,9 +172,9 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
       {/* Charts and Bottom Section - Responsive Layout */}
       <div className='flex flex-col xl:flex-row items-center justify-between gap-6 xl:gap-4 mt-6 xl:mt-0'>
         {/* Charts Section */}
-        <div className='flex items-center justify-center xl:items-start xl:justify-start gap-4 opacity-80 relative w-full xl:w-auto'>
+        <div className=' flex items-center justify-center xl:items-start xl:justify-start gap-4 opacity-80 relative w-full xl:w-auto'>
           {/* Coming Soon Overlay - Visible on all sizes */}
-          <div className='absolute inset-0 z-2 flex items-center justify-center'>
+          <div className='hidden absolute inset-0 z-2 flex items-center justify-center'>
             <p className='text-foreground text-xl sm:text-2xl font-bold text-left flex flex-row items-center justify-center gap-2'>
               <LineChart className='w-10 h-10 sm:w-14 sm:h-14 text-primary' />
               <span>
@@ -184,7 +184,7 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
           </div>
 
           {/* Factor 1 - Hidden below md */}
-          <figure className='hidden md:flex flex-col items-center justify-center blur-lg'>
+          <figure className='hidden md:flex flex-col items-center justify-center '>
             <RadarChartComponent
               data={factor1}
               width={300}
@@ -199,14 +199,15 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
               margin={{ top: 20, left: 20, right: 20, bottom: 20 }}
             />
             <figcaption>
-              <h3 className='text-base text-foreground font-semibold -mt-2 uppercase'>
-                Factor 1
+              <h3 className='text-sm text-foreground font-semibold -mt-2 '>
+              Credibility & Transparency
+
               </h3>
             </figcaption>
           </figure>
 
           {/* Factor 2 - Hidden below md */}
-          <figure className='hidden md:flex flex-col items-center justify-center blur-lg'>
+          <figure className='hidden md:flex flex-col items-center justify-center '>
             <RadarChartComponent
               data={factor2}
               width={300}
@@ -221,14 +222,14 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
               margin={{ top: 20, left: 20, right: 20, bottom: 20 }}
             />
             <figcaption>
-              <h3 className='text-base text-foreground font-semibold -mt-2 uppercase'>
-                Factor 2
+              <h3 className='text-sm text-foreground font-semibold -mt-2 '>
+              Trading Experience
               </h3>
             </figcaption>
           </figure>
 
           {/* Factor 3 - Visible on all sizes with blur */}
-          <figure className='flex flex-col items-center justify-center blur-lg'>
+          <figure className='flex flex-col items-center justify-center '>
             <RadarChartComponent
               data={factor3}
               width={chartWidth}
@@ -243,8 +244,8 @@ const FirmHeader: React.FC<FirmHeaderProps> = ({
               margin={{ top: 20, left: 20, right: 20, bottom: 20 }}
             />
             <figcaption>
-              <h3 className='text-base text-foreground font-semibold -mt-2 uppercase'>
-                Factor 3
+              <h3 className='text-sm text-foreground font-semibold -mt-2 '>
+                Payout/Payment Reliability
               </h3>
             </figcaption>
           </figure>

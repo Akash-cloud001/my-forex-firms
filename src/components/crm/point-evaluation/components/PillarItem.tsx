@@ -59,7 +59,7 @@ const PillarItem: React.FC<PillarItemProps> = ({
                 </div>
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-medium">
-                        {total.toFixed(1)} / {maxTotal.toFixed(1)}
+                        {total.toFixed(3)} / {maxTotal.toFixed(3)}
                     </span>
                     <div className="w-20 h-1.5 bg-muted rounded-full">
                         <div

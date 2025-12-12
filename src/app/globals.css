@@ -258,7 +258,17 @@
   scrollbar-width: none;
 }
 
+/* Hide scrollbar for all browsers */
+html,
+body {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
 
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
 @layer utilities {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;

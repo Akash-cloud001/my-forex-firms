@@ -207,7 +207,7 @@ function FirmListSection() {
                             {firm.totalPayout}
                           </div> */}
                           <div className="text-xs text-foreground/70">
-                            {firm.totalReview} Reviews
+                            {firm.totalReview} Complaints
                           </div>
                         </div>
 

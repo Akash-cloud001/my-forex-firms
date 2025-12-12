@@ -83,7 +83,7 @@ const FactorItem: React.FC<FactorItemProps> = ({
                     ) : (
                         <>
                             <span className="text-xs font-semibold">
-                                {score.toFixed(1)}/{config.max.toFixed(1)}
+                                {score.toFixed(3)}/{config.max.toFixed(3)}
                             </span>
                             <Button
                                 size="sm"
