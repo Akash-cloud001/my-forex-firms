@@ -2,16 +2,16 @@
 // @ts-nocheck
 'use client';
 
-import { DollarSign, Plus, X } from 'lucide-react';
-import React, { useState } from 'react';
+import { DollarSign } from 'lucide-react';
+import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { FirmFormData } from '../schema/schema';
+import { PAYMENT_METHOD_OPTIONS, PAYOUT_METHOD_OPTIONS } from '../constants';
 
 interface Step9PaymentsProps {
   onNext: () => void;
@@ -24,41 +24,9 @@ interface Step9PaymentsProps {
 export function Step9Payments({ onPrevious, onSubmit, onNext, isLastStep }: Step9PaymentsProps) {
   const { register, watch, setValue, formState: { errors, isSubmitting } } = useFormContext<FirmFormData>();
 
-  // Local input states
-  const [methodInput, setMethodInput] = useState('');
-  const [payoutInput, setPayoutInput] = useState('');
-
-  // ✅ Type-safe helper to get an array from payments.*
-  const getArray = <T extends keyof FirmFormData['payments']>(field: T): string[] => {
-    const value = watch(`payments.${field}` as `payments.${T}`);
-    return (value as string[]) || [];
-  };
-
-  // ✅ Generic add function (type-safe)
-  const addItem = <T extends keyof FirmFormData['payments']>(
-    field: T,
-    value: string,
-    setInput: (val: string) => void
-  ) => {
-    if (!value.trim()) return;
-    const current = getArray(field);
-    setValue(`payments.${field}` as `payments.${T}`, [...current, value.trim()] as any, { shouldValidate: true });
-    setInput('');
-  };
-
-  // ✅ Generic remove function (type-safe)
-  const removeItem = <T extends keyof FirmFormData['payments']>(field: T, value: string) => {
-    const current = getArray(field);
-    setValue(
-      `payments.${field}` as `payments.${T}`,
-      current.filter((item) => item !== value) as any,
-      { shouldValidate: true }
-    );
-  };
-
-  // Watch payment arrays
-  const methods = getArray('methods');
-  const payoutMethods = getArray('payoutMethods');
+  // Watch payment arrays for MultiSelect default values
+  const methods = watch('payments.methods') || [];
+  const payoutMethods = watch('payments.payoutMethods') || [];
 
   return (
     <div className="space-y-6">
@@ -76,88 +44,39 @@ export function Step9Payments({ onPrevious, onSubmit, onNext, isLastStep }: Step
       {/* Payment Methods (Deposit) */}
       <div className="space-y-2">
         <Label className="text-sm font-medium">Payment Methods (Deposit)</Label>
-        <div className="flex gap-2">
-          <Input
-            value={methodInput}
-            onChange={(e) => setMethodInput(e.target.value)}
-            placeholder="Add payment method (e.g., Credit Card, PayPal)"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                addItem('methods', methodInput, setMethodInput);
-              }
-            }}
-          />
-          <Button
-            type="button"
-            onClick={() => addItem('methods', methodInput, setMethodInput)}
-            size="icon"
-            variant="outline"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {methods.map((method) => (
-            <Badge key={method} variant="secondary" className="px-3 py-1 bg-blue-100 text-blue-700">
-              {method}
-              <button
-                type="button"
-                onClick={() => removeItem('methods', method)}
-                className="ml-2 hover:text-red-500"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
-        </div>
-        {methods.length === 0 && (
-          <p className="text-xs text-gray-500">No payment methods added yet</p>
-        )}
+        <MultiSelect
+          options={PAYMENT_METHOD_OPTIONS.map(opt => ({ label: opt.label, value: opt.value }))}
+          onValueChange={(value) => {
+            setValue('payments.methods', value, { shouldValidate: true });
+          }}
+          defaultValue={Array.isArray(methods) ? methods : []}
+          placeholder="Select payment methods"
+          variant="inverted"
+          maxCount={5}
+        />
+        <p className="text-xs text-gray-500">
+          Select the payment methods accepted for deposits
+        </p>
       </div>
 
       {/* Payout Methods (Withdrawal) */}
       <div className="space-y-2">
         <Label className="text-sm font-medium">Payout Methods (Withdrawal)</Label>
-        <div className="flex gap-2">
-          <Input
-            value={payoutInput}
-            onChange={(e) => setPayoutInput(e.target.value)}
-            placeholder="Add payout method (e.g., Bank Transfer, Crypto)"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                addItem('payoutMethods', payoutInput, setPayoutInput);
-              }
-            }}
-          />
-          <Button
-            type="button"
-            onClick={() => addItem('payoutMethods', payoutInput, setPayoutInput)}
-            size="icon"
-            variant="outline"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {payoutMethods.map((method) => (
-            <Badge key={method} variant="secondary" className="px-3 py-1 bg-green-100 text-green-700">
-              {method}
-              <button
-                type="button"
-                onClick={() => removeItem('payoutMethods', method)}
-                className="ml-2 hover:text-red-500"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
-        </div>
-        {payoutMethods.length === 0 && (
-          <p className="text-xs text-gray-500">No payout methods added yet</p>
-        )}
+        <MultiSelect
+          options={PAYOUT_METHOD_OPTIONS.map(opt => ({ label: opt.label, value: opt.value }))}
+          onValueChange={(value) => {
+            setValue('payments.payoutMethods', value, { shouldValidate: true });
+          }}
+          defaultValue={Array.isArray(payoutMethods) ? payoutMethods : []}
+          placeholder="Select payout methods"
+          variant="inverted"
+          maxCount={5}
+        />
+        <p className="text-xs text-gray-500">
+          Select the payout methods available for withdrawals
+        </p>
       </div>
+
 
       {/* Base Currency & Min Withdrawal */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

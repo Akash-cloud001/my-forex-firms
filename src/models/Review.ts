@@ -148,7 +148,6 @@ const ReviewSchema = new Schema({
   adminNotes: String,
   reviewedBy: String,
   reviewedAt: Date,
-  analytics: Object,           // simplify nested ReviewAnalyticsSchema
 
   // Admin/Moderator Message Tracking
   adminMessages: [AdminMessageSchema],              // Array of all admin messages
@@ -213,10 +212,16 @@ const ReviewSchema = new Schema({
 
 // Compound indexes for common queries
 ReviewSchema.index({ firmId: 1, status: 1 });
+ReviewSchema.index({ firmId: 1, createdAt: -1 });
 ReviewSchema.index({ userId: 1, createdAt: -1 });
+ReviewSchema.index({ status: 1, createdAt: -1 });
 ReviewSchema.index({ status: 1, isVerified: 1, createdAt: -1 });
 ReviewSchema.index({ issueType: 1, status: 1 });
-ReviewSchema.index({ issueCategory: 1, status: 1 }); // Index for new field
+ReviewSchema.index({ issueCategory: 1, status: 1 });
+
+// Index for PTI v3 related queries
+ReviewSchema.index({ relatedSubFactor: 1, status: 1 });
+ReviewSchema.index({ severity: -1, status: 1 });
 
 // Index for admin messages queries
 ReviewSchema.index({ 'adminMessages.senderId': 1, createdAt: -1 });
@@ -247,12 +252,6 @@ ReviewSchema.virtual('ageInDays').get(function () {
   return Math.floor((Date.now() - this.createdAt.getTime()) / (1000 * 60 * 60 * 24));
 });
 
-// Virtual for helpfulness ratio
-ReviewSchema.virtual('helpfulnessRatio').get(function () {
-  const total = this.analytics.helpfulVotes + this.analytics.notHelpfulVotes;
-  return total > 0 ? (this.analytics.helpfulVotes / total) : 0;
-});
-
 // ============================================================================
 // INSTANCE METHODS (Best Practice: Add business logic methods)
 // ============================================================================
@@ -274,25 +273,6 @@ ReviewSchema.methods.reject = function (adminUserId: string, notes?: string) {
   this.reviewedBy = adminUserId;
   this.reviewedAt = new Date();
   if (notes) this.adminNotes = notes;
-  return this.save();
-};
-
-// Method to mark as helpful
-ReviewSchema.methods.markHelpful = function () {
-  this.analytics.helpfulVotes += 1;
-  return this.save();
-};
-
-// Method to mark as not helpful
-ReviewSchema.methods.markNotHelpful = function () {
-  this.analytics.notHelpfulVotes += 1;
-  return this.save();
-};
-
-// Method to increment views
-ReviewSchema.methods.incrementViews = function () {
-  this.analytics.views += 1;
-  this.analytics.lastViewedAt = new Date();
   return this.save();
 };
 
@@ -430,14 +410,6 @@ export interface IReview extends Document {
   adminNotes?: string;
   reviewedBy?: string;
   reviewedAt?: Date;
-  analytics: {
-    views: number;
-    helpfulVotes: number;
-    notHelpfulVotes: number;
-    shares: number;
-    lastViewedAt?: Date;
-  };
-
   // Admin/Moderator Message Tracking
   adminMessages: IAdminMessage[];
   infoRequestCount: number;
@@ -452,16 +424,11 @@ export interface IReview extends Document {
 
   // Virtual fields
   displayFirmName: string;
-  displayIssueType: string;
   ageInDays: number;
-  helpfulnessRatio: number;
 
   // Instance methods
   approve(adminUserId: string, notes?: string): Promise<IReview>;
   reject(adminUserId: string, notes?: string): Promise<IReview>;
-  markHelpful(): Promise<IReview>;
-  markNotHelpful(): Promise<IReview>;
-  incrementViews(): Promise<IReview>;
   requestMoreInfo(
     senderId: string,
     senderRole: 'admin' | 'moderator',

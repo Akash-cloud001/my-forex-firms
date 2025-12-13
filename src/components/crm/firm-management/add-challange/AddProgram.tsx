@@ -161,6 +161,7 @@ const ProgramForm = ({ programId }: { programId?: string }) => {
           <EvaluationSteps
             control={control}
             register={register}
+            setValue={setValue}
             stepFields={stepFields}
             appendStep={appendStep}
             removeStep={removeStep}

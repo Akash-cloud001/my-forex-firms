@@ -117,9 +117,32 @@ export const tradingSchema = z.object({
   tradingPlatforms: z.array(z.string()).optional(),
 });
 
+// Payment Method Enum Values (for validation)
+export const PAYMENT_METHODS = [
+  'bank_transfer',
+  'credit_debit_cards',
+  'crypto',
+  'e_wallet',
+  'apple_pay',
+  'google_pay',
+  'upi',
+  'skrill',
+  'paypal',
+  'astro_pay',
+  'other',
+] as const;
+
+export const PAYOUT_METHODS = [
+  'bank_transfer',
+  'crypto',
+  'e_wallet',
+  'rise',
+  'other',
+] as const;
+
 export const paymentsSchema = z.object({
-  methods: z.array(z.string()).optional(),
-  payoutMethods: z.array(z.string()).optional(),
+  methods: z.array(z.enum(PAYMENT_METHODS)).optional(),
+  payoutMethods: z.array(z.enum(PAYOUT_METHODS)).optional(),
   baseCurrency: z.string().optional(),
   minWithdrawal: z.any().optional(),
   processingTime: z

@@ -52,8 +52,8 @@ export const SUBFACTOR_MAPPING: Record<string, { pillar: string; category: strin
     "fair_spreads": { pillar: "trading_experience", category: "trading_conditions" },
     "fair_commissions": { pillar: "trading_experience", category: "trading_conditions" },
     "acceptable_slippage": { pillar: "trading_experience", category: "trading_conditions" },
-    "multiple_trading_platforms": { pillar: "trading_experience", category: "trading_conditions" },
     // Trading Experience - Trading Freedom
+    "multiple_trading_platforms": { pillar: "trading_experience", category: "trading_freedom" },
     "profit_targets": { pillar: "trading_experience", category: "trading_freedom" },
     "consistancy_rule": { pillar: "trading_experience", category: "trading_freedom" },
     "news_trading": { pillar: "trading_experience", category: "trading_freedom" },

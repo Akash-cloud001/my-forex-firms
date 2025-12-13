@@ -25,7 +25,7 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({ register }) 
                     <Label>Time Limit</Label>
                     <Input
                         {...register("timeLimit")}
-                        placeholder="e.g., 30 days"
+                        placeholder="e.g., 4 (in days) "
                     />
                 </div>
 

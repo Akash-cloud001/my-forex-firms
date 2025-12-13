@@ -36,10 +36,10 @@ export const initialScoresData = {
                 fair_spreads: 0.7,
                 fair_commissions: 1,
                 acceptable_slippage: 0.7,
-                multiple_trading_platforms: 0.8,
             },
 
             trading_freedom: {
+                multiple_trading_platforms: 0.8,
                 profit_targets: 0.8,
                 consistancy_rule: 0.9,
                 news_trading: 0.8, // using one of the criteria values
@@ -537,9 +537,9 @@ const sampleFirms = [
                     fair_spreads: 1,
                     fair_commissions: 1,
                     acceptable_slippage: 1,
-                    multiple_trading_platforms: 1,
                 },
                 trading_freedom: {
+                    multiple_trading_platforms: 1,
                     profit_targets: 1,
                     consistancy_rule: 1,
                     news_trading: 1,
@@ -601,9 +601,9 @@ const sampleFirms = [
                     fair_spreads: 0.7,
                     fair_commissions: 0.7,
                     acceptable_slippage: 0.7,
-                    multiple_trading_platforms: 0.8,
                 },
                 trading_freedom: {
+                    multiple_trading_platforms: 0.8,
                     profit_targets: 0.7,
                     consistancy_rule: 0.7,
                     news_trading: 0.5,
