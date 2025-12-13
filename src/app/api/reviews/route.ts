@@ -294,7 +294,7 @@ export async function POST(request: NextRequest) {
       lastModifiedBy: userId,
       relatedSubFactor: relatedSubFactor,
     });
-    console.log(newReview, "newReview")
+    // console.log(newReview, "newReview")
     // Save to MongoDB
     const savedReview = await newReview.save();
 

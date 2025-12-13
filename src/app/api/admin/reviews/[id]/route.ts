@@ -42,7 +42,7 @@ export async function PUT(
 
     const { id: reviewId } = await params;
     const updateData = await request.json();
-    console.log("🚀 ~ PUT ~ updateData:", updateData)
+    // console.log("🚀 ~ PUT ~ updateData:", updateData)
 
     // Get the current review to check status change
     const currentReview = await Review.findById(reviewId);
@@ -98,9 +98,9 @@ export async function PUT(
  * Formula: PerComplaint = d_slab × (categoryMaxPoints / 10)
  */
 async function applyPTIDeduction(firmId: string, relatedSubFactor: string): Promise<void> {
-  console.log('\n╔══════════════════════════════════════════════════════════════╗');
-  console.log('║           PTI v2 — COMPLAINT PROCESSING                      ║');
-  console.log('╚══════════════════════════════════════════════════════════════╝\n');
+  // console.log('\n╔══════════════════════════════════════════════════════════════╗');
+  // console.log('║           PTI v2 — COMPLAINT PROCESSING                      ║');
+  // console.log('╚══════════════════════════════════════════════════════════════╝\n');
 
   // Get the sub-factor path (pillar, category, subFactor)
   const pathInfo = getSubFactorPath(relatedSubFactor);
@@ -124,13 +124,13 @@ async function applyPTIDeduction(firmId: string, relatedSubFactor: string): Prom
     totalPayout >= 10_000_000 ? 0.12 :
       totalPayout >= 2_000_000 ? 0.16 : 0.20;
 
-  console.log('┌─────────────────────────────────────────────────────────────┐');
-  console.log('│ FIRM PROFILE                                                │');
-  console.log('├─────────────────────────────────────────────────────────────┤');
-  console.log(`│ Firm Name:      ${firm.firmDetails?.name}`);
-  console.log(`│ Payout Range:   $${(totalPayout / 1_000_000).toFixed(1)}M (Slab ${slab})`);
-  console.log(`│ Deduction Rate: ${deductionRate}`);
-  console.log('└─────────────────────────────────────────────────────────────┘\n');
+  // console.log('┌─────────────────────────────────────────────────────────────┐');
+  // console.log('│ FIRM PROFILE                                                │');
+  // console.log('├─────────────────────────────────────────────────────────────┤');
+  // console.log(`│ Firm Name:      ${firm.firmDetails?.name}`);
+  // console.log(`│ Payout Range:   $${(totalPayout / 1_000_000).toFixed(1)}M (Slab ${slab})`);
+  // console.log(`│ Deduction Rate: ${deductionRate}`);
+  // console.log('└─────────────────────────────────────────────────────────────┘\n');
 
   // Fetch current PointEvaluation
   const evaluation = await PointEvaluation.findOne({ firmId });
@@ -153,39 +153,39 @@ async function applyPTIDeduction(firmId: string, relatedSubFactor: string): Prom
   const scores = evaluation.scores as unknown as ScoresType;
   const currentScore = scores?.[pillar]?.[category]?.[subFactor] ?? 0;
 
-  console.log('┌─────────────────────────────────────────────────────────────┐');
-  console.log('│ COMPLAINT RECEIVED                                          │');
-  console.log('├─────────────────────────────────────────────────────────────┤');
-  console.log(`│ Category:    ${pillar.replace(/_/g, ' ').toUpperCase()}`);
-  console.log(`│ Sub-Factor:  ${category.replace(/_/g, ' ')}`);
-  console.log(`│ Field:       ${subFactor}`);
-  console.log(`│ Date:        ${new Date().toLocaleDateString()}`);
-  console.log('└─────────────────────────────────────────────────────────────┘\n');
+  // console.log('┌─────────────────────────────────────────────────────────────┐');
+  // console.log('│ COMPLAINT RECEIVED                                          │');
+  // console.log('├─────────────────────────────────────────────────────────────┤');
+  // console.log(`│ Category:    ${pillar.replace(/_/g, ' ').toUpperCase()}`);
+  // console.log(`│ Sub-Factor:  ${category.replace(/_/g, ' ')}`);
+  // console.log(`│ Field:       ${subFactor}`);
+  // console.log(`│ Date:        ${new Date().toLocaleDateString()}`);
+  // console.log('└─────────────────────────────────────────────────────────────┘\n');
 
-  console.log('┌─────────────────────────────────────────────────────────────┐');
-  console.log('│ STEP-BY-STEP CALCULATION                                    │');
-  console.log('├─────────────────────────────────────────────────────────────┤');
-  console.log('│');
-  console.log('│ Step 1: Identify Affected Sub-Factor');
-  console.log(`│   • Sub-Factor:   ${category}`);
-  console.log(`│   • Current Score: ${currentScore}`);
-  console.log(`│   • Max Points:    ${categoryMax}`);
-  console.log('│');
-  console.log('│ Step 2: Calculate Per-Complaint Deduction');
-  console.log(`│   PerComplaint = d_slab × (maxPoints / 10)`);
-  console.log(`│   PerComplaint = ${deductionRate} × (${categoryMax} / 10)`);
-  console.log(`│   PerComplaint = ${deductionRate} × ${(categoryMax / 10).toFixed(3)}`);
-  console.log(`│   PerComplaint = ${deduction.toFixed(4)}`);
-  console.log('│');
+  // console.log('┌─────────────────────────────────────────────────────────────┐');
+  // console.log('│ STEP-BY-STEP CALCULATION                                    │');
+  // console.log('├─────────────────────────────────────────────────────────────┤');
+  // console.log('│');
+  // console.log('│ Step 1: Identify Affected Sub-Factor');
+  // console.log(`│   • Sub-Factor:   ${category}`);
+  // console.log(`│   • Current Score: ${currentScore}`);
+  // console.log(`│   • Max Points:    ${categoryMax}`);
+  // console.log('│');
+  // console.log('│ Step 2: Calculate Per-Complaint Deduction');
+  // console.log(`│   PerComplaint = d_slab × (maxPoints / 10)`);
+  // console.log(`│   PerComplaint = ${deductionRate} × (${categoryMax} / 10)`);
+  // console.log(`│   PerComplaint = ${deductionRate} × ${(categoryMax / 10).toFixed(3)}`);
+  // console.log(`│   PerComplaint = ${deduction.toFixed(4)}`);
+  // console.log('│');
 
   // Apply deduction (minimum 0)
   const newScore = Math.max(0, currentScore - deduction);
 
-  console.log('│ Step 3: Apply Deduction');
-  console.log(`│   New Score = Current Score - PerComplaint`);
-  console.log(`│   New Score = ${currentScore} - ${deduction.toFixed(4)}`);
-  console.log(`│   New Score = ${newScore.toFixed(4)}`);
-  console.log('│');
+  // console.log('│ Step 3: Apply Deduction');
+  // console.log(`│   New Score = Current Score - PerComplaint`);
+  // console.log(`│   New Score = ${currentScore} - ${deduction.toFixed(4)}`);
+  // console.log(`│   New Score = ${newScore.toFixed(4)}`);
+  // console.log('│');
 
   // Update the specific sub-factor score
   const updatePath = `scores.${pillar}.${category}.${subFactor}`;
@@ -215,17 +215,17 @@ async function applyPTIDeduction(firmId: string, relatedSubFactor: string): Prom
   const oldPayout = evaluation.payoutPaymentReliability?.score || 0;
   const oldPTI = evaluation.ptiScore || 0;
 
-  console.log('│ Step 4: Recalculate Category Total');
-  console.log(`│   Credibility:  ${oldCredibility} → ${credibilityTotal}`);
-  console.log(`│   Trading:      ${oldTrading} → ${tradingTotal}`);
-  console.log(`│   Payout:       ${oldPayout} → ${payoutTotal}`);
-  console.log('│');
-  console.log('│ Step 5: Compute New PTI');
-  console.log(`│   PTI = (0.35 × ${credibilityTotal}) + (0.30 × ${tradingTotal}) + (0.35 × ${payoutTotal})`);
-  console.log(`│   PTI = ${(0.35 * credibilityTotal).toFixed(3)} + ${(0.30 * tradingTotal).toFixed(3)} + ${(0.35 * payoutTotal).toFixed(3)}`);
-  console.log(`│   PTI = ${ptiScore}`);
-  console.log('│');
-  console.log('└─────────────────────────────────────────────────────────────┘\n');
+  // console.log('│ Step 4: Recalculate Category Total');
+  // console.log(`│   Credibility:  ${oldCredibility} → ${credibilityTotal}`);
+  // console.log(`│   Trading:      ${oldTrading} → ${tradingTotal}`);
+  // console.log(`│   Payout:       ${oldPayout} → ${payoutTotal}`);
+  // console.log('│');
+  // console.log('│ Step 5: Compute New PTI');
+  // console.log(`│   PTI = (0.35 × ${credibilityTotal}) + (0.30 × ${tradingTotal}) + (0.35 × ${payoutTotal})`);
+  // console.log(`│   PTI = ${(0.35 * credibilityTotal).toFixed(3)} + ${(0.30 * tradingTotal).toFixed(3)} + ${(0.35 * payoutTotal).toFixed(3)}`);
+  // console.log(`│   PTI = ${ptiScore}`);
+  // console.log('│');
+  // console.log('└─────────────────────────────────────────────────────────────┘\n');
 
   // Update pillar totals and PTI score
   await PointEvaluation.updateOne(
@@ -241,14 +241,14 @@ async function applyPTIDeduction(firmId: string, relatedSubFactor: string): Prom
     }
   );
 
-  console.log('┌─────────────────────────────────────────────────────────────┐');
-  console.log('│ IMPACT SUMMARY                                              │');
-  console.log('├─────────────────────────────────────────────────────────────┤');
-  console.log('│ Metric              Before      After       Change          │');
-  console.log('├─────────────────────────────────────────────────────────────┤');
-  console.log(`│ Sub-Factor Score    ${currentScore.toFixed(3).padEnd(10)} ${newScore.toFixed(3).padEnd(10)} -${deduction.toFixed(3).padEnd(14)}│`);
-  console.log(`│ PTI Score           ${oldPTI.toFixed(3).padEnd(10)} ${ptiScore.toFixed(3).padEnd(10)} -${(oldPTI - ptiScore).toFixed(3).padEnd(14)}│`);
-  console.log('└─────────────────────────────────────────────────────────────┘\n');
+  // console.log('┌─────────────────────────────────────────────────────────────┐');
+  // console.log('│ IMPACT SUMMARY                                              │');
+  // console.log('├─────────────────────────────────────────────────────────────┤');
+  // console.log('│ Metric              Before      After       Change          │');
+  // console.log('├─────────────────────────────────────────────────────────────┤');
+  // console.log(`│ Sub-Factor Score    ${currentScore.toFixed(3).padEnd(10)} ${newScore.toFixed(3).padEnd(10)} -${deduction.toFixed(3).padEnd(14)}│`);
+  // console.log(`│ PTI Score           ${oldPTI.toFixed(3).padEnd(10)} ${ptiScore.toFixed(3).padEnd(10)} -${(oldPTI - ptiScore).toFixed(3).padEnd(14)}│`);
+  // console.log('└─────────────────────────────────────────────────────────────┘\n');
 
   console.log('✅ PTI Updated Successfully!\n');
 }

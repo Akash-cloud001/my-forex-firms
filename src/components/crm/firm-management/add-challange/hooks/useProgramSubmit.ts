@@ -16,7 +16,7 @@ export const useProgramSubmit = ({ programId, isEditing, propFirmId }: UseProgra
     const router = useRouter();
 
     const onSubmit = async (data: ProgramFormData) => {
-        console.log("🚀 ~ onSubmit ~ data:", data)
+        // console.log("🚀 ~ onSubmit ~ data:", data)
         setIsSubmitting(true);
         const loadingToast = toast.loading(
             isEditing ? "Updating program..." : "Creating program..."
