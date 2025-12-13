@@ -17,13 +17,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check if user is admin using Clerk public metadata
+    // Check if user is admin or moderator using Clerk public metadata
     const clerkClientInstance = await clerkClient();
     const currentUser = await clerkClientInstance.users.getUser(authenticatedUserId);
-    const isAdmin = currentUser.publicMetadata?.role === 'admin';
-    if (!isAdmin) {
+    const userRole = currentUser.publicMetadata?.role as string | undefined;
+    const allowedRoles = ['admin', 'moderator'];
+
+    if (!userRole || !allowedRoles.includes(userRole)) {
       return NextResponse.json(
-        { error: 'Admin access required' },
+        { error: 'Admin or moderator access required' },
         { status: 403 }
       );
     }

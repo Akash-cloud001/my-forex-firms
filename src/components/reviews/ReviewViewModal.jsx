@@ -2,7 +2,7 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { FileText, Calendar, Building2, AlertCircle, Paperclip, CheckCircle2, Shield, Trash2 } from 'lucide-react'
+import { FileText, Calendar, Building2, AlertCircle, Paperclip, CheckCircle2, Shield, Trash2, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
@@ -106,32 +106,33 @@ const ReviewViewModal = ({
 
             {/* Description Section */}
             <div className="">
-              <h3 className="text-sm font-semibold text-white/80 mb-2 uppercase tracking-wide">Description</h3>
+              <h3 className="text-sm font-geist-sans font-semibold text-white/80 mb-2 uppercase tracking-wide flex items-center gap-2">
+              <MessageCircle className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-white/60 uppercase tracking-wide">Description</span>
+              </h3>
               <div className="bg-black/20 rounded-lg p-4">
-                <p className="text-white/90 font-geist-sans leading-relaxed whitespace-pre-wrap first-letter:capitalize">
+                <p className="text-white/90 font-geist-inter text-sm leading-relaxed whitespace-pre-wrap first-letter:capitalize">
                   {review.description}
                 </p>
               </div>
             </div>
             {/* Additional Info and Actions */}
-            <div className="">
-              <div className="flex items-end justify-end mb-4">
-                
-                {onDelete && (
-                  <Button
-                    onClick={() => {
-                      onClose();
-                      onDelete(review);
-                    }}
-                    variant="destructive"
-                    className="flex items-center gap-2"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete Review
-                  </Button>
-                )}
-              </div>
-            </div>
+            { (review.status === 'pending' || review.status === 'rejected') && <div className="flex items-end justify-end">
+              
+              { onDelete && (
+                <Button
+                  onClick={() => {
+                    onClose();
+                    onDelete(review);
+                  }}
+                  variant="destructive"
+                  className="flex items-center gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete Review
+                </Button>
+              )}
+            </div>}
           </div>
         </div>
       </DialogContent>

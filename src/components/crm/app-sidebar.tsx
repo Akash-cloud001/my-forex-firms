@@ -127,6 +127,27 @@ const editorNavigationItems = [
     icon: Building2,
     hasSubmenu: false,
   },
+ 
+  {
+    title: "FAQ",
+    url: "/admin/faq-management",
+    icon: MessageCircleQuestionMark,
+    hasSubmenu: false,
+  },
+];
+const moderatorNavigationItems = [
+  {
+    title: "Dashboard",
+    url: "/admin/dashboard",
+    icon: LayoutDashboard,
+    hasSubmenu: false,
+  },
+  {
+    title: "Firm Management",
+    url: "/admin/firm-management",
+    icon: Building2,
+    hasSubmenu: false,
+  },
   {
     title: "Reviews",
     url: "/admin/reviews",
@@ -134,15 +155,27 @@ const editorNavigationItems = [
     hasSubmenu: false,
   },
   {
-    title: "Penalties",
-    url: "/admin/penalties",
-    icon: ShieldAlert,
+    title: "Point Evaluation",
+    url: "/admin/point-evaluation",
+    icon: Mail,
+    hasSubmenu: false,
+  },
+  {
+    title: "Blogs",
+    url: "/admin/blogs",
+    icon: Book,
     hasSubmenu: false,
   },
   {
     title: "FAQ",
     url: "/admin/faq-management",
     icon: MessageCircleQuestionMark,
+    hasSubmenu: false,
+  },
+  {
+    title: "Penalties",
+    url: "/admin/penalties",
+    icon: ShieldAlert,
     hasSubmenu: false,
   },
 ];
@@ -161,6 +194,8 @@ export default function AppSidebar() {
       return adminNavigationItems;
     } else if (userRole === 'editor') {
       return editorNavigationItems;
+    } else if (userRole === 'moderator') {
+      return moderatorNavigationItems;
     }
     // Default to admin navigation if role is not recognized
     return adminNavigationItems;

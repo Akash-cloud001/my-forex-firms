@@ -68,8 +68,8 @@ my-forex-firms/
 │   │   │   ├── firms/                # Firm listing & detail pages
 │   │   │   │   ├── [slug]/           # Dynamic firm detail pages
 │   │   │   │   └── page.tsx          # Firm listing page
-│   │   │   ├── reviews/              # Reviews page
-│   │   │   ├── post-review/          # Submit review page
+│   │   │   ├── complaints/            # Complaints page (formerly reviews)
+│   │   │   ├── post-complaint/       # Submit complaint page (formerly post-review)
 │   │   │   ├── profile/              # User profile
 │   │   │   ├── layout.tsx            # Website layout (Navbar, Footer)
 │   │   │   └── page.tsx              # Landing page
@@ -158,14 +158,15 @@ my-forex-firms/
 │   │   │   │   └── BlogTableOfContents.tsx # Table of contents component
 │   │   │   ├── firms/                # Firm display components
 │   │   │   ├── landing-page/         # Landing page sections
-│   │   │   ├── post-review/          # Review submission form
-│   │   │   ├── navbar.jsx            # Navigation bar
+│   │   │   ├── post-complaint/       # Complaint submission form (formerly post-review)
+│   │   │   ├── navbar.jsx            # Navigation bar (with scroll progress indicator)
 │   │   │   ├── footer.jsx            # Footer
 │   │   │   ├── bottombar.jsx         # Bottom navigation
 │   │   │   └── ...                   # Other website components
 │   │   ├── profile/                  # User profile components
-│   │   ├── reviews/                  # Review display components
+│   │   ├── reviews/                  # Review/Complaint display components
 │   │   ├── ui/                       # Reusable UI components (shadcn/ui)
+│   │   │   └── infinite-slider.tsx   # InfiniteSlider component for seamless scrolling
 │   │   └── svgs/                     # SVG icon components
 │   ├── lib/                          # Utility libraries
 │   │   ├── mongodb.ts                # MongoDB connection
@@ -361,9 +362,9 @@ my-forex-firms/
 #### Firm Rules
 - Similar CRUD operations for firm rules
 
-#### Reviews
-- `GET /api/admin/reviews` - List reviews (with filters)
-- `POST /api/admin/reviews` - Approve/reject review
+#### Reviews/Complaints
+- `GET /api/admin/reviews` - List complaints (with filters, terminology updated)
+- `POST /api/admin/reviews` - Approve/reject complaint
 
 #### Users
 - `GET /api/admin/users` - List users (with advanced filtering)
@@ -381,8 +382,9 @@ my-forex-firms/
 - `POST /api/admin/faq/faq-categories` - Create category
 - `POST /api/admin/faq/reorder` - Reorder FAQs
 
-#### Point Evaluation
+#### Point Evaluation (PTI)
 - `GET /api/admin/point-eval` - Get evaluation points and metrics for firm assessment
+- **PTI Score Calculation**: Automatic calculation and storage of PropTrust Index scores
 
 #### Firm Reviews (Blog Management)
 - `GET /api/admin/firm-reviews` - List all firm reviews (with search, pagination, sorting)
@@ -408,10 +410,10 @@ my-forex-firms/
 - `GET /api/public/firm-reviews` - List all published firm reviews (with search, pagination, sorting)
 - `GET /api/public/firm-reviews/[slug]` - Get single published review by slug
 
-### Reviews API (`/api/reviews/`)
-- `GET /api/reviews` - Get reviews (filtered by user/admin)
-- `POST /api/reviews` - Create review (with BunnyCDN file upload)
-- `DELETE /api/reviews` - Delete review(s)
+### Reviews/Complaints API (`/api/reviews/`)
+- `GET /api/reviews` - Get complaints (filtered by user/admin, terminology updated from "reviews")
+- `POST /api/reviews` - Create complaint (with BunnyCDN file upload, terminology updated)
+- `DELETE /api/reviews` - Delete complaint(s)
 
 ### Newsletter API (`/api/newsletter/`)
 - `GET /api/newsletter` - List subscriptions (admin)
@@ -431,12 +433,14 @@ my-forex-firms/
 - `GET /api/analytics/overview` - Get overview analytics (admin only)
   - Returns: total users (7d/30d), page views (7d/30d), sessions (7d/30d), bounce rate (7d)
   - Includes growth percentages vs previous periods
+  - Enhanced error handling: Specific error messages for missing env vars, auth failures, permission errors
 - `GET /api/analytics/page` - Get page-specific analytics (admin only)
   - Query params: `path` (required), `startDate`, `endDate`
   - Returns: page views for specified path
 - `GET /api/analytics/top-pages` - Get top pages by views (admin only)
   - Query params: `limit` (default: 10), `startDate`, `endDate`
   - Returns: array of top pages with path and view counts
+  - Enhanced error handling: Detailed error messages for debugging
 
 ### Testing API (`/api/test-db/`)
 - `GET /api/test-db` - Test MongoDB connection and list collections
@@ -453,13 +457,14 @@ my-forex-firms/
 - **Version Control**: Track changes with version numbers
 - **Audit Trail**: Log all changes via AuditLog model
 
-### 2. Review System
-- **Review Submission**: Users can submit reviews with files
-- **File Upload**: BunnyCDN integration for review attachments
+### 2. Complaints System (formerly Reviews)
+- **Complaint Submission**: Users can submit complaints with files (rebranded from "Reviews" to "Complaints")
+- **File Upload**: BunnyCDN integration for complaint attachments
 - **Moderation**: Admin approval/rejection workflow
-- **Issue Types**: Categorized complaint types
+- **Issue Types**: Categorized complaint types (payout issues, account/platform issues, trading issues, rule/policy issues, support/communication issues, misconduct)
 - **Analytics**: Track views, helpful votes, shares
-- **Verification**: Admin can verify reviews
+- **Verification**: Admin can verify complaints
+- **Terminology**: Consistent use of "Complaints" terminology across the application
 
 ### 2.5. Analytics Dashboard
 - **GA4 Integration**: Google Analytics 4 Data API integration
@@ -468,6 +473,8 @@ my-forex-firms/
 - **Growth Tracking**: Period-over-period growth calculations
 - **Top Pages**: Most viewed pages list
 - **Admin Only**: Analytics access restricted to admin role
+- **Error Handling**: Enhanced error messages for API failures, missing environment variables, authentication issues, and permission errors
+- **User Feedback**: Detailed error messages displayed in Dashboard component with proper error extraction from API responses
 
 ### 3. Admin Dashboard
 - **Dashboard**: Statistics and overview with GA4 analytics integration
@@ -486,12 +493,14 @@ my-forex-firms/
 - **Affiliates**: Affiliate link management (partial implementation)
 
 ### 4. Public Website
-- **Landing Page**: Hero, firm slider, firm list, reviews, FAQ, blogs, newsletter
-- **Firm Detail Pages**: Dashboard, challenges, reviews tabs with enhanced UI
-- **Review Submission**: Public form to submit reviews with file uploads
+- **Landing Page**: Hero with 3D models, firm slider (InfiniteSlider), firm list, complaints, FAQ, blogs, newsletter
+- **Firm Detail Pages**: Dashboard, challenges, complaints tabs with enhanced UI
+- **Complaint Submission**: Public form to submit complaints with file uploads (rebranded from Reviews)
 - **Blog System**: Dynamic blog listing and detail pages with table of contents
 - **FAQ Section**: Categorized FAQs with Zustand store management
 - **Newsletter Signup**: Email subscription with admin management
+- **Scroll Progress Indicator**: Visual scroll progress bar in navbar
+- **ScrollToTop**: Automatic scroll to top on route changes
 
 ### 5. User Profile
 - **Account Info**: View/edit profile
@@ -501,15 +510,22 @@ my-forex-firms/
 - **Danger Zone**: Account deletion
 
 ### 6. Enhanced UI/UX Features
+- **Scroll-Linked Animation**: Navbar scroll progress indicator with gradient bar (Framer Motion)
+- **Hidden Scrollbars**: Cross-browser scrollbar hiding for cleaner UI
+- **InfiniteSlider**: Seamless scrolling image display component
+- **ScrollToTop**: Automatic scroll to top on route changes
+- **AnimatedNumber**: Dynamic number display with animations
+- **3D Model Integration**: GLB format 3D models on landing page
 - **Loading States**: Skeleton components for tables and content
-- **Challenge Drawer**: Detailed challenge information with card-based layout
+- **Challenge Drawer**: Detailed challenge information with card-based layout, trading rules, and tooltips
 - **Verification Badges**: Visual indicators for firm transparency features (check/cross icons)
 - **Role-Based Navigation**: Dynamic sidebar based on user permissions (admin/editor)
 - **Responsive Design**: Mobile-optimized layouts and components
 - **Error Handling**: Comprehensive error states and user feedback
-- **Table of Contents**: Sticky navigation for blog posts with scroll tracking
+- **Table of Contents**: Sticky navigation for blog posts with scroll tracking and body scroll lock on mobile
 - **Modal Dialogs**: Company description modals and confirmation dialogs
 - **Enhanced Forms**: Multi-step forms with draft saving and validation
+- **AnimatedSection**: Customizable animation thresholds for better control
 
 ### 7. Dynamic Blog Management System (Firm Reviews)
 - **Database-Backed**: MongoDB FirmReview model with comprehensive schema
@@ -685,8 +701,11 @@ npm start
 - **Fonts**: Geist Sans, Geist Mono, Montserrat, Inter
 
 ### Animations
-- **Motion (Framer Motion)**: Page transitions, component animations
-- **AnimatedSection**: Wrapper component for scroll animations
+- **Motion (Framer Motion)**: Page transitions, component animations, scroll-linked animations
+- **AnimatedSection**: Wrapper component for scroll animations with customizable thresholds
+- **Scroll-Linked Animation**: Navbar scroll progress indicator using `useScroll` and `scrollYProgress`
+- **AnimatedNumber**: Dynamic number display with smooth transitions
+- **InfiniteSlider**: Seamless infinite scrolling animations for images
 
 ### Form Handling
 - **React Hook Form**: Form state management
@@ -726,7 +745,13 @@ npm start
 ### Error Handling
 - API routes return JSON with `success` boolean
 - Error messages in `message` or `error` field
-- HTTP status codes: 200 (success), 400 (bad request), 401 (unauthorized), 404 (not found), 500 (server error)
+- HTTP status codes: 200 (success), 400 (bad request), 401 (unauthorized), 403 (forbidden), 404 (not found), 500 (server error)
+- **Analytics API**: Enhanced error handling with specific messages for:
+  - Missing Google Analytics environment variables
+  - Authentication/credential failures
+  - Permission errors (403 status)
+  - Safe error message exposure (excludes sensitive data like private keys)
+- **Frontend Error Display**: Dashboard components extract and display actual error messages from API responses for better debugging
 
 ### Pagination Pattern
 - Query params: `page`, `limit`
@@ -800,9 +825,32 @@ npm start
 
 ---
 
-## 📝 Recent Git Commits (November 2024)
+## 📝 Recent Git Commits
 
-### Latest Commits Summary (November 27-28, 2024)
+### Latest Commits Summary (December 7-12, 2025)
+- **b46ba6c** (Dec 12): Enhance role-based access control and error handling in analytics and reviews APIs - Improved error messages for Google Analytics API failures, enhanced Dashboard component error handling with detailed error extraction from API responses, added specific error messages for missing environment variables, authentication failures, and permission errors in analytics routes
+- **a834491** (Dec 12): Rebrand Reviews to Complaints and enhance admin navigation - Updated terminology and navigation structure
+- **fdfb132** (Dec 12): Update ReviewViewModal and FirmListSection for improved UI and terminology - Added MessageCircle icon, updated styling, changed "Reviews" to "Complaints"
+- **6def384** (Dec 12): Enhance scrollbar visibility and navbar scroll effect - Hidden scrollbars across all browsers, integrated scroll progress indicator with gradient bar
+- **a7be352** (Dec 12): Introduce InfiniteSlider component for enhanced image display - Seamless scrolling image experience, integrated into TrustedFirmSlider
+- **1213e49** (Dec 11): Implement CRM point evaluation system with admin APIs, UI components, and review management
+- **67feef7** (Dec 11): Update FirstSection component for improved UI consistency - Changed "Verified Brokers" to "Verified Propfirms"
+- **222847d** (Dec 11): Implement point evaluation and review management system with dedicated API endpoints, models, and utilities
+- **3b3db88** (Dec 11): Add new trusted firms to TrustedFirmSlider - Funding Pips, 5%ers, Alpha Capital
+- **f7853db** (Dec 11): Enhance blog navigation and user interaction - Integrated useRouter for direct navigation to blog posts
+- **5044186** (Dec 11): Enhance scrolling behavior and UI components - ScrollToTop component, improved BlogDetailPage scroll calculation, customizable AnimatedSection threshold
+- **341d841** (Dec 11): Update UI elements in Subscribe and TrustedFirmSlider components - Cleaner button styling, improved layout
+- **07f390d** (Dec 11): Refine UI elements and enhance user feedback in complaints section - Improved text shadows, gradient text styling, redirect after form submission
+- **4ac63d5** (Dec 10): Introduce Complaints functionality and update related components - New pages and components for managing user complaints, updated terminology from "Reviews" to "Complaints"
+- **7cbe7dd** (Dec 10): Update terminology from "Reviews" to "Complaints" across the application
+- **866ef4d** (Dec 10): Enhance ChallengesContent and FirmHeader components - Detailed trading rules, tooltips, formatPayout function
+- **dd45540** (Dec 8): Implement firm program creation and configuration within CRM - Profit/payout settings, trading rules, evaluation steps
+- **d9578ea** (Dec 8): Introduce AnimatedNumber component for dynamic number display
+- **c752163** (Dec 7): PTI score calculation implementation
+- **50fb259** (Dec 7): Replace GLTF model with GLB format and enhance 3D canvas integration
+- **e00de20** (Dec 7): Enhance landing page with 3D model and updated statistics
+
+### Previous Commits Summary (November 27-28, 2024)
 - **0045c93** (Nov 28): Enhanced blog components and improved loading states - Modularized blog components, added Toaster for notifications
 - **41e8490** (Nov 28): Introduced blog management features and enhanced admin interface - Complete blog CRUD system with inline editing
 - **abf2c8d** (Nov 28): Implemented blog detail page with dynamic review data and loading state
@@ -811,22 +859,21 @@ npm start
 - **1e5e825** (Nov 27): Implemented blog detail page with dynamic content and interactive table of contents
 - **9b07c36** (Nov 27): Updated Skeleton component styling and enhanced table header font weight
 - **c6d7d80** (Nov 27): Updated success color scheme and enhanced UI components across the platform
-- **924753a**: Removed react-country-flag dependency, added firms page, enhanced Subscribe component
-- **77c695b**: Major update - Introduced admin point evaluation, firm review system, and comprehensive CRM
-- **79e0aa5**: Added totalPayout and slug support, updated forms, fixed FAQ count in admin
-- **4c07077**: Integrated Axios + TanStack Query for modern data fetching
-- **5c888b0**: Implemented role-based access control and loading states for admin pages
 
 ### Key Development Milestones
-1. **Blog Management System**: Complete CRUD system with database-backed firm reviews (November 28, 2024)
-2. **Component Modularization**: Broke down blog pages into reusable components (BlogHero, BlogIntroduction, etc.)
-3. **Toast Notifications**: Integrated sonner Toaster for user feedback
-4. **Point Evaluation System**: Complete scoring system for firm assessment
-5. **Enhanced Review Management**: Improved categorization and admin interface
-6. **Modern Data Fetching**: Migration to TanStack Query + Axios
-7. **Blog System Enhancement**: Interactive table of contents and scroll tracking
-8. **UI Consistency**: Success color theming and improved component styling
-9. **Role-Based Security**: Enhanced access control and loading states
+1. **Scroll-Linked Animation**: Navbar scroll progress indicator with gradient bar (December 12, 2025)
+2. **Complaints System**: Complete rebranding from "Reviews" to "Complaints" with new functionality (December 10, 2025)
+3. **InfiniteSlider Component**: Seamless scrolling image display for firm logos (December 12, 2025)
+4. **Point Evaluation System (PTI)**: Complete scoring system for firm assessment with calculation and storage (December 7-11, 2025)
+5. **ScrollToTop Component**: Automatic scroll to top on route changes (December 11, 2025)
+6. **AnimatedNumber Component**: Dynamic number display with animations (December 8, 2025)
+7. **3D Model Integration**: GLB format 3D models on landing page (December 7, 2025)
+8. **Blog Management System**: Complete CRUD system with database-backed firm reviews (November 28, 2024)
+9. **Component Modularization**: Broke down blog pages into reusable components (BlogHero, BlogIntroduction, etc.)
+10. **Toast Notifications**: Integrated sonner Toaster for user feedback
+11. **Modern Data Fetching**: Migration to TanStack Query + Axios
+12. **UI Consistency**: Success color theming and improved component styling
+13. **Role-Based Security**: Enhanced access control and loading states
 
 ---
 
@@ -835,8 +882,8 @@ npm start
 ### Completed Features ✅
 - **Admin Dashboard**: Full admin panel with role-based sidebar navigation
 - **Firm Management**: 8-step form with draft system, publish/unpublish functionality
-- **Review System**: Complete review submission with enhanced categorization and file uploads (BunnyCDN)
-- **Point Evaluation System**: Comprehensive firm assessment with scoring metrics
+- **Complaints System**: Complete complaint submission system (rebranded from Reviews) with enhanced categorization and file uploads (BunnyCDN)
+- **Point Evaluation System (PTI)**: Comprehensive firm assessment with scoring metrics, calculation, and storage
 - **User Authentication**: Clerk integration with role-based access control
 - **FAQ Management**: Admin panel with categories, public API with Zustand store
 - **Newsletter System**: Enhanced subscription management with form validation and error handling
@@ -845,8 +892,8 @@ npm start
 - **File Uploads**: Cloudinary (firm logos) + BunnyCDN (review attachments)
 - **Public API**: `/api/public/faqs` with category filtering and firm program endpoints
 - **UI Components**: Custom accordion, loading screens, skeleton components with improved styling
-- **Firm Detail Pages**: Dashboard, challenges, reviews with enhanced UI and scroll tracking
-- **Challenge Management**: Programs with detailed drawer interface
+- **Firm Detail Pages**: Dashboard, challenges, complaints with enhanced UI and scroll tracking
+- **Challenge Management**: Programs with detailed drawer interface, trading rules, and tooltips
 - **Blog System**: Complete database-backed blog management system with inline editing
 - **Blog Components**: Modular, reusable components for blog rendering (BlogHero, BlogIntroduction, etc.)
 - **Content Builder**: Inline editing system with section-specific editors
@@ -855,8 +902,89 @@ npm start
 - **Toast Notifications**: sonner Toaster for user feedback and notifications
 - **Data Fetching**: Modern data fetching with TanStack Query and Axios integration
 - **UI Theming**: Consistent success color scheme across all components
+- **Scroll-Linked Animation**: Navbar scroll progress indicator with gradient bar using Framer Motion
+- **InfiniteSlider Component**: Seamless scrolling image display for firm logos and images
+- **ScrollToTop Component**: Automatic scroll to top on route changes
+- **AnimatedNumber Component**: Dynamic number display with animations
+- **3D Model Integration**: GLB format 3D models integrated into landing page
+- **Hidden Scrollbars**: Cross-browser scrollbar hiding for cleaner UI
+- **Firm Program Configuration**: Complete CRM system for firm program creation with profit/payout settings
 
-### Recently Added Features 🆕 (November 27-28, 2024)
+### Recently Added Features 🆕 (December 7-12, 2025)
+- **Analytics Error Handling**: Enhanced error handling for analytics API
+  - Detailed error messages for missing Google Analytics environment variables
+  - Specific error messages for authentication and credential failures
+  - Permission error handling with appropriate HTTP status codes
+  - Dashboard component extracts and displays actual error messages from API responses
+  - Improved debugging experience with clear error context
+- **Scroll-Linked Animation**: Navbar scroll progress indicator
+  - Framer Motion integration with `useScroll` hook and `scrollYProgress`
+  - Gradient progress bar (3px height) at top of page
+  - Fixed positioning with z-index 51 (above navbar)
+  - Smooth horizontal scaling from 0 to 1 based on scroll position
+- **Hidden Scrollbars**: Cross-browser scrollbar hiding
+  - CSS rules for Chrome, Safari, Opera (webkit-scrollbar)
+  - Firefox (scrollbar-width: none)
+  - IE/Edge (-ms-overflow-style: none)
+  - Applied to both html and body elements
+- **InfiniteSlider Component**: Seamless scrolling image display
+  - Reusable component for infinite horizontal scrolling
+  - Integrated into TrustedFirmSlider for firm logos
+  - Type-safe with SliderImage interface
+  - Directional control (left/right)
+- **Complaints System**: Complete rebranding from "Reviews" to "Complaints"
+  - Updated terminology across all components and pages
+  - New complaint icon and visual representation
+  - Updated navigation links and routes
+  - Enhanced complaint submission form with redirect after submission
+  - Success modal with dialog header for user feedback
+- **Point Evaluation System (PTI)**: Comprehensive scoring system
+  - PTI score calculation and storage
+  - Admin APIs for point evaluation
+  - UI components for displaying evaluation metrics
+  - Integration with firm assessment workflow
+- **ScrollToTop Component**: Automatic scroll management
+  - Scrolls to top on route changes
+  - Improved BlogDetailPage scroll position calculation
+  - Enhanced navigation experience
+- **AnimatedNumber Component**: Dynamic number display
+  - Animated number transitions
+  - Used for statistics and metrics display
+- **3D Model Integration**: Enhanced landing page
+  - GLB format 3D models (replaced GLTF)
+  - Enhanced 3D canvas integration
+  - Updated statistics display
+- **Enhanced ChallengesContent**: Improved challenge details
+  - Detailed trading rules display
+  - Tooltips for user guidance
+  - Better layout and loading states
+- **FirmHeader Enhancements**: Improved firm information display
+  - formatPayout function for better payout value display
+  - Enhanced UI consistency
+- **Firm Program Configuration**: Complete CRM system
+  - Firm program creation and configuration
+  - Profit/payout settings
+  - Trading rules configuration
+  - Evaluation steps management
+- **AnimatedSection Improvements**: Customizable animation thresholds
+  - Threshold prop for animation triggering control
+  - Better animation control in BlogIntroduction and BlogOverview
+  - Mobile Table of Contents with body scroll lock
+- **Blog Navigation Enhancements**: Improved user interaction
+  - Direct navigation to individual blog posts via useRouter
+  - Enhanced cursor styling for clickable elements
+  - Better user feedback on interactions
+- **TrustedFirmSlider Updates**: Enhanced firm display
+  - Added new firms: Funding Pips, 5%ers, Alpha Capital
+  - Updated links and logos
+  - Improved layout and padding
+  - Reduced logo size for better alignment
+- **FirstSection Updates**: Improved landing page hero
+  - Changed "Verified Brokers" to "Verified Propfirms"
+  - Adjusted maximum width for better responsiveness
+  - Enhanced text styling with tracking-tight
+
+### Previously Added Features 🆕 (November 27-28, 2024)
 - **Complete Blog Management System**: Database-backed firm review system with full CRUD operations
   - MongoDB FirmReview model with comprehensive schema
   - Admin API endpoints for blog management
@@ -952,13 +1080,43 @@ npm start
 
 ---
 
-**Last Updated**: November 28, 2024 - Updated based on recent Git commits including complete blog management system, component modularization, toast notifications, and database-backed firm reviews
-**Version**: 1.4.0
+**Last Updated**: December 12, 2025 - Updated based on recent Git commits (Dec 7-12, 2025) including analytics error handling improvements, role-based access control enhancements, scroll-linked animation, complaints system rebranding, InfiniteSlider component, PTI point evaluation system, ScrollToTop component, AnimatedNumber component, 3D model integration, and various UI/UX enhancements
+**Version**: 1.5.0
 **Maintainer**: Development Team
 
 ## 🎨 Recent UI/UX Improvements
 
-### Enhanced Components
+### Enhanced Components (December 2025)
+- **Scroll Progress Indicator**: Gradient progress bar in navbar showing scroll position
+  - Framer Motion scroll-linked animation
+  - 3px height gradient bar (orange to dark brown)
+  - Fixed at top of page with proper z-index
+- **InfiniteSlider**: Seamless horizontal scrolling for images
+  - Used in TrustedFirmSlider for firm logos
+  - Smooth infinite loop animation
+  - Type-safe implementation
+- **ScrollToTop**: Automatic scroll management on route changes
+  - Improves navigation experience
+  - Better scroll position calculation
+- **AnimatedNumber**: Dynamic number display with animations
+  - Used for statistics and metrics
+  - Smooth number transitions
+- **Hidden Scrollbars**: Cleaner UI with hidden default scrollbars
+  - Cross-browser support
+  - Maintains scroll functionality
+- **Complaint Icons**: New SVG icons for complaints functionality
+- **Enhanced ChallengesContent**: 
+  - Detailed trading rules with tooltips
+  - Better layout and loading states
+  - Improved skeleton display
+- **FirmHeader Improvements**: 
+  - formatPayout function for better value display
+  - Enhanced UI consistency
+- **3D Model Integration**: GLB format 3D models on landing page
+  - Enhanced 3D canvas integration
+  - Better performance with GLB format
+
+### Enhanced Components (Previous)
 - **Challenge Details Drawer**: Clean, card-based layout with key metrics
 - **Table Skeletons**: Professional loading states for data tables
 - **Verification Badges**: Visual indicators for firm transparency (CEO verified, office verified, etc.)

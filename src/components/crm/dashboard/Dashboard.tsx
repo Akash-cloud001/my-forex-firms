@@ -76,7 +76,9 @@ function Dashboard() {
         // Fetch overview analytics
         const overviewRes = await fetch('/api/analytics/overview');
         if (!overviewRes.ok) {
-          throw new Error('Failed to fetch overview analytics');
+          const errorData = await overviewRes.json().catch(() => ({}));
+          const errorMessage = errorData.error || `Failed to fetch overview analytics (${overviewRes.status})`;
+          throw new Error(errorMessage);
         }
         const overviewData = await overviewRes.json();
         setAnalytics(overviewData);
@@ -84,7 +86,9 @@ function Dashboard() {
         // Fetch top pages
         const topPagesRes = await fetch('/api/analytics/top-pages?limit=10');
         if (!topPagesRes.ok) {
-          throw new Error('Failed to fetch top pages');
+          const errorData = await topPagesRes.json().catch(() => ({}));
+          const errorMessage = errorData.error || `Failed to fetch top pages (${topPagesRes.status})`;
+          throw new Error(errorMessage);
         }
         const topPagesData = await topPagesRes.json();
         setTopPages(topPagesData.topPages || []);

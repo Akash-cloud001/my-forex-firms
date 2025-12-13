@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useFirmProgramList } from '@/hooks/queries/useFirmProgramList'
@@ -8,6 +8,19 @@ import { useParams } from 'next/navigation'
 import { IProgram } from '@/models/FirmProgram'
 import Image from 'next/image'
 import { ArrowRight, Infinity, Info } from 'lucide-react'
+import mongoose from 'mongoose'
+
+// Extended program interface to include optional leverage field
+interface IProgramWithLeverage extends IProgram {
+  leverage?: string
+  stopLossRequired?: boolean
+  eaAllowed?: boolean
+  weekendHolding?: boolean
+  overnightHolding?: boolean
+  newsTrading?: boolean
+  copyTrading?: boolean
+  refundFee?: boolean
+}
 import {
   Dialog,
   DialogContent,
@@ -20,25 +33,12 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 
-interface GroupedProgram {
-  type: string
-  programs: IProgram[]
-  name: string // First program's name for this type
-  accountSizes: Array<{ size: number; price: number }>
-  profitTargets: Array<{ phase: number; target: string }>
-  profitSplit: string
-  maxDrawDown: string
-  dailyDrawDown: string
-  drawDownStep: string
-  minTradingDays: number
-}
-
 const ChallengesContent = () => {
   const params = useParams()
   const slug = params.slug as string
   const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false)
-  const [selectedStepType, setSelectedStepType] = useState<string | null>(null)
-  // Track selected account size for each group (keyed by group type)
+  const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null)
+  // Track selected account size for each program (keyed by program ID)
   const [selectedAccountSizes, setSelectedAccountSizes] = useState<Record<string, number>>({})
 
   const { data: programsData, isLoading: isLoadingPrograms } = useFirmProgramList({
@@ -91,79 +91,32 @@ const ChallengesContent = () => {
     }).format(value)
   }
 
-  // Group programs by type and aggregate data
-  const groupedPrograms = useMemo(() => {
-    if (!programsData?.programs || programsData.programs.length === 0) {
-      return []
+  // Helper function to format percentage values
+  const formatPercentage = (value: string | undefined | null): string => {
+    if (!value || value === '-') return '-'
+    // Remove any existing % and add it back
+    const numericValue = value.replace('%', '').trim()
+    if (!numericValue) return '-'
+    return `${numericValue}%`
+  }
+
+  // Helper function to format profit split
+  const formatProfitSplit = (value: string | undefined | null): string => {
+    if (!value || value === '-') return '-'
+    if (value.includes('%')) return value
+    return `${value}%`
+  }
+
+  // Get leverage from program or firm data
+  const getProgramLeverage = (program: IProgram): string | null => {
+    // First try to get leverage from program itself
+    const programWithLeverage = program as IProgramWithLeverage
+    if (programWithLeverage.leverage) {
+      return programWithLeverage.leverage
     }
-
-    const groups = new Map<string, GroupedProgram>()
-
-    programsData.programs.forEach((program) => {
-      const type = program.type || 'Unknown'
-      
-      if (!groups.has(type)) {
-        // Get first program's evaluation step data
-        const firstStep = program.evaluationSteps && program.evaluationSteps.length > 0 
-          ? program.evaluationSteps[0] 
-          : null
-
-        // Format profit split - add % if not present
-        let profitSplit = program.profitSplit || '-'
-        if (profitSplit !== '-' && !profitSplit.includes('%')) {
-          profitSplit = `${profitSplit}%`
-        }
-
-        groups.set(type, {
-          type,
-          programs: [],
-          name: program.name || 'Challenge',
-          accountSizes: [],
-          profitTargets: [],
-          profitSplit,
-          maxDrawDown: firstStep?.maxLoss ? `${firstStep.maxLoss}%` : '-',
-          dailyDrawDown: firstStep?.dailyLoss ? `${firstStep.dailyLoss}%` : '-',
-          drawDownStep: firstStep?.maxLossType || program.drawdownResetType || '-',
-          minTradingDays: firstStep?.minTradingDays || 0
-        })
-      }
-
-      const group = groups.get(type)!
-      group.programs.push(program)
-
-      // Aggregate account sizes (collect unique sizes with their prices)
-      program.accountSizes.forEach(({ size, price }) => {
-        const existing = group.accountSizes.find(s => s.size === size)
-        if (!existing) {
-          group.accountSizes.push({ size, price })
-        }
-      })
-
-      // Extract profit targets from evaluation steps
-      if (program.evaluationSteps && program.evaluationSteps.length > 0) {
-        program.evaluationSteps.forEach((step) => {
-          const existing = group.profitTargets.find(p => p.phase === step.stepNumber)
-          if (!existing) {
-            group.profitTargets.push({
-              phase: step.stepNumber,
-              target: step.profitTarget
-            })
-          }
-        })
-      }
-    })
-
-    // Sort account sizes by size
-    groups.forEach((group) => {
-      group.accountSizes.sort((a, b) => a.size - b.size)
-      group.profitTargets.sort((a, b) => a.phase - b.phase)
-    })
-
-    return Array.from(groups.values())
-  }, [programsData?.programs])
-
-  const getLeverageForStepType = (stepType: string): Array<{ asset: string; leverage: string }> => {
-    if (!firmData?.trading?.leverageMatrix) return []
+    
+    // Fallback to firm data leverage matrix
+    if (!firmData?.trading?.leverageMatrix) return null
 
     const leverageEntries: Array<{ asset: string; leverage: string }> = []
     
@@ -171,7 +124,7 @@ const ChallengesContent = () => {
       if (stepTypes && typeof stepTypes === 'object') {
         // Try to match step type (handle case variations)
         const stepTypeKey = Object.keys(stepTypes).find(
-          key => key.toLowerCase() === stepType.toLowerCase()
+          key => key.toLowerCase() === program.type.toLowerCase()
         )
         if (stepTypeKey && stepTypes[stepTypeKey as keyof typeof stepTypes]) {
           leverageEntries.push({
@@ -182,7 +135,8 @@ const ChallengesContent = () => {
       }
     })
 
-    return leverageEntries
+    // Return first leverage entry or null
+    return leverageEntries.length > 0 ? leverageEntries[0].leverage : null
   }
 
   const isLoading = isLoadingPrograms || isLoadingFirm
@@ -204,7 +158,7 @@ const ChallengesContent = () => {
     )
   }
 
-  if (!groupedPrograms || groupedPrograms.length === 0) {
+  if (!programsData?.programs || programsData.programs.length === 0) {
     return (
       <div className="w-full border border-border p-8 rounded-lg card-custom-grad">
         <p className="text-center text-foreground">No challenge programs found</p>
@@ -212,25 +166,39 @@ const ChallengesContent = () => {
     )
   }
 
+  // Sort account sizes for each program
+  const sortedPrograms = programsData.programs.map(program => {
+    const sortedAccountSizes = [...program.accountSizes].sort((a, b) => a.size - b.size)
+    return {
+      ...program.toObject ? program.toObject() : program,
+      accountSizes: sortedAccountSizes
+    } as IProgram
+  })
+
   return (
     <div className="max-w-7xl w-full mx-auto mt-8">
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-8 justify-items-center">
-        {groupedPrograms.map((group) => {
-          const leverageData = getLeverageForStepType(group.type)
+        {sortedPrograms.map((program) => {
+          const firstStep = program.evaluationSteps && program.evaluationSteps.length > 0 
+            ? program.evaluationSteps[0] 
+            : null
+          
+          const programLeverage = getProgramLeverage(program)
           const platforms = firmData?.trading?.tradingPlatforms || []
+          const programId = (program._id as mongoose.Types.ObjectId).toString()
 
           return (
             <div
-              key={group.type}
+              key={programId}
               className="w-full sm:w-[600px] rounded-lg overflow-hidden border border-primary/50 bg-secondary/5 relative pb-8"
             >
               {/* Header Section - Orange Background */}
               <div className="bg-primary p-5 flex items-center justify-between flex-wrap gap-0 sm:gap-3 h-auto sm:h-16">
                 <p className="text-white font-normal text-xs sm:text-sm">
-                  Challenge Name: <span className="font-semibold">{group.name}</span>
+                  Challenge Name: <span className="font-semibold">{program.name || 'Challenge'}</span>
                 </p>
                 <p className="text-white font-normal text-xs sm:text-sm ">
-                  Type: <span className="font-semibold">{group.type.toUpperCase().replace('-', ' ')}</span>
+                  Type: <span className="font-semibold">{(program.type || 'Unknown').toUpperCase().replace('-', ' ')}</span>
                 </p>
               </div>
 
@@ -242,11 +210,11 @@ const ChallengesContent = () => {
                   {/* Mobile: Select dropdown */}
                   <div className="sm:hidden">
                     <Select
-                      value={selectedAccountSizes[group.type]?.toString() || group.accountSizes[0]?.size.toString() || ''}
+                      value={selectedAccountSizes[programId]?.toString() || program.accountSizes[0]?.size.toString() || ''}
                       onValueChange={(value) => {
                         setSelectedAccountSizes(prev => ({
                           ...prev,
-                          [group.type]: parseInt(value)
+                          [programId]: parseInt(value)
                         }))
                       }}
                     >
@@ -254,7 +222,7 @@ const ChallengesContent = () => {
                         <SelectValue placeholder="Select size" />
                       </SelectTrigger>
                       <SelectContent>
-                        {group.accountSizes.map(({ size }, idx) => (
+                        {program.accountSizes.map(({ size }, idx) => (
                           <SelectItem key={idx} value={size.toString()}>
                             {formatCurrency(size)}
                           </SelectItem>
@@ -264,7 +232,7 @@ const ChallengesContent = () => {
                   </div>
                   {/* Desktop: List of sizes */}
                   <div className="hidden sm:flex flex-wrap gap-2 items-end justify-end">
-                    {group.accountSizes.map(({ size }, idx) => (
+                    {program.accountSizes.map(({ size }, idx) => (
                       <span
                         key={idx}
                         className="w-16 py-1.5 text-xs sm:text-sm text-success flex items-center justify-center rounded-md bg-success/10 border border-success/20 font-semibold font-inter  "
@@ -281,8 +249,8 @@ const ChallengesContent = () => {
                   {/* Mobile: Show selected size's fee */}
                   <div className="sm:hidden">
                     {(() => {
-                      const selectedSize = selectedAccountSizes[group.type] || group.accountSizes[0]?.size
-                      const selectedSizeObj = group.accountSizes.find(s => s.size === selectedSize)
+                      const selectedSize = selectedAccountSizes[programId] || program.accountSizes[0]?.size
+                      const selectedSizeObj = program.accountSizes.find(s => s.size === selectedSize)
                       return selectedSizeObj ? (
                         <span className="w-16 py-1.5 text-xs text-secondary flex items-center justify-center rounded-md bg-white/10 border border-white/20 font-semibold font-inter">
                           {formatPrice(selectedSizeObj.price)}
@@ -292,7 +260,7 @@ const ChallengesContent = () => {
                   </div>
                   {/* Desktop: List of all fees */}
                   <div className="hidden sm:flex flex-wrap gap-2 items-end justify-end">
-                    {group.accountSizes.map(({ price }, idx) => (
+                    {program.accountSizes.map(({ price }, idx) => (
                       <span
                         key={idx}
                         className="w-16 py-1.5 text-xs text-secondary flex items-center justify-center rounded-md bg-white/10 border border-white/20 font-semibold font-inter  "
@@ -304,16 +272,16 @@ const ChallengesContent = () => {
                 </div>
 
                 {/* Profit Targets */}
-                {group.profitTargets.length > 0 && (
+                {program.evaluationSteps && program.evaluationSteps.length > 0 && (
                   <div className="flex justify-between items-start">
                     <p className="text-xs sm:text-sm font-medium text-secondary/80">Profit Targets:</p>
                     <div className="flex flex-wrap gap-2 items-end justify-end">
-                      {group.profitTargets.map((target, idx) => (
+                      {program.evaluationSteps.map((step, idx) => (
                         <span
                           key={idx}
                           className="px-4 py-1.5 text-xs text-secondary flex items-center justify-center rounded-md bg-white/10 border border-white/20 font-semibold font-inter  "
                         >
-                          Phase {target.phase} - {target.target.split('%')[0]}%
+                          Phase {step.stepNumber} - {formatPercentage(step.profitTarget).replace('%', '')}%
                         </span>
                       ))}
                     </div>
@@ -325,7 +293,7 @@ const ChallengesContent = () => {
                   <p className="text-xs sm:text-sm font-medium text-secondary/80">Profit Split:</p>
                   <div className="flex flex-wrap gap-2 items-end justify-end">
                     <span className="px-4 py-1.5 text-xs text-secondary flex items-center justify-center rounded-md bg-white/10 border border-white/20 font-semibold font-inter  ">
-                      {group.profitSplit}
+                      {formatProfitSplit(program.profitSplit)}
                     </span>
                   </div>
                 </div>
@@ -360,18 +328,13 @@ const ChallengesContent = () => {
                 )}
 
                 {/* Leverage */}
-                {leverageData.length > 0 && (
+                {programLeverage && (
                   <div className="flex justify-between items-start gap-4">
                     <p className="text-xs sm:text-sm font-medium text-secondary/80">Leverage:</p>
                     <div className="flex flex-wrap gap-2 items-end justify-end">
-                      {leverageData.map((item, idx) => (
-                        <span
-                          key={idx}
-                          className="px-4 py-1.5 text-xs text-secondary flex items-center justify-center rounded-md bg-white/10 border border-white/20 font-semibold font-inter  "
-                        >
-                          {item.asset} | {item.leverage}
-                        </span>
-                      ))}
+                      <span className="px-4 py-1.5 text-xs text-secondary flex items-center justify-center rounded-md bg-white/10 border border-white/20 font-semibold font-inter  ">
+                        {programLeverage}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -379,26 +342,32 @@ const ChallengesContent = () => {
                 {/* Max Draw Down */}
                 <div className="flex justify-between items-center">
                   <p className="text-xs sm:text-sm font-medium text-secondary/80">Max Draw Down:</p>
-                  <p className="text-xs sm:text-sm text-white font-medium text-right">{group.maxDrawDown.endsWith('%') ? group.maxDrawDown.split('%')[0] + '%' : group.maxDrawDown}</p>
+                  <p className="text-xs sm:text-sm text-white font-medium text-right">
+                    {formatPercentage(firstStep?.maxLoss)}
+                  </p>
                 </div>
 
                 {/* Daily Draw Down */}
                 <div className="flex justify-between items-center">
                   <p className="text-xs sm:text-sm font-medium text-secondary/80">Daily Draw Down:</p>
-                  <p className="text-xs sm:text-sm text-white font-medium text-right">{group.dailyDrawDown.endsWith('%') ? group.dailyDrawDown.split('%')[0] + '%' : group.dailyDrawDown}</p>
+                  <p className="text-xs sm:text-sm text-white font-medium text-right">
+                    {formatPercentage(firstStep?.dailyLoss)}
+                  </p>
                 </div>
 
                 {/* Draw Down Step */}
                 <div className="flex justify-between items-center">
-                  <p className="text-xs sm:text-sm font-medium text-secondary/80">Draw Down Step:</p>
-                  <p className="text-xs sm:text-sm text-white font-medium text-right">{group.drawDownStep.endsWith('%') ? group.drawDownStep.split('%')[0] : group.drawDownStep}</p>
+                  <p className="text-xs sm:text-sm font-medium text-secondary/80">Draw Down Type:</p>
+                  <p className="text-xs sm:text-sm text-white font-medium text-right">
+                    {firstStep?.maxLossType || program.drawdownResetType || '-'}
+                  </p>
                 </div>
 
                 {/* Min Trading Days */}
-                {group.minTradingDays > 0 && (
+                {firstStep?.minTradingDays && firstStep.minTradingDays > 0 && (
                   <div className="flex justify-between items-center">
                     <p className="text-xs sm:text-sm font-medium text-secondary/80">Min Trading Days:</p>
-                    <p className="text-xs sm:text-sm text-white font-medium text-right">{group.minTradingDays}</p>
+                    <p className="text-xs sm:text-sm text-white font-medium text-right">{firstStep.minTradingDays}</p>
                   </div>
                 )}
 
@@ -406,7 +375,7 @@ const ChallengesContent = () => {
                 <div className="absolute bottom-5 right-5">
                   <button
                     onClick={() => {
-                      setSelectedStepType(group.type)
+                      setSelectedProgramId(programId)
                       setIsFeaturesModalOpen(true)
                     }}
                     className="text-[#F66435] text-xs sm:text-sm hover:opacity-80 transition-opacity flex items-center gap-1"
@@ -425,27 +394,15 @@ const ChallengesContent = () => {
         <DialogContent className="max-w-xs sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-sm">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-xl text-primary">
-              Features - {selectedStepType ? selectedStepType.toUpperCase().replace('-', ' ') : ''} Challenge
+              Features - {selectedProgramId && programsData?.programs.find(p => (p._id as mongoose.Types.ObjectId).toString() === selectedProgramId)?.name || ''} Challenge
             </DialogTitle>
           </DialogHeader>
           <div className="py-4 space-y-6">
             {(() => {
-              const selectedGroup = groupedPrograms.find(g => g.type === selectedStepType)
-              if (!selectedGroup || selectedGroup.programs.length === 0) {
-                return <p className="text-foreground/60">No challenge data available.</p>
-              }
+              const program = programsData?.programs.find(p => (p._id as mongoose.Types.ObjectId).toString() === selectedProgramId) as IProgramWithLeverage | undefined
 
-              // Use first program from the group for detailed data
-              const program = selectedGroup.programs[0] as IProgram & {
-                stopLossRequired?: boolean
-                eaAllowed?: boolean
-                weekendHolding?: boolean
-                overnightHolding?: boolean
-                newsTrading?: boolean
-                copyTrading?: boolean
-                refundFee?: boolean
-                leverage?: string
-                minTradingDays?: number
+              if (!program) {
+                return <p className="text-foreground/60">No challenge data available.</p>
               }
 
               return (
@@ -502,10 +459,12 @@ const ChallengesContent = () => {
                   <div>
                     <h3 className="text-base font-semibold text-foreground mb-2">Additional Information</h3>
                     <div className="space-y-2">
-                      {program.leverage && (
+                      {(program.leverage || getProgramLeverage(program)) && (
                         <div className="flex justify-between">
                           <span className="text-sm text-foreground/60 text-left">Leverage:</span>
-                          <span className="text-sm font-medium text-foreground text-right">{program.leverage}</span>
+                          <span className="text-sm font-medium text-foreground text-right">
+                            {program.leverage || getProgramLeverage(program) || '-'}
+                          </span>
                         </div>
                       )}
                       {program.timeLimit && (
@@ -531,19 +490,25 @@ const ChallengesContent = () => {
                       {program.evaluationSteps && program.evaluationSteps.length > 0 && program.evaluationSteps[0]?.profitTarget && (
                         <div className="flex justify-between">
                           <span className="text-sm text-foreground/60 text-left">Profit Target:</span>
-                          <span className="text-sm font-medium text-foreground text-right">{program.evaluationSteps[0].profitTarget.endsWith('%') ? program.evaluationSteps[0].profitTarget.split('%')[0] + '%' : program.evaluationSteps[0].profitTarget}</span>
+                          <span className="text-sm font-medium text-foreground text-right">
+                            {formatPercentage(program.evaluationSteps[0].profitTarget)}
+                          </span>
                         </div>
                       )}
                       {program.evaluationSteps && program.evaluationSteps.length > 0 && program.evaluationSteps[0]?.maxLoss && (
                         <div className="flex justify-between">
                           <span className="text-sm text-foreground/60 text-left">Max Loss:</span>
-                          <span className="text-sm font-medium text-foreground text-right">{program.evaluationSteps[0].maxLoss.endsWith('%') ? program.evaluationSteps[0].maxLoss.split('%')[0] + '%' : program.evaluationSteps[0].maxLoss}</span>
+                          <span className="text-sm font-medium text-foreground text-right">
+                            {formatPercentage(program.evaluationSteps[0].maxLoss)}
+                          </span>
                         </div>
                       )}
                       {program.evaluationSteps && program.evaluationSteps.length > 0 && program.evaluationSteps[0]?.dailyLoss && (
                         <div className="flex justify-between">
                           <span className="text-sm text-foreground/60 text-left">Daily Loss:</span>
-                          <span className="text-sm font-medium text-foreground text-right">{program.evaluationSteps[0].dailyLoss.endsWith('%') ? program.evaluationSteps[0].dailyLoss.split('%')[0] + '%' : program.evaluationSteps[0].dailyLoss}</span>
+                          <span className="text-sm font-medium text-foreground text-right">
+                            {formatPercentage(program.evaluationSteps[0].dailyLoss)}
+                          </span>
                         </div>
                       )}
                     </div>

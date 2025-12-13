@@ -64,9 +64,37 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error('GA top pages error', error);
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to fetch top pages analytics';
+    let statusCode = 500;
+    
+    if (error instanceof Error) {
+      // Check for missing environment variables
+      if (error.message.includes('Missing Google Analytics environment variables') || 
+          error.message.includes('Missing GA4_PROPERTY_ID')) {
+        errorMessage = 'Google Analytics configuration is missing. Please check environment variables.';
+        statusCode = 500;
+      } 
+      // Check for authentication errors
+      else if (error.message.includes('authentication') || error.message.includes('credentials')) {
+        errorMessage = 'Google Analytics authentication failed. Please check credentials.';
+        statusCode = 500;
+      }
+      // Check for permission errors
+      else if (error.message.includes('permission') || error.message.includes('403')) {
+        errorMessage = 'Insufficient permissions to access Google Analytics data.';
+        statusCode = 403;
+      }
+      // For other errors, include the message if it's safe to expose
+      else if (error.message && !error.message.includes('private_key')) {
+        errorMessage = `Analytics error: ${error.message}`;
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to fetch top pages analytics' },
-      { status: 500 },
+      { error: errorMessage },
+      { status: statusCode },
     );
   }
 }

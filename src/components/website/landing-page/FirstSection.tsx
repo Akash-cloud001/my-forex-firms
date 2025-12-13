@@ -96,22 +96,22 @@ function FirstSection() {
       className="relative flex flex-col-reverse md:flex-row justify-center md:justify-evenly items-center min-h-screen px-4 md:px-8 lg:px-0 mt-24 md:mt-0 overflow-hidden"
     >
       {/* LEFT SECTION - TEXT */}
-      <div className="relative z-10 max-w-[320px] sm:max-w-[400px] lg:max-w-[470px] h-auto  w-full">
+      <div className="relative z-10 max-w-[320px] sm:max-w-[420px] lg:max-w-[520px] h-auto  w-full">
         <div className="text-left">
           <h1
-            className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight whitespace-nowrap gradient-text"
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight whitespace-nowrap gradient-text"
             style={gradientTextStyle}
           >
             Transparency,
           </h1>
           <h1
-            className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight whitespace-nowrap w-full gradient-text"
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight whitespace-nowrap w-full gradient-text"
             style={gradientTextStyle}
           >
-            Verified Ratings,
+            Verified Ratings &
           </h1>
           <h1
-            className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-none gradient-text mt-2"
+            className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-none tracking-tight gradient-text mt-2"
             style={gradientTextStyle}
           >
             Traders Trust.
@@ -150,7 +150,7 @@ function FirstSection() {
                 className="font-bold text-base md:text-[20px] leading-[100%]"
               />
               <p className="text-base md:text-[20px] font-light tracking-[-0.05em]">
-                Verified Brokers
+                Verified Propfirms
               </p>
             </div>
           </div>
