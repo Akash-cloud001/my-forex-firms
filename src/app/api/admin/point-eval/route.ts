@@ -62,6 +62,7 @@ export async function POST(req: Request) {
                 hasMT5 ? 0.8 :
                     hasCTrader ? 0.7 : 0.5;
 
+        // console.log("🚀 ~ POST ~ firmId:", firmId)
         const profitTargetPrograms = await Program.aggregate([
             { $match: { propFirmId: new Types.ObjectId(firmId) } },
             {
@@ -147,8 +148,8 @@ export async function POST(req: Request) {
                 : 0.7;
 
 
-        const methods = firm.payments?.payoutMethods?.map(m => m.toLowerCase()) || [];
-        const hasBank = methods.includes("bank") || methods.includes("bank transfer");
+        const methods = firm.payments?.payoutMethods?.map(m => m) || [];
+        const hasBank = methods.includes("bank_transfer");
         const hasCrypto = methods.includes("crypto");
         const hasRise = methods.includes("rise");
 
@@ -160,14 +161,14 @@ export async function POST(req: Request) {
 
         const payoutDenialScore = 1;
 
-        const paymentmethods = firm.payments?.methods?.map(m => m.toLowerCase()) || [];
-        const hasCards = paymentmethods.includes("credit card") || paymentmethods.includes("cards");
+        const paymentmethods = firm.payments?.methods?.map(m => m) || [];
+        const hasCards = paymentmethods.includes("credit_debit_cards")
         const hasPaymentCrypto = paymentmethods.includes("crypto");
-        const hasUPI = paymentmethods.includes("upi");
+        const hasPayPal = paymentmethods.includes("paypal");
 
         let paymentMethodsScore = 0;
-        if (hasCards && hasPaymentCrypto && hasUPI) paymentMethodsScore = 1.0;
-        else if (hasCards && !hasPaymentCrypto && !hasUPI) paymentMethodsScore = 0.6;
+        if (hasCards && hasPaymentCrypto && hasPayPal) paymentMethodsScore = 1.0;
+        else if (hasCards && !hasPaymentCrypto && !hasPayPal) paymentMethodsScore = 0.6;
         else if ((hasCards && !hasPaymentCrypto) || (hasPaymentCrypto && !hasCards)) paymentMethodsScore = 0.8;
 
 

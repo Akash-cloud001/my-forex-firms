@@ -5,12 +5,12 @@ import { CreateUserData, UserRole } from '@/types/user';
 
 export async function POST(req: NextRequest) {
   try {
-    console.log('🔄 [ADMIN-SYNC] Starting single user sync...');
-    
+    // console.log('🔄 [ADMIN-SYNC] Starting single user sync...');
+
     // Check if user is authenticated
     const { userId: currentUserId } = await auth();
     if (!currentUserId) {
-      console.log('❌ [ADMIN-SYNC] Unauthorized - no userId found');
+      // console.log('❌ [ADMIN-SYNC] Unauthorized - no userId found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -18,13 +18,13 @@ export async function POST(req: NextRequest) {
     const clerk = await clerkClient();
     const currentUser = await clerk.users.getUser(currentUserId);
     const isAdmin = currentUser.publicMetadata?.role === 'admin';
-    
+
     if (!isAdmin) {
       console.log('❌ [ADMIN-SYNC] Admin access denied for user:', currentUserId, 'Clerk role:', currentUser.publicMetadata?.role);
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
-    
-    console.log('✅ [ADMIN-SYNC] Admin access verified via Clerk metadata for:', currentUser.emailAddresses[0]?.emailAddress);
+
+    // console.log('✅ [ADMIN-SYNC] Admin access verified via Clerk metadata for:', currentUser.emailAddresses[0]?.emailAddress);
 
     const body = await req.json();
     const { clerkUserId } = body;
@@ -76,15 +76,15 @@ export async function POST(req: NextRequest) {
     // Validate required fields
     if (!createUserData.email) {
       console.log('❌ [ADMIN-SYNC] User has no email address');
-      return NextResponse.json({ 
-        error: 'User has no email address' 
+      return NextResponse.json({
+        error: 'User has no email address'
       }, { status: 400 });
     }
 
     if (!createUserData.firstName) {
       console.log('❌ [ADMIN-SYNC] User has no first name');
-      return NextResponse.json({ 
-        error: 'User has no first name' 
+      return NextResponse.json({
+        error: 'User has no first name'
       }, { status: 400 });
     }
 
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   try {
     console.log('🔄 [ADMIN-SYNC] Starting bulk user sync...');
-    
+
     // Check if user is authenticated and is admin
     const { userId: currentUserId } = await auth();
     if (!currentUserId) {
@@ -121,19 +121,19 @@ export async function GET() {
     const clerk = await clerkClient();
     const currentUser = await clerk.users.getUser(currentUserId);
     const isAdmin = currentUser.publicMetadata?.role === 'admin';
-    
+
     if (!isAdmin) {
       console.log('❌ [ADMIN-SYNC] Admin access denied for user:', currentUserId, 'Clerk role:', currentUser.publicMetadata?.role);
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
-    
+
     console.log('✅ [ADMIN-SYNC] Admin access verified via Clerk metadata for:', currentUser.emailAddresses[0]?.emailAddress);
 
     // Get all Clerk users
     console.log('📥 [ADMIN-SYNC] Fetching all users from Clerk...');
     const clerkUsers = await clerk.users.getUserList();
     console.log('📊 [ADMIN-SYNC] Found', clerkUsers.data.length, 'users in Clerk');
-    
+
     let syncedCount = 0;
     let skippedCount = 0;
     let errorCount = 0;
@@ -142,7 +142,7 @@ export async function GET() {
     for (const clerkUser of clerkUsers.data) {
       try {
         console.log(`\n📝 [ADMIN-SYNC] Processing user: ${clerkUser.emailAddresses[0]?.emailAddress}`);
-        
+
         // Check if user already exists
         const existingUser = await userService.getUserByUserId(clerkUser.id);
         if (existingUser) {

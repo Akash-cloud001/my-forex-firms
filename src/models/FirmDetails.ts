@@ -242,8 +242,32 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
     },
 
     payments: {
-      methods: [String],
-      payoutMethods: [String],
+      methods: [{
+        type: String,
+        enum: [
+          'bank_transfer',
+          'credit_debit_cards',
+          'crypto',
+          'e_wallet',
+          'apple_pay',
+          'google_pay',
+          'upi',
+          'skrill',
+          'paypal',
+          'astro_pay',
+          'other',
+        ],
+      }],
+      payoutMethods: [{
+        type: String,
+        enum: [
+          'bank_transfer',
+          'crypto',
+          'e_wallet',
+          'rise',
+          'other',
+        ],
+      }],
       baseCurrency: String,
       minWithdrawal: String,
       processingTime: {
@@ -272,9 +296,26 @@ const FundingFirmSchema = new Schema<IFundingFirm>(
   }
 );
 
+// Indexes for query optimization
 FundingFirmSchema.index({ "firmDetails.name": 1 });
+FundingFirmSchema.index({ "firmDetails.slug": 1 }, { unique: true, sparse: true });
 FundingFirmSchema.index({ "firmDetails.status": 1 });
+FundingFirmSchema.index({ "firmDetails.yearFounded": -1 });
+FundingFirmSchema.index({ "firmDetails.jurisdiction": 1 });
+FundingFirmSchema.index({ "ratings.trustPilotRating": -1 });
 FundingFirmSchema.index({ createdAt: -1 });
+FundingFirmSchema.index({ updatedAt: -1 });
+
+// Compound indexes for common query patterns
+FundingFirmSchema.index({ "firmDetails.status": 1, "firmDetails.name": 1 });
+FundingFirmSchema.index({ "firmDetails.status": 1, createdAt: -1 });
+
+// Text index for search functionality
+FundingFirmSchema.index({
+  "firmDetails.name": "text",
+  "firmDetails.companyDescription": "text",
+  "firmDetails.jurisdiction": "text"
+});
 
 // Prevent Mongoose OverwriteModelError by deleting the model if it exists
 // This ensures that schema changes are picked up in development

@@ -37,7 +37,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
 }) => {
     const { total: catTotal, maxTotal: catMax } = calculateCategoryScore(pillarId, category.id, category.factors);
     const categoryData = scoresData.scores[pillarId]?.[category.id] || {};
-    console.log("🚀 ~ CategoryItem ~ categoryData:", categoryData)
+    // console.log("🚀 ~ CategoryItem ~ categoryData:", categoryData)
 
     return (
         <div>

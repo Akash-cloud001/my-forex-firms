@@ -47,9 +47,9 @@ export interface IPointEvaluation extends Document {
                 fair_spreads: number;
                 fair_commissions: number;
                 acceptable_slippage: number;
-                multiple_trading_platforms: number;
             };
             trading_freedom: {
+                multiple_trading_platforms: number;
                 profit_targets: number;
                 consistancy_rule: number;
                 news_trading: number;
@@ -130,9 +130,9 @@ const PointEvaluationSchema = new Schema<IPointEvaluation>(
                     fair_spreads: { type: Number, default: 0 },
                     fair_commissions: { type: Number, default: 0 },
                     acceptable_slippage: { type: Number, default: 0 },
-                    multiple_trading_platforms: { type: Number, default: 0 },
                 },
                 trading_freedom: {
+                    multiple_trading_platforms: { type: Number, default: 0 },
                     profit_targets: { type: Number, default: 0 },
                     consistancy_rule: { type: Number, default: 0 },
                     news_trading: { type: Number, default: 0 },

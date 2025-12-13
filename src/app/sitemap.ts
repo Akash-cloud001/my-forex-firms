@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import connectDB from '@/lib/mongodb';
 import FundingFirm from '@/models/FirmDetails';
-import FirmReviewModel from '@/models/FirmReview';
+// import FirmReviewModel from '@/models/FirmReview';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://myforexfirms.com';
@@ -70,20 +70,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     // Fetch all blog slugs
-    const blogs = await FirmReviewModel.find(
-      { slug: { $exists: true, $ne: null } },
-      { slug: 1, updatedAt: 1 }
-    ).lean();
+    // const blogs = await FirmReviewModel.find(
+    //   { slug: { $exists: true, $ne: null } },
+    //   { slug: 1, updatedAt: 1 }
+    // ).lean();
 
-    const blogPages: MetadataRoute.Sitemap = blogs.map((blog) => ({
-      url: `${baseUrl}/blogs/${blog.slug}`,
-      lastModified: blog.updatedAt ? new Date(blog.updatedAt) : new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }));
+    // const blogPages: MetadataRoute.Sitemap = blogs.map((blog) => ({
+    //   url: `${baseUrl}/blogs/${blog.slug}`,
+    //   lastModified: blog.updatedAt ? new Date(blog.updatedAt) : new Date(),
+    //   changeFrequency: 'monthly' as const,
+    //   priority: 0.7,
+    // }));
 
     // Combine all pages
-    return [...staticPages, ...firmPages, ...blogPages];
+    return [...staticPages, ...firmPages];
   } catch (error) {
     console.error('Error generating sitemap:', error);
     // Return at least static pages if database connection fails

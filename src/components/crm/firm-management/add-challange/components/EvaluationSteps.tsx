@@ -1,5 +1,5 @@
 import React from "react";
-import { Control, UseFieldArrayRemove, UseFieldArrayAppend, UseFormRegister, FieldArrayWithId, FieldErrors } from "react-hook-form";
+import { Control, UseFieldArrayRemove, UseFieldArrayAppend, UseFormRegister, FieldArrayWithId, FieldErrors, UseFormSetValue } from "react-hook-form";
 import { Plus, Trash2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,9 +7,17 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ProgramFormData } from "../types";
 
+// Helper: Block % character input
+const blockPercentChar = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === '%') {
+        e.preventDefault();
+    }
+};
+
 interface EvaluationStepsProps {
     control: Control<ProgramFormData>;
     register: UseFormRegister<ProgramFormData>;
+    setValue: UseFormSetValue<ProgramFormData>;
     stepFields: FieldArrayWithId<ProgramFormData, "evaluationSteps", "id">[];
     appendStep: UseFieldArrayAppend<ProgramFormData, "evaluationSteps">;
     removeStep: UseFieldArrayRemove;
@@ -19,6 +27,7 @@ interface EvaluationStepsProps {
 
 export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
     register,
+    setValue,
     stepFields,
     appendStep,
     removeStep,
@@ -40,7 +49,8 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
                             <Label>Profit Target *</Label>
                             <Input
                                 {...register("fundedCriteria.profitTarget")}
-                                placeholder="e.g., 10%"
+                                placeholder="e.g., 10  (in %)"
+                                onKeyDown={blockPercentChar}
                             />
                             {errors.fundedCriteria?.profitTarget && (
                                 <p className="text-sm text-destructive">
@@ -53,7 +63,8 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
                             <Label>Max Loss *</Label>
                             <Input
                                 {...register("fundedCriteria.maxLoss")}
-                                placeholder="e.g., 6%"
+                                placeholder="e.g., 6  (in %)"
+                                onKeyDown={blockPercentChar}
                             />
                             {errors.fundedCriteria?.maxLoss && (
                                 <p className="text-sm text-destructive">
@@ -66,7 +77,8 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
                             <Label>Daily Loss *</Label>
                             <Input
                                 {...register("fundedCriteria.dailyLoss")}
-                                placeholder="e.g., 4%"
+                                placeholder="e.g., 4  (in %)"
+                                onKeyDown={blockPercentChar}
                             />
                             {errors.fundedCriteria?.dailyLoss && (
                                 <p className="text-sm text-destructive">
@@ -95,7 +107,10 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
                             <Label>Max Loss Type *</Label>
                             <Input
                                 {...register("fundedCriteria.maxLossType")}
-                                placeholder="e.g., Static, Trailing"
+                                placeholder="e.g., static, trailing"
+                                onChange={(e) => {
+                                    setValue("fundedCriteria.maxLossType", e.target.value.toLowerCase() as "static" | "trailing");
+                                }}
                             />
                             {errors.fundedCriteria?.maxLossType && (
                                 <p className="text-sm text-destructive">
@@ -185,7 +200,8 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
                                     <Label>Profit Target *</Label>
                                     <Input
                                         {...register(`evaluationSteps.${index}.profitTarget`)}
-                                        placeholder="e.g., 8%"
+                                        placeholder="e.g., 8  (in %)"
+                                        onKeyDown={blockPercentChar}
                                     />
                                     {errors.evaluationSteps?.[index]?.profitTarget && (
                                         <p className="text-sm text-destructive">
@@ -198,7 +214,8 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
                                     <Label>Max Loss *</Label>
                                     <Input
                                         {...register(`evaluationSteps.${index}.maxLoss`)}
-                                        placeholder="e.g., 6%"
+                                        placeholder="e.g., 6  (in %)"
+                                        onKeyDown={blockPercentChar}
                                     />
                                     {errors.evaluationSteps?.[index]?.maxLoss && (
                                         <p className="text-sm text-destructive">
@@ -211,7 +228,8 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
                                     <Label>Daily Loss *</Label>
                                     <Input
                                         {...register(`evaluationSteps.${index}.dailyLoss`)}
-                                        placeholder="e.g., 4%"
+                                        placeholder="e.g., 4  (in %)"
+                                        onKeyDown={blockPercentChar}
                                     />
                                     {errors.evaluationSteps?.[index]?.dailyLoss && (
                                         <p className="text-sm text-destructive">
@@ -241,7 +259,10 @@ export const EvaluationSteps: React.FC<EvaluationStepsProps> = ({
                                     <Label>Max Loss Type *</Label>
                                     <Input
                                         {...register(`evaluationSteps.${index}.maxLossType`)}
-                                        placeholder="e.g., Static, Trailing"
+                                        placeholder="e.g., static, trailing"
+                                        onChange={(e) => {
+                                            setValue(`evaluationSteps.${index}.maxLossType`, e.target.value.toLowerCase() as "static" | "trailing");
+                                        }}
                                     />
                                     {errors.evaluationSteps?.[index]?.maxLossType && (
                                         <p className="text-sm text-destructive">
